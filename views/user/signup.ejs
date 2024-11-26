@@ -9,114 +9,9 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Keania+One&display=swap"
         rel="stylesheet">
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #000;
-            font-family: 'Roboto', sans-serif;
-        }
 
-        .container {
-            background-color: #2b0000;
-            padding: 40px;
-            border-radius: 20px;
-            width: 500px;
-            text-align: center;
-            color: #fff;
-        }
-
-        .container h1 {
-            font-size: 48px;
-            margin-bottom: 20px;
-            font-family: "Keania One", sans-serif;
-            font-weight: 400;
-            font-style: normal;
-        }
-
-        .container h2 {
-            font-size: 24px;
-            margin-bottom: 20px;
-            font-weight: 400;
-            font-style: normal;
-            color: #ffffffdd;
-        }
-
-        .form-group {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 15px;
-        }
-
-        .form-group input {
-            width: 48%;
-            padding: 10px;
-            border: none;
-            border-bottom: 1px solid #fff;
-            background: none;
-            color: #fff;
-            font-size: 16px;
-        }
-
-        .form-group input::placeholder {
-            color: #ffffff8e;
-        }
-
-        .form-group.full-width input {
-            width: 100%;
-        }
-
-        .btn {
-            background-color: #ff0000;
-            color: #fff;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            cursor: pointer;
-            margin-top: 20px;
-        }
-
-        .google-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: #fff;
-            color: #000;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            cursor: pointer;
-            margin-top: 18px;
-            margin-left: 140px;
-        }
-
-        .google-btn img {
-            width: 20px;
-            height: 20px;
-            margin-right: 10px;
-        }
-
-        .login-link {
-            margin-top: 20px;
-            display: block;
-            color: #fff;
-            text-decoration: none;
-        }
-
-        .error-message {
-            color: #ff0000;
-            font-size: 14px;
-            margin-top: 5px;
-            text-align: left;
-            margin-left: -200px;
-        }
-    </style>
+    <link rel="stylesheet" href="/css/signup.css">  <!--Signup Style -->
+    
 </head>
 
 <body>
@@ -127,6 +22,10 @@
         <h2>
             SIGN UP
         </h2>
+
+        <% if(message) { %>
+            <div class="backend-message"><%= message %></div>
+        <% } %>
 
         <form method="post" action="/signup">
             <div class="form-group full-width">

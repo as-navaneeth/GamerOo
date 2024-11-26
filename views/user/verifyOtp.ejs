@@ -1,0 +1,138 @@
+<html>
+<head>
+    <title>OTP Verification</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="/css/verify-otp.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Keania+One&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
+
+</head>
+<body>
+    <div class="container">
+        <h1>GamerOo</h1>
+        <div class="otp-box">
+            <h3>Email Verification</h3>
+            <form id="otpForm"   onsubmit="return ValidateOTPForm()">
+                <label for="otp">Enter OTP:</label>
+                <input type="text" id="otp" name="otp" required maxlength="6" pattern="\d*">
+                <button type="submit">Verify Email</button>
+                <div class="otp-timer">
+                    <span id="timerValue">60</span>
+                </div>
+                <button type="button" onclick="resendOTP()" class="btn-secondary">Resend OTP</button>
+
+                <% if (locals.message && message.length > 0) { %>
+                    <div class="alert alert-danger"><%= message %></div>
+                    <% } %>
+    
+            </form>
+            <div class="text-muted">
+                Already verified? <a href="/login">Login now</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+   
+
+    <script>
+        document.getElementById("otp").focus();
+    
+        let timer = 30;
+        let timerInterval;
+    
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                timer--;
+                document.getElementById("timerValue").textContent = timer;
+                if (timer <= 0) {
+                    clearInterval(timerInterval);
+                    document.getElementById("timerValue").classList.add("expired");
+                    document.getElementById("timerValue").textContent = "Expired";
+                    document.getElementById("otp").disabled = true;
+                }
+            }, 1000);
+        }
+        startTimer();
+
+
+        function ValidateOTPForm(){
+            const otpInput=document.getElementById("otp").value;
+            $.ajax({
+                type:"POST",
+                url:"verifyOtp",
+                data:{otp:otpInput},
+                success:function (response){
+                    if(response.success){
+                        Swal.fire({
+                            icon:"success",
+                            title:"OTP Verified Sucessfully",
+                            showConfirmButton:false,
+                            timer:1500,
+
+                        }).then(()=>{
+                            window.location.href=response.redirectUrl;
+                        })
+                    }else{
+                        Swal.fire({
+                            icon:"error",
+                            title:"Error",
+                            text:response.message, 
+                            confirmButtonText:"Try Again",  //check after
+                        })
+                    }
+                },
+                error:function(){
+                    Swal.fire({
+                        icon:"error",
+                        title:"Invalid OTP",
+                        text:"Please try again"
+                    })
+                }
+            })
+            return false;
+        }
+    
+
+        function resendOTP(){
+            clearInterval(timerInterval);
+            timer=30;
+            document.getElementById("otp").disabled=false;
+            // document.getElementById("timervalue").classList.remove("expired");
+            document.getElementById("timerValue").classList.remove("expired");
+
+
+            $.ajax({
+                type:"POST",
+                url:"resendOtp",
+                success:function(response){
+                    if(response.success){
+                        Swal.fire({
+                            icon:"success",
+                            title:"OTP Resend Successfully",
+                            showConfirmButton:false,
+                            timer:1500,
+                        }).then(()=>{
+                            startTimer();
+                        })
+                    }else{
+                        Swal.fire({
+                            icon:"error",
+                            title:"Error",
+                            text:"An error occured while resending OTP. Please try again",
+                        })
+                    }
+                }
+            })
+            return false;
+        }
+
+
+    </script>
+    
+</body>
+</html>
