@@ -108,3 +108,14 @@
             margin-left: -200px;
         }
   
+
+        .buttonClass{
+           position: relative;
+        }
+
+        .buttonLogo img{
+            position:absolute;
+            left: 228px;
+            top:65px;
+            border-radius: 10px;
+        }
