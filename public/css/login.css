@@ -1,0 +1,185 @@
+body {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #1a1a1a;
+    font-family: 'Roboto', sans-serif;
+}
+
+.login-container {
+    background-color: #2b0000;
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    text-align: center;
+    width: 90%; /* Adjust width to fit smaller screens */
+    max-width: 400px; /* Keep a max width for larger screens */
+}
+
+.login-container h1 {
+    color: white;
+    font-size: 36px; /* Adjust font size for responsiveness */
+    margin-bottom: 20px;
+    font-family: "Keania One", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+}
+
+.login-container h2 {
+    color: white;
+    font-size: 20px; /* Adjust font size for responsiveness */
+    margin-bottom: 20px;
+    font-weight: 400;
+}
+
+.login-container input[type="email"],
+.login-container input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: none;
+    border-bottom: 1px solid #ccc;
+    background: none;
+    color: white;
+    font-size: 16px;
+    outline: none;
+}
+
+.login-container input[type="email"]::placeholder,
+.login-container input[type="password"]::placeholder {
+    color: #ccc;
+    outline: none;
+}
+
+.login-container .login-btn {
+    background-color: red;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 20px;
+}
+
+.login-container .login-btn:hover {
+    background-color: darkred;
+}
+
+.login-container .google-btn {
+    background-color: #4285F4;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-container .google-btn i {
+    margin-right: 10px;
+}
+
+.login-container .google-btn:hover {
+    background-color: #357ae8;
+}
+
+.login-container a {
+    color: #ccc;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.login-container a:hover {
+    text-decoration: underline;
+}
+
+.login-container .forgot-password {
+    margin-top: 10px;
+}
+
+.login-container .create-account {
+    margin-top: 20px;
+}
+
+.buttonClass {
+    position: relative;
+}
+
+.buttonLogo img {
+    position: absolute;
+    left: 90%; /* Adjust placement for smaller screens */
+    top: 19px;
+    left:381px;
+    transform: translateX(-50%);
+    border-radius: 10px;
+    max-width: 40px; /* Ensure the image doesn't overflow */
+}
+
+
+
+.otherLogin {
+    position: relative;
+    bottom: 30px;
+    left: 103px;
+    color:#c2bdbd
+    
+}
+
+/* Media Queries for Responsive Design */
+@media (max-width: 768px) {
+    .login-container {
+        padding: 20px; /* Reduce padding for smaller screens */
+    }
+
+    .login-container h1 {
+        font-size: 28px; /* Smaller font size for smaller screens */
+    }
+
+    .login-container h2 {
+        font-size: 18px; /* Smaller font size for smaller screens */
+    }
+
+    .login-container input[type="email"],
+    .login-container input[type="password"] {
+        font-size: 14px; /* Adjust input font size */
+    }
+
+    .buttonLogo img {
+        left: 85%; /* Adjust Google logo position */
+        max-width: 35px; /* Reduce size for smaller screens */
+    }
+
+    .login-container .login-btn,
+    .login-container .google-btn {
+        font-size: 14px; /* Reduce button font size */
+        padding: 8px 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .login-container h1 {
+        font-size: 24px; /* Further reduce font size for very small screens */
+    }
+
+    .login-container h2 {
+        font-size: 16px;
+    }
+
+    .login-container .forgot-password,
+    .login-container .create-account {
+        font-size: 12px; /* Adjust link size for readability */
+    }
+
+    .buttonLogo img {
+        left: 80%; /* Adjust further for very small screens */
+        max-width: 30px;
+    }
+}
