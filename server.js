@@ -11,9 +11,6 @@ const db=require('./config/db');
 db()
 
 
-
-
-
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
 

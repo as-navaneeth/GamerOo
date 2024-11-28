@@ -168,8 +168,13 @@ const verifyOtp = async (req, res) => {
 
             })
             await saveUserData.save();
-            req.session.user = saveUserData._id;
-            res.json({ success: true, redirectUrl: "/" })
+            // req.session.user = saveUserData._id;
+
+            req.session.userOtp=null;
+            req.session.userData=null;
+
+            res.json({ success: true, redirectUrl: "/login" })
+
         } else {
             res.status(400).json({ success: false, message: "Invalid OTP, Please try again" })
         }
