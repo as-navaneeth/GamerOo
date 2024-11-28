@@ -16,9 +16,10 @@ router.get("/auth/google",passport.authenticate('google',{scope:['profile','emai
 router.get("/auth/google/callback",passport.authenticate('google',{failureRedirect:'/signup'}),(req,res)=>{
     res.redirect('/')
 });
-//User login
+//User login and logout
 router.get("/login",userController.loadLogin);
 router.post("/login",userController.login);
+router.get("/logout",userController.logout);
 
 
 

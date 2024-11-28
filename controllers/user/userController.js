@@ -13,15 +13,64 @@ const pageNotFound = async (req, res) => {
 }
 
 
+// const loadHomePage = async (req, res) => {
+//     try {
+//             const user=req.session.user;
+//             if(user){
+//                 const userData=await User.findOne({_id:user._id});
+//                 res.render("home",{user:userData})
+//             }else{
+//                 return res.render('home');
+//             }
+
+        
+
+//     } catch (error) {
+//         console.log("Home page not found");
+//         res.status(500).send("Server error");
+//     }
+// }
+
+
+
 const loadHomePage = async (req, res) => {
     try {
-        return res.render("home");
-
+        const userId = req.session.user; // This should store the user ID
+        if (userId) {
+            const userData = await User.findOne({ _id: userId });
+            if (userData) {
+                return res.render("home", { user: userData }); // Pass user data to the template
+            }
+        }
+        // Render the home page without user data
+        res.render("home");
     } catch (error) {
-        console.log("Home page not found");
+        console.log("Home page not found:", error);
         res.status(500).send("Server error");
     }
+};
+
+//logout
+
+const logout=async(req,res)=>{
+    try {
+        req.session.destroy((err)=>{
+            if(err){
+                console.log("Session destruction error",err.message);
+                return res.redirect("/pageNotFound");
+            }
+            return res.redirect("/login")
+        })
+
+    } catch (error) {
+        console.log("Logout Error",error)
+        res.redirect("/PageNotFound")
 }
+}
+
+
+
+
 
 
 const loadSignup = async (req, res) => {
@@ -230,4 +279,5 @@ module.exports = {
     resendOtp,
     loadLogin,
     login,
+    logout
 }

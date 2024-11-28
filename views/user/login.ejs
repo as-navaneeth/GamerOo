@@ -12,6 +12,8 @@
         rel="stylesheet">
 
     <link rel="stylesheet" href="/css/login.css">
+
+
 </head>
 
 
@@ -24,9 +26,16 @@
         <h2>
             LOGIN
         </h2>
-        <form action="/login"  method="post">
+        <form action="/login" method="post">
             <input placeholder="Enter Email" name="email" type="email" />
             <input placeholder="Enter Password" type="password" name="password" />
+
+           <% if(locals.message && message.length>0){ %>
+                <div class="alert alert-danger text-center" style="color:red">
+                    <%=message%>
+                </div>
+           <% } %> 
+
             <div class="buttonClass">
                 <button type="submit" class="login-btn">
                     Login
