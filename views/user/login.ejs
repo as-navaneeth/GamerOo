@@ -27,23 +27,30 @@
             LOGIN
         </h2>
         <form action="/login" method="post">
-            <input placeholder="Enter Email" name="email" type="email" />
-            <input placeholder="Enter Password" type="password" name="password" />
+            <div class="form-group full-width">
+                <input placeholder="Enter Email" name="email" type="email" id="email" />
+                <div id="emailError" class="error-message"></div>
+            </div>
+            <div class="form-group full-width">
+                <input placeholder="Enter Password" type="password" name="password" id="password" />
+                <div id="passwordError" class="error-message"></div>
+            </div>
 
-           <% if(locals.message && message.length>0){ %>
+            <% if(locals.message && locals.message.length>0){ %>
                 <div class="alert alert-danger text-center" style="color:red">
                     <%=message%>
                 </div>
-           <% } %> 
+                <% } %>
 
-            <div class="buttonClass">
-                <button type="submit" class="login-btn">
-                    Login
-                </button>
-                <a href="#" class="buttonLogo">
-                    <img src="/img/googlesignup.png" alt="googlelogo" height="40" width="40">
+                    <div class="buttonClass">
+                        <button type="submit" class="login-btn">
+                            Login
+                        </button>
+                        <a href="#" class="buttonLogo">
+                            <img src="/img/googlesignup.png" alt="googlelogo" height="40" width="40">
 
-                </a>
+                        </a>
+
         </form>
     </div>
 
@@ -56,11 +63,43 @@
         </a>
     </div>
     <div class="create-account">
-        <a href="#">
+        <a href="signup">
             Don't have an account? Create an account
         </a>
     </div>
     </div>
+
+    <script>
+        document.querySelector("form").addEventListener("submit", function (e) {
+            let isValid = true;
+
+
+            document.querySelectorAll(".error-message").forEach(el => el.textContent = "");
+
+            const email = document.getElementById("email").value.trim();
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+            if (email === "") {
+                document.getElementById("emailError").innerText = "Email is required";
+                isValid = false;
+            } else if (!emailRegex.test(email)) {
+                document.getElementById("emailError").innerText = "Invalid email address";
+                isValid = false;
+            }
+
+            const password = document.getElementById("password").value.trim();
+            if (password === "") {
+                document.getElementById("passwordError").innerText = "Password is required";
+                isValid = false;
+            }
+
+
+            if (!isValid) {
+                e.preventDefault();
+            }
+        });
+
+    </script>
 </body>
 
 </html>
