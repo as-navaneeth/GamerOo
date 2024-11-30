@@ -26,7 +26,7 @@
         <h2>
             LOGIN
         </h2>
-        <form action="/login" method="post">
+        <form action="/login" method="post" id="loginForm">
             <div class="form-group full-width">
                 <input placeholder="Enter Email" name="email" type="email" id="email" />
                 <div id="emailError" class="error-message"></div>
@@ -69,7 +69,66 @@
     </div>
     </div>
 
+   
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
+
     <script>
+
+    const loginForm = document.getElementById("loginForm");
+
+    loginForm.addEventListener("submit", async (event) => {
+        event.preventDefault(); // Prevent default form submission
+
+        // Get form data
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
+
+        try {
+            // Send login request to backend
+            const response = await fetch("/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ email, password }),
+            });
+
+            if (response.ok) {
+                // Success case
+                Swal.fire({
+                    icon: "success",
+                    title: "Logged In!",
+                    text: "Welcome back! Redirecting...",
+                    timer: 2000,
+                    showConfirmButton: false,
+                });
+
+                // Redirect after delay
+                setTimeout(() => {
+                    window.location.href = "/";
+                }, 2000);
+            } else {
+                // Handle errors returned from backend
+                const errorData = await response.json(); // Parse error response
+                Swal.fire({
+                    icon: "error",
+                    title: "Login Failed",
+                    text: errorData.message, // Display the backend message
+                });
+            }
+        } catch (error) {
+            // Catch any unexpected errors
+            console.error("Fetch Error:", error);
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: "Something went wrong. Please try again later.",
+            });
+        }
+    });
+</script>
+    <script>
+        
         document.querySelector("form").addEventListener("submit", function (e) {
             let isValid = true;
 

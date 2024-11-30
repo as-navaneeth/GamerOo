@@ -225,35 +225,43 @@ const loadLogin = async (req, res) => {
             res.redirect("/")
         }
     } catch (error) {
-        res.redirect("/pageNotFound")
+        // res.redirect("/pageNotFound")
+        console.log(error)
+        return res.status(500).json({success:false})
     }
 }
 
-const login = async (req, res) => {
-    try {
-        const { email, password } = req.body;   
-        const findUser = await User.findOne({ isAdmin: 0, email: email });
+    const login = async (req, res) => {
+      
 
-        if (!findUser) {
-            return res.render("login", { message: "User not found" })
+        try {
+            const { email, password } = req.body; 
+           
+            const findUser = await User.findOne({ isAdmin: 0, email: email });
+
+            if (!findUser) {
+            
+                return res.status(400).json({message:"User is not found"})
+            }
+            if (findUser.isBlocked) {
+                return res.status(400).json({message:"User is blocked by admin"})
+
+            }
+
+            const passwordMatch = await bcrypt.compare(password, findUser.password);
+
+            if(!passwordMatch){
+                return res.status(400).json({message:"Password do not matc"})
+
+            }
+            req.session.user=findUser._id;
+            res.redirect("/")
+
+        } catch (error) {
+            console.log("Login Error",error);
+    
         }
-        if (findUser.isBlocked) {
-            return res.render("login", { message: "User is blocked by admin" });
-        }
-
-        const passwordMatch = await bcrypt.compare(password, findUser.password);
-
-        if(!passwordMatch){
-            return res.render("login",{message:"Incorrect Password"})
-        }
-        req.session.user=findUser._id;
-        res.redirect("/")
-
-    } catch (error) {
-        console.log("Login Error",error);
-        res.render("login",{message:"Login failed, Please try again later"})
     }
-}
 
 
 

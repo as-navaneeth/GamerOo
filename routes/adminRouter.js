@@ -5,9 +5,9 @@ const {userAuth,adminAuth}=require("../middlewares/auth")
 
 
 
+router.get("/",adminAuth,adminController.loadDashboard)
 router.get("/login",adminController.loadLogin);
 router.post("/login",adminController.login);
-router.get("/",adminAuth,adminController.loadDashboard)
 router.get("/pageerror",adminController.pageerror);
 router.get("/logout", adminController.logout)
 
