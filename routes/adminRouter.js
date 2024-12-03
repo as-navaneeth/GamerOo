@@ -13,6 +13,8 @@ router.get("/pageerror",adminController.pageerror);
 router.get("/logout", adminController.logout);
 
 router.get('/customer',adminAuth,customerController.userList);
+
+//block and unblock user
 router.post('/unblock/:userId',adminAuth,customerController.unblockUser);
 router.post('/block/:userId',adminAuth,customerController.blockUser);
 

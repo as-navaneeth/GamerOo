@@ -4,15 +4,25 @@ const User = require('../../models/userSchema')
 
 const userList = async (req,res)=>{
     try {
+        const page = parseInt(req.query.page) || 1; // Current page number, default to 1
+        const limit = parseInt(req.query.limit) || 5; // Items per page, default to 10
+        const skip = (page - 1) * limit;
+    
+        // Fetch users with pagination
         const users = await User.find()
-        // console.log('______________________', users)
-
-    if(!users){
-        return res.status(404).send('users not found')
-    }
-    res.render('customer',{
-        users
-    })
+          .skip(skip)
+          .limit(limit);
+    
+        // Count total users to calculate the total number of pages
+        const totalUsers = await User.countDocuments();
+    
+        // Send data to the frontend
+        res.render('customer', {
+          users,
+          currentPage: page,
+          totalPages: Math.ceil(totalUsers / limit),
+          limit,
+        });
     } catch (error) {
         console.log(error)
 return res.status(500).send('server error')
