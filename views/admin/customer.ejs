@@ -1,0 +1,191 @@
+<%- include("../../views/partials/admin/header") %>
+
+<!-- Main content -->
+<div class="container-fluid">
+  <div class="row justify-content-center">
+    <div class="col-12 grid-margin">
+      <div class="card">
+        <div class="card-body text-center">
+          <h4 class="card-title">User Status</h4>
+          <div class="table-responsive">
+            <table class="table text-center">
+              <thead>
+                <tr>
+                  <th>
+                    <div class="form-check form-check-muted m-0">
+                      <label class="form-check-label">
+                        <input type="checkbox" class="form-check-input">
+                      </label>
+                    </div>
+                  </th>
+                  <th> Name </th>
+                  <th> Email </th>
+                  <th> Phone </th>
+                  <th> Action </th>
+                </tr>
+              </thead>
+              <tbody>
+                <% users.forEach(user => { %>
+                  <tr>
+                    <td>
+                      <div class="form-check form-check-muted m-0">
+                        <label class="form-check-label">
+                          <input type="checkbox" class="form-check-input">
+                        </label>
+                      </div>
+                    </td>
+                    <td> <%= user.name %> </td>
+                    <td> <%= user.email %> </td>
+                    <td> <%= user.phone %> </td>
+                    <td>
+                      <% if (user.isBlocked) { %>
+                        <button class="btn btn-success unblock-btn" id="unblock-btn" onclick="unblockUser('<%= user.id %>')">Unblock</button>
+                      <% } else { %>
+                        <button class="btn btn-danger block-btn" id="block-btn" onclick="blockUser('<%= user.id %>')">Block</button>
+                      <% } %>
+                    </td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Styles for full page height and responsiveness -->
+<style>
+  /* Make the content area fill the page, accounting for navbar and sidebar */
+  .container-fluid {
+    min-height: 100vh; /* Take up full viewport height */
+    padding-top: 20px; /* Adjust padding to avoid overlap with navbar */
+  }
+
+  /* Adjust table and cards for responsiveness */
+  .table-responsive {
+    max-height: 900px;  /*Set max height for the table, scrollable if necessary */
+    overflow-y: auto; /* Add vertical scroll if the table overflows */
+  }
+
+  .card-body {
+    padding: 20px; /* Space inside the card */
+  }
+
+  /* Center the title */
+  .card-title {
+    text-align: center;
+  }
+
+  /* Make sure the table is responsive on smaller screens */
+  .table {
+    width: 100%; /* Ensure the table takes full width of the container */
+  }
+
+  /* Mobile responsiveness */
+  @media (max-width: 768px) {
+    .table th, .table td {
+      font-size: 12px; /* Make text smaller on small screens */
+    }
+
+    .table-responsive {
+      padding: 10px; /* Add padding around the table on small screens */
+    }
+  }
+</style>
+
+
+<script>
+ 
+ function unblockUser(userId){
+  Swal.fire({
+    title:"Are you Sure?",
+    text:"Do you want to unblock the user",
+    icon:'warning',
+    showCancelButton:true,
+    confirmButtonText:"Yes, Unblock",
+    cancelButtonText:"Cancel",
+  }).then((result)=>{
+    if(result.isConfirmed){
+      fetch(`/admin/unblock/${userId}`,{
+        method:'POST',
+        headers: { 'Content-Type': 'application/json' },
+      })
+      .then((response)=>{
+         return response.json()
+      })
+      .then((data)=>{
+        if(data.success){
+            Swal.fire(
+              'Unblocked!',
+              data.message,
+              'Success'
+            );
+            
+        }else{
+          Swal.fire(
+            'Error!',
+             data.message,
+              'error'
+          );
+        }
+      })
+      .catch(error=>{
+        Swal.fire(
+          'Error!',
+            'There was an error with the request. Please try againfdfdfdfdfd.',
+            'error'
+        );
+      });
+    }
+  })
+ }
+
+
+
+ function blockUser(userId) {
+    // Show SweetAlert confirmation popup
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "You are about to block this user.",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, block!',
+      cancelButtonText: 'Cancel',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Send AJAX request to block the user
+        fetch(`/admin/block/${userId}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            Swal.fire(
+              'Blocked!',
+              data.message,
+              'success'
+            );
+            // Optionally, update the UI as needed
+          } else {
+            Swal.fire(
+              'Error!',
+               data.message,
+              'error'
+            );
+          }
+        })
+        .catch(error => {
+          Swal.fire(
+            'Error!',
+            'There was an error with the request. Please try again.',
+            'error'
+          );
+        });
+      }
+    });
+  }
+
+</script>

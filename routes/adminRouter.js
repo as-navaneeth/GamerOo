@@ -12,9 +12,9 @@ router.post("/login",adminController.login);
 router.get("/pageerror",adminController.pageerror);
 router.get("/logout", adminController.logout);
 
-//Customer management
-router.get("/users",adminAuth,customerController.customerInfo)
-
+router.get('/customer',adminAuth,customerController.userList);
+router.post('/unblock/:userId',adminAuth,customerController.unblockUser);
+router.post('/block/:userId',adminAuth,customerController.blockUser);
 
 
 

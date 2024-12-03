@@ -1,45 +1,61 @@
-const User=require("../../models/userSchema");
+const User = require('../../models/userSchema')
 
-const customerInfo=async (req,res)=>{
+
+
+const userList = async (req,res)=>{
     try {
-        let search="";
-        if(req.query.search){
-            search=req.query.search;
-        }
-        let page=1;
-        if(req.query.page){
-            page=req.query.page
-        }
-        //find data form db, there are two things to find using name and email
-        const limit=3
-        const userData=await User.find({
-            isAdmin:false,
-            $or:[
-                {name:{$regex:".*"+search+".*"}},
-                {email:{$regex:".*"+search+".*"}},
-            ],
-        })
-        .limit(limit*1)
-        .skip((page-1)*limit)
-        .exec();
+        const users = await User.find()
+        // console.log('______________________', users)
 
-        const count=await User.find({
-            isAdmin:false,
-            $or:[
-                {name:{$regex:".*"+search+".*"}},
-                {email:{$regex:".*"+search+".*"}},
-            ],
-        }).countDocuments();
-
-        res.render('customers')
-
+    if(!users){
+        return res.status(404).send('users not found')
+    }
+    res.render('customer',{
+        users
+    })
     } catch (error) {
+        console.log(error)
+return res.status(500).send('server error')
         
     }
 }
 
+//unblock user
 
-module.exports={
-    customerInfo,
+const unblockUser=async(req,res)=>{
+    try {
+        const userId=req.params.userId;
 
+        // const user=await User.findById(userId);
+
+        await User.updateOne({_id:userId},{$set:{isBlocked:false}})
+        
+         return res.status(200).json({success:true,message:"User Unblocked Successful"});
+        
+
+    } catch (error) {
+        res.status(500).json({success:false,message:"Internal server error"});
+    }
+}
+
+const blockUser=async(req,res)=>{
+    try {
+        const userId=req.params.userId;
+
+        // const user=await User.findById(userId);
+
+        await User.updateOne({_id:userId},{$set:{isBlocked:true}})
+        
+         return res.status(200).json({ success: true,message:"User blocked Successful"});
+
+    } catch (error) {
+        res.status(500).json({ success: false,message:"Internal server error"});
+    }
+}
+
+
+module.exports = {
+    userList,
+    unblockUser,
+    blockUser
 }
