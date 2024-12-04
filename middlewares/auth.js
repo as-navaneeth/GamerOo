@@ -21,18 +21,25 @@ const userAuth =(req,res,next)=>{
 
 
 const adminAuth=(req,res,next)=>{
-    User.findOne({isAdmin:true})
-    .then(data=>{
-        if(data){
-            next();
-        }else{
-            res.redirect("/admin/login")
-        }
-    })
-    .catch(error=>{
-        console.log("Error in Admimauth middliware",error);
-        res.status(500).send("Internal Server error")
-    })
+
+    if(req.session.admin){
+        res.set('Cache-Control','no-store,no-cache,must-revalidate,private');
+
+        User.findOne({_id:req.session.admin,isAdmin:true})
+        .then((admin)=>{
+            if(admin){
+                next();
+            }else{
+                res.redirect('/admin/login');
+            }
+        })
+        .catch((error)=>{
+            console.log('Error in adminAuth',error);
+            res.status(500).send("Internal Server Error")
+    });
+    }else{
+        res.redirect("/admin/login");
+    }
 }
 
 

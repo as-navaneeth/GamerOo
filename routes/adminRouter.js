@@ -19,8 +19,9 @@ router.get('/customer',adminAuth,customerController.userList);
 router.post('/unblock/:userId',adminAuth,customerController.unblockUser);
 router.post('/block/:userId',adminAuth,customerController.blockUser);
 
-//category
+//category management routes
 router.get("/category",adminAuth,categoryController.getCategory);
+router.post("/category/add",adminAuth,categoryController.addCategory);
 
 
 module.exports=router;

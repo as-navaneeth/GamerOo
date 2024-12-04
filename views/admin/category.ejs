@@ -1,14 +1,117 @@
 <%- include("../../views/partials/admin/header") %>
 
+
+
+<!-- Styles for full page height and responsiveness -->
+<style>
+  /* Make the content area fill the page, accounting for navbar and sidebar */
+  .container-fluid {
+    min-height: 100vh; /* Take up full viewport height */
+    padding-top: 20px; /* Adjust padding to avoid overlap with navbar */
+  }
+
+  /* Adjust table and cards for responsiveness */
+  .table-responsive {
+    max-height: 900px;  /*Set max height for the table, scrollable if necessary */
+    overflow-y: auto; /* Add vertical scroll if the table overflows */
+  }
+
+  .card-body {
+    padding: 20px; /* Space inside the card */
+  }
+
+  /* Center the title */
+  .card-title {
+    text-align: center;
+  }
+
+  /* Make sure the table is responsive on smaller screens */
+  .table {
+    width: 100%; /* Ensure the table takes full width of the container */
+  }
+
+  /* Mobile responsiveness */
+  @media (max-width: 768px) {
+    .table th, .table td {
+      font-size: 12px; /* Make text smaller on small screens */
+    }
+
+    .table-responsive {
+      padding: 10px; /* Add padding around the table on small screens */
+    }
+  }
+
+  .modal-content {
+      border-radius: 10px;
+  }
+
+  .modal-header, .modal-footer {
+      border: none;
+  }
+
+  .form-control {
+      border-radius: 5px;
+  }
+
+  .move-left {
+    margin-right: 20px; /* Adjust this value to control the leftward shift */
+  }
+
+  /* Ensure responsiveness on smaller screens */
+  @media (max-width: 768px) {
+    .move-left {
+      margin-right: 10px; /* Smaller margin on smaller screens */
+    }
+  }
+  
+</style>
+
+
 <!-- Main content -->
  
 <div class="main-panel">
+
+  <div class="d-flex justify-content-between m-1">
+    <h4 class="card-title">Category</h4>
+    <button type="button" class="btn btn-primary  move-left" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
+        Add Category
+    </button>
+</div>
+
+<!-- Add Category Modal -->
+<div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addCategoryModalLabel">Add New Category</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">X</button>
+            </div>
+            <form id="addCategoryForm" action="/category/add" method="POST">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="categoryName" class="form-label">Category Name</label>
+                        <input type="text" class="form-control" id="categoryName" name="name" placeholder="Enter category name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="categoryDescription" class="form-label">Category Description</label>
+                        <textarea class="form-control" id="categoryDescription" name="description" rows="3" placeholder="Enter category description" required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
   
     <div class="row justify-content-center">
       <div class="col-12 grid-margin">
         <div class="card">
           <div class="card-body text-center">
-            <h4 class="card-title">Category</h4>
+
             
               <table class="table text-center">
                 <thead>
@@ -21,12 +124,28 @@
                       </div>
                     </th>
                     <th> Name </th>
-                    <th> Email </th>
-                    <th> Phone </th>
-                    <th> Action </th>
+                    <th> Description </th>
+                    <th> Listed </th>
+                    <th> Offer </th>
                   </tr>
                 </thead>
-                
+                <tbody> <!--Getting the categories detials-->
+                  <% if(categories && categories.length >0) { %>
+                    <% categories.forEach((category,index)=>{ %>
+                      <tr>
+                        <td><%=index+1 %></td>
+                        <td><%=category.name %></td>
+                        <td><%=category.description %></td>
+                        <td><%=category.isListed ? "Yes": "No" %></td>
+                        <td><%=category.offer || "N/A" %></td>
+                      </tr>
+                 <%   }) %>
+
+                 <% }else{ %>
+                  <tr>
+                    <td colspan="5">No Categories Found</td>
+                  </tr>
+                <% } %>
                 </tbody>
               </table>
            
@@ -41,45 +160,56 @@
     </div>
   </div>
   
-  <!-- Styles for full page height and responsiveness -->
-  <style>
-    /* Make the content area fill the page, accounting for navbar and sidebar */
-    .container-fluid {
-      min-height: 100vh; /* Take up full viewport height */
-      padding-top: 20px; /* Adjust padding to avoid overlap with navbar */
+  
+  
+  <script>
+
+    document.getElementById("addCategoryForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const name = document.getElementById("categoryName").value;
+    const description = document.getElementById("categoryDescription").value;
+
+    try {
+        const response = await fetch("/admin/category/add", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name, description }),
+          });
+
+          const result = await response.json();
+          console.log(result)
+        if (response.ok) {
+            Swal.fire({
+              title:'Success!',
+              text:`${result.message}`,
+              icon:'success',
+              confirmButtonText:'OK'
+            })
+            .then(()=>{
+              window.location.reload();
+            })
+             // Reload to fetch new data
+        } else {
+            Swal.fire({
+              title:'Error!',
+              text:`${result.message}`,
+              icon:'error',
+              confirmButtonText:'OK'
+            });
+        }
+    } catch (error) {
+        console.error("Error adding category:", error);
+        Swal.fire({
+          title:'Error!',
+          text:'An Error Occured',
+          icon:'error',
+          confirmButtonText:'OK'
+        })
     }
-  
-    /* Adjust table and cards for responsiveness */
-    .table-responsive {
-      max-height: 900px;  /*Set max height for the table, scrollable if necessary */
-      overflow-y: auto; /* Add vertical scroll if the table overflows */
-    }
-  
-    .card-body {
-      padding: 20px; /* Space inside the card */
-    }
-  
-    /* Center the title */
-    .card-title {
-      text-align: center;
-    }
-  
-    /* Make sure the table is responsive on smaller screens */
-    .table {
-      width: 100%; /* Ensure the table takes full width of the container */
-    }
-  
-    /* Mobile responsiveness */
-    @media (max-width: 768px) {
-      .table th, .table td {
-        font-size: 12px; /* Make text smaller on small screens */
-      }
-  
-      .table-responsive {
-        padding: 10px; /* Add padding around the table on small screens */
-      }
-    }
-  
-    
-  </style>
+});
+
+  </script>
+ 
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
   
