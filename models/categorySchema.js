@@ -9,7 +9,6 @@ const categorySchema=new mongoose.Schema({
     },
     description:{
         type:String,
-        required:true
     },
     isListed:{
         type:Boolean,
@@ -19,12 +18,7 @@ const categorySchema=new mongoose.Schema({
         type:Number,
         default:0
     },
-    createdAt:{
-        type:{
-            type:Date,
-            default:Date.now
-        }
-    }
+    
 })
 
 

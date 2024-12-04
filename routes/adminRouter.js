@@ -2,6 +2,7 @@ const express=require("express");
 const router=express.Router();
 const adminController=require("../controllers/admin/adminController");
 const customerController=require("../controllers/admin/customerController");
+const categoryController=require("../controllers/admin/categoryController")
 const {userAuth,adminAuth}=require("../middlewares/auth")
 
 
@@ -18,6 +19,8 @@ router.get('/customer',adminAuth,customerController.userList);
 router.post('/unblock/:userId',adminAuth,customerController.unblockUser);
 router.post('/block/:userId',adminAuth,customerController.blockUser);
 
+//category
+router.get("/category",adminAuth,categoryController.getCategory);
 
 
 module.exports=router;
