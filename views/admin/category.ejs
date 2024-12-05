@@ -106,6 +106,40 @@
     </div>
 </div>
 
+
+
+<!-- Edit Category Modal -->
+<div class="modal fade" id="editCategoryModal" tabindex="-1" aria-labelledby="editCategoryModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editCategoryModalLabel">Edit Category</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">X</button>
+      </div>
+      <form id="editCategoryForm"  >
+        <div class="modal-body">
+          <input type="hidden" id="editCategoryId" name="id" />
+          <div class="mb-3">
+            <label for="editCategoryName" class="form-label">Category Name</label>
+            <input type="text" class="form-control" id="editCategoryName" name="name" required />
+          </div>
+          <div class="mb-3">
+            <label for="editCategoryDescription" class="form-label">Category Description</label>
+            <textarea class="form-control" id="editCategoryDescription" name="description" rows="3" required></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+
+
   
     <div class="row justify-content-center">
       <div class="col-12 grid-margin">
@@ -138,6 +172,19 @@
                         <td><%=category.description %></td>
                         <td><%=category.isListed ? "Yes": "No" %></td>
                         <td><%=category.offer || "N/A" %></td>
+
+                        <!-- Adding the edit button-->
+                        <td>
+                          <button class="btn btn-warning edit-btn"
+                          data-bs-toggle="modal"
+                          data-bs-target="#editCategoryModal"
+                          data-id="<%=category._id%>"
+                          data-name="<%=category.name%>"
+                          data-description="<%=category.description%>"
+                          
+                          >Edit</button>
+                        </td>
+
                       </tr>
                  <%   }) %>
 
@@ -208,6 +255,72 @@
         })
     }
 });
+
+
+
+//Edit Category 
+
+document.addEventListener("DOMContentLoaded",()=>{//Ensure that the script runs only after the entire HTML doc is fully loaded and parsed without this may interact with other elements
+  //Attach event listener to all edit buttons
+   document.querySelectorAll(".edit-btn").forEach((button)=>{
+    button.addEventListener("click",(e)=>{
+
+      //get category data from button attributes
+      const id=button.getAttribute("data-id");
+      const name=button.getAttribute("data-name");
+      const description=button.getAttribute("data-description");
+
+      //populate modal fields means filling input fields
+      document.getElementById("editCategoryId").value=id;
+      document.getElementById("editCategoryName").value=name;
+      document.getElementById("editCategoryDescription").value=description;
+    });
+   });
+
+  //Handle from submission
+   document.getElementById("editCategoryForm").addEventListener("submit",async(e)=>{
+    e.preventDefault();
+
+    const id=document.getElementById("editCategoryId").value;
+    const name=document.getElementById("editCategoryName").value;
+    const description=document.getElementById("editCategoryDescription").value;
+
+    try {
+      const response=await fetch(`/admin/category/edit/${id}`,{
+        method:"PUT",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({name,description}),
+      });
+
+      const result=await response.json();
+      if(response.ok){
+        Swal.fire({
+          title:'Success!',
+          text:`${result.message}`,
+          icon:'success',
+          confirmButtonText:'OK'
+        }).then(()=>{
+          window.location.reload(); //reload page to fetch updated data
+        });
+      }else{
+        Swal.fire({
+          title:'Error!',
+          text:`${result.message}`,
+          icon:'error',
+          confirmButtonText:'OK'
+        });
+      }
+    } catch (error) {
+      console.error("Error editing category:",error);
+      Swal.fire({
+        titel:'Error!',
+        text:'An Error Occured',
+        icon:'error',
+        confirmButtonText:'OK'
+      });
+    }
+   });
+});     
 
   </script>
  

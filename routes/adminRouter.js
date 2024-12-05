@@ -22,6 +22,7 @@ router.post('/block/:userId',adminAuth,customerController.blockUser);
 //category management routes
 router.get("/category",adminAuth,categoryController.getCategory);
 router.post("/category/add",adminAuth,categoryController.addCategory);
+router.put("/category/edit/:id",adminAuth,categoryController.editCategory);
 
 
 module.exports=router;
