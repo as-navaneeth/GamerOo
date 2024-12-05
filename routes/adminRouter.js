@@ -3,6 +3,7 @@ const router=express.Router();
 const adminController=require("../controllers/admin/adminController");
 const customerController=require("../controllers/admin/customerController");
 const categoryController=require("../controllers/admin/categoryController")
+const productController=require("../controllers/admin/productController");
 const {userAuth,adminAuth}=require("../middlewares/auth")
 
 
@@ -24,5 +25,8 @@ router.get("/category",adminAuth,categoryController.getCategory);
 router.post("/category/add",adminAuth,categoryController.addCategory);
 router.put("/category/edit/:id",adminAuth,categoryController.editCategory);
 
+
+//product managemnet routes
+router.get("/products",adminAuth,productController.getProduct);
 
 module.exports=router;
