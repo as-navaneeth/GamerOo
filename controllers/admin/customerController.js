@@ -9,12 +9,12 @@ const userList = async (req,res)=>{
         const skip = (page - 1) * limit;
     
         // Fetch users with pagination
-        const users = await User.find()
+        const users = await User.find({isAdmin:false})
           .skip(skip)
           .limit(limit);
     
         // Count total users to calculate the total number of pages
-        const totalUsers = await User.countDocuments();
+        const totalUsers = await User.countDocuments({isAdmin:false});
     
         // Send data to the frontend
         res.render('customer', {

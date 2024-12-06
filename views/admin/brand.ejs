@@ -1,0 +1,237 @@
+<%- include("../../views/partials/admin/header") %>
+
+
+    <style>
+        /* General container styling */
+        .container {
+            width: 90%;
+            margin: 20px auto;
+            font-family: Arial, sans-serif;
+            border: 1px solid #383a3c;
+            border-radius: 10px;
+            padding: 20px;
+            background-color: #191c24;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Header styling */
+        h1 {
+            font-size: 24px;
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        /* Form container */
+        .form-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        /* Label styling */
+        label {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 5px;
+        }
+
+        /* Input fields styling */
+        input[type="text"],
+        input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        /* Button styling */
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            color: #fff;
+            font-size: 14px;
+        }
+
+        button#addBrand {
+            background-color: #0090e7;
+        }
+
+        button#addBrand:hover {
+            background-color: #0381cff8;
+        }
+
+        /* Table styling */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table th,
+        table td {
+            padding: 10px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+
+        table th {
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        table td {
+            font-size: 14px;
+            color: #555;
+        }
+
+        /* Status label styling */
+        .status-label {
+            display: inline-block;
+            padding: 5px 10px;
+            font-size: 12px;
+            border-radius: 3px;
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .status-label.blocked {
+            background-color: #dc3545;
+        }
+
+        .status-label.active {
+            background-color: #28a745;
+        }
+
+        /* Action buttons */
+        .action-buttons button {
+            margin-right: 10px;
+            padding: 5px 15px;
+            border: none;
+            border-radius: 5px;
+            color: #fff;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        button.block {
+            background-color: #dc3545;
+        }
+
+        button.block:hover {
+            background-color: #c82333;
+        }
+
+        button.unblock {
+            background-color: #28a745;
+        }
+
+        button.unblock:hover {
+            background-color: #218838;
+        }
+
+        button.delete {
+            background-color: #6c757d;
+        }
+
+        button.delete:hover {
+            background-color: #5a6268;
+        }
+
+        /*Search bar */
+        .search-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        #searchBrand {
+            width: 80%;
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        #searchButton {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #searchButton:hover {
+            background-color: #0056b3;
+        }
+    </style>
+
+
+
+
+    <div class="main-panel">
+
+        <div class="container">
+            <h1>Brands</h1>
+
+
+            <!-- Search Bar -->
+            <div class="search-container">
+                <input type="text" id="searchBrand" placeholder="Search for a brand..." />
+                <button id="searchButton">Search</button>
+            </div>
+
+
+
+            <div class="form-container">
+                <label for="brandName">Brand Name</label>
+                <input type="text" id="brandName" placeholder="Type here">
+
+                <label for="brandImage">Brand Image</label>
+                <input type="file" id="brandImage">
+
+                <button id="addBrand">Add Brand</button>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Brand</th>
+                        <th>Logo</th>
+                        <th>Status</th>
+                        <th>Block/Unblock/Delete</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Sample</td>
+                        <td><img src="#" alt="Brand Logo" style="width: 50px;"></td>
+                        <td><span class="status-label blocked">Blocked</span></td>
+                        <td class="action-buttons">
+                            <button class="block">Block</button>
+                            <button class="unblock">Unblock</button>
+                            <button class="delete">Delete</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Sample</td>
+                        <td><img src="#" alt="Brand Logo" style="width: 50px;"></td>
+                        <td><span class="status-label active">Active</span></td>
+                        <td class="action-buttons">
+                            <button class="block">Block</button>
+                            <button class="unblock">Unblock</button>
+                            <button class="delete">Delete</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+
+    </div>
