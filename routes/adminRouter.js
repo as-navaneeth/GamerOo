@@ -1,13 +1,16 @@
 const express=require("express");
 const router=express.Router();
+const multer=require("multer");
 
 const adminController=require("../controllers/admin/adminController");
 const customerController=require("../controllers/admin/customerController");
 const categoryController=require("../controllers/admin/categoryController");
 const productController=require("../controllers/admin/productController");
 const brandController=require("../controllers/admin/brandController");
+const storage=require("../helpers/multer");
+const uploads=multer({storage:storage}); 
 
-const {userAuth,adminAuth}=require("../middlewares/auth")
+const {userAuth,adminAuth}=require("../middlewares/auth");
 
 
 //login management

@@ -1,4 +1,5 @@
 const brand=require("../../models/brandSchema");
+const Product=require("../../models/productSchema");
 
 const getBrand=async (req,res)=>{
     try {
@@ -13,5 +14,5 @@ const getBrand=async (req,res)=>{
 
 module.exports={
     getBrand,
-    
+
 }
