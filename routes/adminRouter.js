@@ -1,14 +1,12 @@
 const express=require("express");
 const router=express.Router();
-const multer=require("multer");
+const upload=require("../helpers/multer");
 
 const adminController=require("../controllers/admin/adminController");
 const customerController=require("../controllers/admin/customerController");
 const categoryController=require("../controllers/admin/categoryController");
 const productController=require("../controllers/admin/productController");
 const brandController=require("../controllers/admin/brandController");
-const storage=require("../helpers/multer");
-const uploads=multer({storage:storage}); 
 
 const {userAuth,adminAuth}=require("../middlewares/auth");
 
@@ -34,6 +32,7 @@ router.put("/category/edit/:id",adminAuth,categoryController.editCategory);
 
 //brand management
 router.get("/brands",adminAuth,brandController.getBrand);
+router.post("/addBrand",adminAuth,upload.single("brandImage"),brandController.addBrand);
 
 //product managemnet routes
 router.get("/products",adminAuth,productController.getProduct);

@@ -1,237 +1,163 @@
 <%- include("../../views/partials/admin/header") %>
 
-
-    <style>
-        /* General container styling */
-        .container {
-            width: 90%;
-            margin: 20px auto;
-            font-family: Arial, sans-serif;
-            border: 1px solid #383a3c;
-            border-radius: 10px;
-            padding: 20px;
-            background-color: #191c24;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        /* Header styling */
-        h1 {
-            font-size: 24px;
-            color: #333;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        /* Form container */
-        .form-container {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        /* Label styling */
-        label {
-            font-size: 14px;
-            color: #555;
-            margin-bottom: 5px;
-        }
-
-        /* Input fields styling */
-        input[type="text"],
-        input[type="file"] {
-            width: 100%;
-            padding: 10px;
-            font-size: 14px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-
-        /* Button styling */
-        button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            color: #fff;
-            font-size: 14px;
-        }
-
-        button#addBrand {
-            background-color: #0090e7;
-        }
-
-        button#addBrand:hover {
-            background-color: #0381cff8;
-        }
-
-        /* Table styling */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-
-        table th,
-        table td {
-            padding: 10px;
-            text-align: left;
-            border: 1px solid #ddd;
-        }
-
-        table th {
-            background-color: #f4f4f4;
-            color: #333;
-        }
-
-        table td {
-            font-size: 14px;
-            color: #555;
-        }
-
-        /* Status label styling */
-        .status-label {
-            display: inline-block;
-            padding: 5px 10px;
-            font-size: 12px;
-            border-radius: 3px;
-            color: #fff;
-            font-weight: bold;
-        }
-
-        .status-label.blocked {
-            background-color: #dc3545;
-        }
-
-        .status-label.active {
-            background-color: #28a745;
-        }
-
-        /* Action buttons */
-        .action-buttons button {
-            margin-right: 10px;
-            padding: 5px 15px;
-            border: none;
-            border-radius: 5px;
-            color: #fff;
-            font-size: 12px;
-            cursor: pointer;
-        }
-
-        button.block {
-            background-color: #dc3545;
-        }
-
-        button.block:hover {
-            background-color: #c82333;
-        }
-
-        button.unblock {
-            background-color: #28a745;
-        }
-
-        button.unblock:hover {
-            background-color: #218838;
-        }
-
-        button.delete {
-            background-color: #6c757d;
-        }
-
-        button.delete:hover {
-            background-color: #5a6268;
-        }
-
-        /*Search bar */
-        .search-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        #searchBrand {
-            width: 80%;
-            padding: 10px;
-            font-size: 14px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-
-        #searchButton {
-            padding: 10px 20px;
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        #searchButton:hover {
-            background-color: #0056b3;
-        }
-    </style>
-
-
-
-
-    <div class="main-panel">
-
-        <div class="container">
-            <h1>Brands</h1>
-
-
-            <!-- Search Bar -->
-            <div class="search-container">
-                <input type="text" id="searchBrand" placeholder="Search for a brand..." />
-                <button id="searchButton">Search</button>
+<div class="container-fluid">
+    <div class="row">
+        <!-- Add Brand Form -->
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Add New Brand</h5>
+                </div>
+                <div class="card-body">
+                    <form action="/admin/addBrand" method="post" enctype="multipart/form-data" id="brandForm">
+                        <div class="mb-3">
+                            <label for="brandName" class="form-label">Brand Name</label>
+                            <input type="text" class="form-control" id="brandName" name="name" >
+                        </div>
+                        <div class="mb-3">
+                            <label for="brandImage" class="form-label">Brand Logo</label>
+                            <input type="file" class="form-control" id="brandImage" name="brandImage" accept="image/*" >
+                            <div class="form-text">Upload brand logo image</div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Add Brand</button>
+                    </form>
+                </div>
             </div>
-
-
-
-            <div class="form-container">
-                <label for="brandName">Brand Name</label>
-                <input type="text" id="brandName" placeholder="Type here">
-
-                <label for="brandImage">Brand Image</label>
-                <input type="file" id="brandImage">
-
-                <button id="addBrand">Add Brand</button>
-            </div>
-
-            <table>
-                <thead>
-                    <tr>
-                        <th>Brand</th>
-                        <th>Logo</th>
-                        <th>Status</th>
-                        <th>Block/Unblock/Delete</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Sample</td>
-                        <td><img src="#" alt="Brand Logo" style="width: 50px;"></td>
-                        <td><span class="status-label blocked">Blocked</span></td>
-                        <td class="action-buttons">
-                            <button class="block">Block</button>
-                            <button class="unblock">Unblock</button>
-                            <button class="delete">Delete</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Sample</td>
-                        <td><img src="#" alt="Brand Logo" style="width: 50px;"></td>
-                        <td><span class="status-label active">Active</span></td>
-                        <td class="action-buttons">
-                            <button class="block">Block</button>
-                            <button class="unblock">Unblock</button>
-                            <button class="delete">Delete</button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
         </div>
 
-
+        <!-- Brand List Table -->
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Brand List</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Brand Name</th>
+                                    <th>Logo</th>
+                                    <th>Created Date</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% if(data && data.length > 0) { %>
+                                    <% data.forEach((brand) => { %>
+                                        <tr>
+                                            <td><%= brand.brandName %></td>
+                                            <td>
+                                                <% if(brand.brandImage && brand.brandImage.length > 0) { %>
+                                                    <img src="/uploads/brands/<%= brand.brandImage[0] %>" 
+                                                         alt="<%= brand.brandName %>" 
+                                                         class="brand-logo"
+                                                         style="width: 50px; height: 50px; object-fit: contain;">
+                                                <% } %>
+                                            </td>
+                                            <!-- <td><%= new Date(brand.createdAt).toLocaleDateString() %></td>
+                                            <td>
+                                                <span class="badge <%= brand.isBlocked ? 'bg-danger' : 'bg-success' %>">
+                                                    <%= brand.isBlocked ? 'Blocked' : 'Active' %>
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-sm btn-warning edit-brand" 
+                                                        data-brand-id="<%= brand._id %>"
+                                                        data-brand-name="<%= brand.brandName %>">
+                                                    Edit
+                                                </button>
+                                                <button class="btn btn-sm <%= brand.isBlocked ? 'btn-success' : 'btn-danger' %> toggle-status"
+                                                        data-brand-id="<%= brand._id %>"
+                                                        data-current-status="<%= brand.isBlocked %>">
+                                                    <%= brand.isBlocked ? 'Unblock' : 'Block' %>
+                                                </button>
+                                            </td> -->
+                                        </tr>
+                                    <% }) %>
+                                <% } else { %>
+                                    <tr>
+                                        <td colspan="5" class="text-center">No brands found</td>
+                                    </tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+</div>
+
+<style>
+    .brand-logo {
+        border-radius: 4px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .table td {
+        vertical-align: middle;
+    }
+    .btn-sm {
+        margin: 0 2px;
+    }
+</style>
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const brandForm = document.getElementById('brandForm');
+        brandForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+
+            try {
+                const response = await fetch('/admin/addBrand', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if(response.ok) {
+                    Swal.fire({
+                        title: 'Brand Added!',
+                        text: data.message,
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    }).then(result => {
+                        if(result.isConfirmed) {
+                            window.location.reload();
+                        }
+                    });
+                } else {
+                    let title = 'Error!';
+                    let icon = 'error';
+                    
+                    if(response.status === 400) {
+                        title = 'Missing Information';
+                        icon = 'warning';
+                    } else if(response.status === 409) {
+                        title = 'Duplicate Brand';
+                        icon = 'info';
+                    }
+                    
+                    Swal.fire({
+                        title: title,
+                        text: data.message || 'Something went wrong, please try again',
+                        icon: icon,
+                        confirmButtonText: 'OK'
+                    });
+                }
+            } catch (error) {
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'An error occurred while adding the brand',
+                    icon: 'error',
+                    confirmButtonText: 'Retry'
+                });
+            }
+        });
+    });
+</script>
