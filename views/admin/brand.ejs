@@ -38,7 +38,7 @@
                                 <tr>
                                     <th>Brand Name</th>
                                     <th>Logo</th>
-                                    <th>Created Date</th>
+                        
                                     <th>Status</th>
                                     <th>Actions</th>
                                 </tr>
@@ -56,24 +56,24 @@
                                                          style="width: 50px; height: 50px; object-fit: contain;">
                                                 <% } %>
                                             </td>
-                                            <!-- <td><%= new Date(brand.createdAt).toLocaleDateString() %></td>
+                                            
                                             <td>
-                                                <span class="badge <%= brand.isBlocked ? 'bg-danger' : 'bg-success' %>">
-                                                    <%= brand.isBlocked ? 'Blocked' : 'Active' %>
-                                                </span>
+                                                <%if(brand.isBlocked===false){%>
+                                                    <button class="btn btn-danger" style="width:90px"
+                                                     onclick="confirmBlockAction('<%=brand._id%>',true)" class="text-white">
+                                                     Block
+                                                    </button>
+                                                    <%}else{%>
+                                                    <button class="btn btn-success" style="width:90px"
+                                                        onclick="confirmBlockAction('<%=brand._id%>',false)" class="text-white">
+                                                        Unblock
+                                                    </button>
+                                                    <%}%>
                                             </td>
                                             <td>
-                                                <button class="btn btn-sm btn-warning edit-brand" 
-                                                        data-brand-id="<%= brand._id %>"
-                                                        data-brand-name="<%= brand.brandName %>">
-                                                    Edit
-                                                </button>
-                                                <button class="btn btn-sm <%= brand.isBlocked ? 'btn-success' : 'btn-danger' %> toggle-status"
-                                                        data-brand-id="<%= brand._id %>"
-                                                        data-current-status="<%= brand.isBlocked %>">
-                                                    <%= brand.isBlocked ? 'Unblock' : 'Block' %>
-                                                </button>
-                                            </td> -->
+                                               <button class="btn btn-danger" style="width: 90px;"
+                                               onclick="confirmDelete('<%=brand.id%>')">Delete</button>
+                                            </td> 
                                         </tr>
                                     <% }) %>
                                 <% } else { %>
@@ -160,4 +160,96 @@
             }
         });
     });
+
+
+
+    //Delete button
+    function confirmDelete(brandId){
+        Swal.fire({
+            title:'Are you sure?',
+            text:"Do you want to delete this prementaly",
+            icon:'warning',
+            showCancelButton:true,
+            confirmButtonText:'Yes'
+        }).then((result)=>{
+            if(result.isConfirmed){
+                //send delete request
+                fetch(`/admin/deleteBrand/${brandId}`,{
+                    method:'DELETE'
+                })
+                .then(response=>response.json())
+                .then(data=>{
+                    if(data.success){
+                        Swal.fire({
+                            title:'Deleted!',
+                            text:'Brand had been deleted',
+                            icon:'success'
+                        }).then(()=>{
+                            window.location.reload();
+                        });
+                    }else{
+                        Swal.fire({
+                            title:'Error!',
+                            text:data.message,
+                            icon:'error'
+                        })
+                    }
+                })
+                .catch(error=>{
+                    Swal.fire({
+                        title:"Error!",
+                        text:'Something went wrong',
+                        icon:'error'
+                    })
+                })
+            }
+        })
+    }
+
+//block and unblock user
+    function confirmBlockAction(brandId,block){
+        const action=block?'block':'unblock';
+
+        Swal.fire({
+            title:'Are you sure?',
+            text:`Do you want to ${action} this brand?`,
+            icon:'warning',
+            showCancelButton:true,
+            confirmButtonText:'Yes',
+            cancelButtonText:'No'
+        }).then((result)=>{
+            if(result.isConfirmed){  //means yes user click it delete it
+                const url=block? `/admin/blockBrand/${brandId}` :  `/admin/unblockBrand/${brandId}`;
+                fetch(url,{
+                    method:'PATCH'         //path method us used to update the data partically  
+                })
+                .then(response=>response.json())
+                .then(data=>{
+                    if(data.success){
+                        Swal.fire({
+                            title:'Success!',
+                            text:data.message,
+                            icon:'success'
+                        }).then(()=>{
+                            window.location.reload();
+                        })
+                    }else{
+                        Swal.fire({
+                            title:'Error!',
+                            text:data.message,
+                            icon:'error'
+                        });
+                    }
+                })
+                .catch(error=>{
+                    Swal.fire({
+                        title:'Error!',
+                        text:'Something went wrong',
+                        icon:'error'
+                    })
+                })
+            }
+        })
+    }
+
 </script>

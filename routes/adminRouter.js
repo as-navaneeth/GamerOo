@@ -33,6 +33,9 @@ router.put("/category/edit/:id",adminAuth,categoryController.editCategory);
 //brand management
 router.get("/brands",adminAuth,brandController.getBrand);
 router.post("/addBrand",adminAuth,upload.single("brandImage"),brandController.addBrand);
+router.delete("/deleteBrand/:id",adminAuth,brandController.deleteBrand);
+router.patch("/blockBrand/:id",adminAuth,brandController.blockBrand);
+router.patch("/unblockBrand/:id",adminAuth,brandController.unblockBrand);
 
 //product managemnet routes
 router.get("/products",adminAuth,productController.getProduct);
