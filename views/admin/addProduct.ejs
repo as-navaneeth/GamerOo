@@ -1,0 +1,151 @@
+<%- include('../partials/admin/header.ejs') %>
+
+<div class="main-panel">
+    <div class="content-wrapper">
+        <div class="page-header">
+            <h3 class="page-title">Add Product</h3>
+        </div>
+        <div class="row">
+            <div class="col-12 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body">
+                        <form id="addProductForm" class="forms-sample" enctype="multipart/form-data">
+                            <div class="form-group">
+                                <label for="name">Product Name</label>
+                                <input type="text" class="form-control" id="name" name="name" placeholder="Product Name" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="description">Description</label>
+                                <textarea class="form-control" id="description" name="description" rows="4" required></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="category">Category</label>
+                                <select class="form-control" id="category" name="category" required>
+                                    <option value="">Select Category</option>
+                                    <% if(categories && categories.length >0) {%>
+                                        <%categories.forEach(category =>{ %>
+                                            <option value="<%=category._id%>"><%=category.name%></option>
+                                            <% });%>
+                                            <%}%>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="brand">Brand</label>
+                                <select class="form-control" id="brand" name="brand" required>
+                                    <option value="">Select Brand</option>
+                                    <% brands.forEach(brand => { %>
+                                        <option value="<%= brand._id %>"><%= brand.brandName %></option>
+                                    <% }); %>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="regularPrice">Regular Price</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">₹</span>
+                                    </div>
+                                    <input type="number" class="form-control" id="regularPrice" name="regularPrice" min="0" step="0.01" required>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="salePrice">Sale Price</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">₹</span>
+                                    </div>
+                                    <input type="number" class="form-control" id="salePrice" name="salePrice" min="0" step="0.01">
+                                   
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="stock">Stock</label>
+                                <input type="number" class="form-control" id="stock" name="stock" min="0" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Product Images</label>
+                                <div class="input-group">
+                                    <input type="file" name="productImages" class="form-control" multiple accept="image/*" required>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary mr-2">Submit</button>
+                            <button type="button" class="btn btn-dark" onclick="window.history.back()">Cancel</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Remove spinbuttons from number inputs */
+    input[type=number]::-webkit-inner-spin-button, 
+    input[type=number]::-webkit-outer-spin-button { 
+        -webkit-appearance: none; 
+        margin: 0; 
+    }
+    input[type=number] {
+        -moz-appearance: textfield;
+        appearance: none;
+    }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('addProductForm');
+
+    form.addEventListener('input', function() {
+        const regularPrice = parseFloat(document.getElementById('regularPrice').value);
+        const salePrice = parseFloat(document.getElementById('salePrice').value);
+
+        if (salePrice && regularPrice && salePrice >= regularPrice) {
+            document.getElementById('salePrice').setCustomValidity('Sale Price must be less than regular price');
+        } else {  
+            document.getElementById('salePrice').setCustomValidity('');
+        }
+    });
+
+    //Handle form submission
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const formData = new FormData(this);
+        
+        try {
+            const response = await fetch('/admin/addProducts', {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+
+            Swal.fire({
+                title: data.success ? 'Success!' : 'Error',
+                text: data.message,
+                icon: data.success ? 'success' : 'error',
+                confirmButtonText: 'OK'
+            }).then((result) => {
+                if (result.isConfirmed && data.success) {
+                    window.location.href = '/admin/products';
+                }
+            });
+        } catch (error) {
+            Swal.fire({
+                title: "Error!",
+                text: 'Something went wrong',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+        }
+    });
+});
+</script>
