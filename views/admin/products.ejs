@@ -1,1 +1,94 @@
 <%- include("../../views/partials/admin/header") %>
+
+<div class="main-panel">
+    <div class="content-wrapper">
+        <div class="page-header">
+            <h3 class="page-title">Product List</h3>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/admin/dashboard">Dashboard</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Products</li>
+                </ol>
+            </nav>
+        </div>
+
+        <!-- Product Table -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Product Name</th>
+                                    <th>Brand</th>
+                                    <th>Category</th>
+                                    <th>Sale Price</th>
+                                    <th>Offer Price</th>
+                                    <th>Quantity</th>
+                                    <th>Actions</th>
+                                    <th>Edit</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% data.forEach(product => { %>
+                                    <tr>
+                                        <td><%= product.name %></td>
+                                        <td><%= product.brand ? product.brand.brandName : 'N/A' %></td>
+                                        <td><%= product.category ? product.category.name : 'N/A' %></td>
+                                        <td>₹<%= product.regularPrice %></td>
+                                        <td><%= product.salePrice ? '₹' + product.salePrice : 'No Offer' %></td>
+                                        <td><%= product.stock %></td>
+                                        <td>
+                                            <!--Block and unblock button-->
+                                            <% if(product.isBlocked) {%>
+                                                <button class="btn btn-warning btn-sm">Unblock</button>
+                                            <%}else{%>
+                                                <button class="btn btn-warning btn-sm">Block</button>
+                                            <%}%>
+                                        </td>
+                                        <td>
+                                            <!--Edit button-->
+                                            <a href="/admin/products/edit/<%= product._id %>">
+                                                <button class="btn btn-primary btn-sm">Edit</button>
+                                            </a>
+                                           
+                                        </td>
+                                    </tr>
+                                <% }) %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pagination -->
+        <% if (totalPages > 1) { %>
+            <div class="row mt-4">
+                <div class="col-12">
+                    <nav>
+                        <ul class="pagination justify-content-center">
+                            <!-- Previous Button -->
+                            <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
+                                <a class="page-link" href="/admin/products?page=<%= currentPage - 1 %>">&laquo;</a>
+                            </li>
+                            
+                            <!-- Page Numbers -->
+                            <% for(let i = 1; i <= totalPages; i++) { %>
+                                <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                                    <a class="page-link" href="/admin/products?page=<%= i %>"><%= i %></a>
+                                </li>
+                            <% } %>
+                            
+                            <!-- Next Button -->
+                            <li class="page-item <%= currentPage === totalPages ? 'disabled' : '' %>">
+                                <a class="page-link" href="/admin/products?page=<%= currentPage + 1 %>">&raquo;</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        <% } %>
+    </div>
+</div>

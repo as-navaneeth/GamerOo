@@ -1,0 +1,84 @@
+<%- include("../../views/partials/admin/header") %>
+
+<div class="main-panel">
+    <div class="content-wrapper">
+        <div class="page-header">
+            <h3 class="page-title">Edit Product</h3>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/admin/dashboard">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="/admin/products">Products</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Edit Product</li>
+                </ol>
+            </nav>
+        </div>
+
+        <!-- Edit Product Form -->
+        <div class="row">
+            <div class="col-md-8 offset-md-2">
+                <div class="card">
+                    <div class="card-body">
+                        <form action="/admin/products/edit/<%= product._id %>" method="POST" enctype="multipart/form-data">
+                            <div class="form-group">
+                                <label for="productName">Product Name</label>
+                                <input type="text" class="form-control" id="productName" name="productName" value="<%= product.name %>" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="brand">Brand</label>
+                                <select class="form-control" id="brand" name="brand" required>
+                                    <% brands.forEach(brand => { %>
+                                        <option value="<%= brand._id %>" <%= product.brand._id.equals(brand._id) ? 'selected' : '' %>><%= brand.brandName %></option>
+                                    <% }) %>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="category">Category</label>
+                                <select class="form-control" id="category" name="category" required>
+                                    <% categories.forEach(category => { %>
+                                        <option value="<%= category._id %>" <%= product.category._id.equals(category._id) ? 'selected' : '' %>><%= category.name %></option>
+                                    <% }) %>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="regularPrice">Regular Price</label>
+                                <input type="number" class="form-control" id="regularPrice" name="regularPrice" value="<%= product.regularPrice %>" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="salePrice">Sale Price</label>
+                                <input type="number" class="form-control" id="salePrice" name="salePrice" value="<%= product.salePrice %>">
+                            </div>
+                            <div class="form-group">
+                                <label for="stock">Quantity</label>
+                                <input type="number" class="form-control" id="stock" name="stock" value="<%= product.stock %>" required>
+                            </div>
+                            <!-- Image Upload Section -->
+                            <div class="form-group">
+                                <label for="productImages">Product Images</label>
+                                <input type="file" class="form-control-file" id="productImages" name="productImages" multiple>
+                                <div class="mt-2">
+                                    <% product.productImage.forEach(image => { %>
+                                        <img src="/uploads/products/<%= image %>" alt="<%= product.name %>" class="img-thumbnail" style="width: 100px; height: 100px;">
+                                    <% }) %>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                            <a href="/admin/products" class="btn btn-secondary">Cancel</a>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-control {
+        margin-bottom: 15px;
+    }
+    .btn {
+        margin-right: 10px;
+    }
+    .img-thumbnail {
+        margin-right: 10px;
+    }
+</style>

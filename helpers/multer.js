@@ -1,22 +1,8 @@
 const multer = require("multer");
 const path = require("path");
 
-// Configure multer storage for products
-const productStorage = multer.memoryStorage();
-
-// Configure multer storage for brands
-const brandStorage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, path.join(__dirname, "../public/uploads/brands"));
-    },
-    filename: (req, file, cb) => {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        cb(null, uniqueSuffix + path.extname(file.originalname));
-    }
-});
-
 // File filter for images
-const imageFileFilter = (req, file, cb) => {
+const fileFilter = (req, file, cb) => {
     if (file.mimetype.startsWith('image/')) {
         cb(null, true);
     } else {
@@ -24,18 +10,35 @@ const imageFileFilter = (req, file, cb) => {
     }
 };
 
-// Create multer upload instances
-const brandUpload = multer({
-    storage: brandStorage,
-    fileFilter: imageFileFilter
+// Product upload configuration
+const productUpload = multer({
+    storage: multer.diskStorage({
+        destination: function (req, file, cb) {
+            cb(null, 'public/uploads/products');
+        },
+        filename: function (req, file, cb) {
+            const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+            cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+        }
+    }),
+    fileFilter: fileFilter
 });
 
-const productUpload = multer({
-    storage: productStorage,
-    fileFilter: imageFileFilter
+// Brand upload configuration
+const brandUpload = multer({
+    storage: multer.diskStorage({
+        destination: function (req, file, cb) {
+            cb(null, "public/uploads/brands");
+        },
+        filename: function (req, file, cb) {
+            const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+            cb(null, file.fieldname + "-" + uniqueSuffix + path.extname(file.originalname));
+        }
+    }),
+    fileFilter: fileFilter
 });
 
 module.exports = {
-    brandUpload,
-    productUpload
+    productUpload,
+    brandUpload
 };
