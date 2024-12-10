@@ -9,7 +9,7 @@ const sharp = require("sharp");
 const getProduct = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
-        const limit = 4;
+        const limit = 7;
 
         // Fetch all products with pagination
         const productData = await Product.find()
@@ -59,10 +59,11 @@ const getAddProduct = async (req, res) => {
     }
 }
 
+//Add product
 
 const addProduct = async (req, res) => {
     try {
-        const { regularPrice, salePrice, ...productData } = req.body;
+        const { name, description, category, brand, regularPrice, salePrice, stock } = req.body;
 
         // Validate prices
         if (salePrice && parseFloat(salePrice) >= parseFloat(regularPrice)) {
@@ -72,40 +73,36 @@ const addProduct = async (req, res) => {
             });
         }
 
-        // Process uploaded images
-        const processedImages = [];
+        // Handle image files
+        const productImages = [];
         if (req.files && req.files.length > 0) {
             for (const file of req.files) {
-                const filename = `${Date.now()}-${file.originalname}`;
-                await sharp(file.buffer)
-                    .resize(800, 800, { fit: 'inside' })
-                    .toFile(path.join(__dirname, '../../public/uploads/products', filename));
-                processedImages.push(filename);
+                productImages.push(file.filename); // Store just the filename
             }
         }
 
         // Create new product
         const product = new Product({
-            ...productData,
+            name,
+            description,
+            category,
+            brand,
             regularPrice: parseFloat(regularPrice),
             salePrice: salePrice ? parseFloat(salePrice) : undefined,
-            images: processedImages
+            stock,
+            productImage: productImages // Use the array of filenames
         });
+        
 
         await product.save();
+        return res.status(200).json({success:true,message:"Product added successfully"})
 
-        res.status(200).json({
-            success: true,
-            message: 'Product added successfully'
-        });
     } catch (error) {
         console.error('Error adding product:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Error adding product'
-        });
+        res.status(500).send('An error occurred while adding the product: ' + error.message);
     }
 };
+
 
 
 //edit product
@@ -178,6 +175,52 @@ const updateProduct = async (req, res) => {
 };
 
 
+//Delete product
+
+const deleteProduct = async (req, res) => {
+    try {
+        const productId = req.params.id;
+        
+        // Check if product exists
+        const product = await Product.findById(productId);
+        if (!product) {
+            return res.status(404).json({
+                success: false,
+                message: 'Product not found'
+            });
+        }
+
+        // Delete associated images
+        if (product.productImage && product.productImage.length > 0) {
+            product.productImage.forEach(image => {
+                const imagePath = path.join(__dirname, '../../public/uploads/products', image);
+                if (fs.existsSync(imagePath)) {
+                    try {
+                        fs.unlinkSync(imagePath);
+                    } catch (err) {
+                        console.error(`Error deleting image ${image}:`, err);
+                    }
+                }
+            });
+        }
+
+        // Delete the product
+        await Product.findByIdAndDelete(productId);
+
+        return res.status(200).json({
+            success: true,
+            message: 'Product deleted successfully'
+        });
+
+    } catch (error) {
+        console.error('Error deleting product:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'An error occurred while deleting the product'
+        });
+    }
+};
+
 
 module.exports = {
     getProduct,
@@ -185,4 +228,5 @@ module.exports = {
     addProduct,
     editProduct,
     updateProduct,
+    deleteProduct
 }

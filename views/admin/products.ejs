@@ -1,94 +1,176 @@
 <%- include("../../views/partials/admin/header") %>
 
-<div class="main-panel">
-    <div class="content-wrapper">
-        <div class="page-header">
-            <h3 class="page-title">Product List</h3>
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="/admin/dashboard">Dashboard</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Products</li>
-                </ol>
-            </nav>
-        </div>
+    <div class="main-panel">
+        <div class="content-wrapper">
+            <div class="page-header">
+                <h3 class="page-title">Product List</h3>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/admin/dashboard">Dashboard</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Products</li>
+                    </ol>
+                </nav>
+            </div>
 
-        <!-- Product Table -->
-        <div class="row">
-            <div class="col-md-12">
-                <div class="card">
-                    <div class="card-body">
-                        <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                    <th>Product Name</th>
-                                    <th>Brand</th>
-                                    <th>Category</th>
-                                    <th>Sale Price</th>
-                                    <th>Offer Price</th>
-                                    <th>Quantity</th>
-                                    <th>Actions</th>
-                                    <th>Edit</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <% data.forEach(product => { %>
+            <!-- Product Table -->
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <table class="table table-striped">
+                                <thead>
                                     <tr>
-                                        <td><%= product.name %></td>
-                                        <td><%= product.brand ? product.brand.brandName : 'N/A' %></td>
-                                        <td><%= product.category ? product.category.name : 'N/A' %></td>
-                                        <td>₹<%= product.regularPrice %></td>
-                                        <td><%= product.salePrice ? '₹' + product.salePrice : 'No Offer' %></td>
-                                        <td><%= product.stock %></td>
-                                        <td>
-                                            <!--Block and unblock button-->
-                                            <% if(product.isBlocked) {%>
-                                                <button class="btn btn-warning btn-sm">Unblock</button>
-                                            <%}else{%>
-                                                <button class="btn btn-warning btn-sm">Block</button>
-                                            <%}%>
-                                        </td>
-                                        <td>
-                                            <!--Edit button-->
-                                            <a href="/admin/products/edit/<%= product._id %>">
-                                                <button class="btn btn-primary btn-sm">Edit</button>
-                                            </a>
-                                           
-                                        </td>
+                                        <th>Product Name</th>
+                                        <th>Brand</th>
+                                        <th>Category</th>
+                                        <th>Sale Price</th>
+                                        <th>Offer Price</th>
+                                        <th>Quantity</th>
+                                        <th>Actions</th>
+                                        <th>Edit</th>
                                     </tr>
-                                <% }) %>
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    <% data.forEach(product=> { %>
+                                        <tr>
+                                            <td>
+                                                <%= product.name %>
+                                            </td>
+                                            <td>
+                                                <%= product.brand ? product.brand.brandName : 'N/A' %>
+                                            </td>
+                                            <td>
+                                                <%= product.category ? product.category.name : 'N/A' %>
+                                            </td>
+                                            <td>₹<%= product.regularPrice %>
+                                            </td>
+                                            <td>
+                                                <%= product.salePrice ? '₹' + product.salePrice : 'No Offer' %>
+                                            </td>
+                                            <td>
+                                                <%= product.stock %>
+                                            </td>
+                                            <td>
+                                                <!--Block and unblock button-->
+                                                <% if(product.isBlocked) {%>
+                                                    <button class="btn btn-warning btn-sm">Unblock</button>
+                                                    <%}else{%>
+                                                        <button class="btn btn-warning btn-sm">Block</button>
+                                                        <%}%>
+                                            </td>
+                                            <td>
+                                                <!--Edit button-->
+                                                <a href="/admin/products/edit/<%= product._id %>">
+                                                    <button class="btn btn-primary btn-sm">Edit</button>
+                                                </a>
+
+                                            </td>
+                                            <td>
+                                                <!--delete button-->
+                                                <!-- <a href="/admin/products/delete/<%=product._id%>" class="delete-btn"
+
+                                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                            </a> -->
+
+
+
+                                                <button class="btn btn-danger btn-sm delete-btn"
+                                                    data-url="/admin/products/delete/<%= product._id %>">
+                                                    Delete
+                                                </button>
+
+
+                                            </td>
+                                        </tr>
+                                        <% }) %>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Pagination -->
-        <% if (totalPages > 1) { %>
-            <div class="row mt-4">
-                <div class="col-12">
-                    <nav>
-                        <ul class="pagination justify-content-center">
-                            <!-- Previous Button -->
-                            <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
-                                <a class="page-link" href="/admin/products?page=<%= currentPage - 1 %>">&laquo;</a>
-                            </li>
-                            
-                            <!-- Page Numbers -->
-                            <% for(let i = 1; i <= totalPages; i++) { %>
-                                <li class="page-item <%= currentPage === i ? 'active' : '' %>">
-                                    <a class="page-link" href="/admin/products?page=<%= i %>"><%= i %></a>
+            <!-- Pagination -->
+            <% if (totalPages> 1) { %>
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <nav>
+                            <ul class="pagination justify-content-center">
+                                <!-- Previous Button -->
+                                <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
+                                    <a class="page-link" href="/admin/products?page=<%= currentPage - 1 %>">&laquo;</a>
                                 </li>
-                            <% } %>
-                            
-                            <!-- Next Button -->
-                            <li class="page-item <%= currentPage === totalPages ? 'disabled' : '' %>">
-                                <a class="page-link" href="/admin/products?page=<%= currentPage + 1 %>">&raquo;</a>
-                            </li>
-                        </ul>
-                    </nav>
+
+                                <!-- Page Numbers -->
+                                <% for(let i=1; i <=totalPages; i++) { %>
+                                    <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                                        <a class="page-link" href="/admin/products?page=<%= i %>">
+                                            <%= i %>
+                                        </a>
+                                    </li>
+                                    <% } %>
+
+                                        <!-- Next Button -->
+                                        <li class="page-item <%= currentPage === totalPages ? 'disabled' : '' %>">
+                                            <a class="page-link"
+                                                href="/admin/products?page=<%= currentPage + 1 %>">&raquo;</a>
+                                        </li>
+                            </ul>
+                        </nav>
+                    </div>
                 </div>
-            </div>
-        <% } %>
+                <% } %>
+        </div>
     </div>
-</div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.querySelectorAll('.delete-btn').forEach(button => {
+            button.addEventListener('click', async (e) => {
+                e.preventDefault();
+
+                const url = button.getAttribute('data-url');
+
+                try {
+                    const result = await Swal.fire({
+                        title: 'Are you sure?',
+                        text: 'This action cannot be undone',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#3085d6',
+                        confirmButtonText: 'Yes, delete it!'
+                    });
+
+                    if (result.isConfirmed) {
+                        const response = await fetch(url, {
+                            method: 'DELETE',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            }
+                        });
+
+                        const data = await response.json();
+
+                        if (data.success) {
+                            await Swal.fire(
+                                'Deleted!',
+                                data.message,
+                                'success'
+                            );
+                            window.location.reload();
+                        } else {
+                            throw new Error(data.message);
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    Swal.fire(
+                        'Error!',
+                        error.message || 'Something went wrong',
+                        'error'
+                    );
+                }
+            });
+        });
+    </script>

@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { brandUpload, productUpload } = require("../helpers/multer");
+const { brandUpload, productUpload,handleProductUpload } = require("../helpers/multer");
 
 const adminController = require("../controllers/admin/adminController");
 const customerController = require("../controllers/admin/customerController");
@@ -39,8 +39,9 @@ router.patch("/unblockBrand/:id", adminAuth, brandController.unblockBrand);
 //product managemnet routes
 router.get("/products", adminAuth, productController.getProduct);
 router.get("/addProduct", adminAuth, productController.getAddProduct);
-router.post("/addProducts", adminAuth, productUpload.array('productImages', 3), productController.addProduct);
+router.post("/addProducts", adminAuth, handleProductUpload, productController.addProduct);
 router.get('/products/edit/:id', adminAuth, productController.editProduct);
-router.post('/products/edit/:id', adminAuth, productUpload.array('productImages', 3), productController.updateProduct);
+// router.post('/products/edit/:id', adminAuth, productUpload.array('productImages', 3), productController.updateProduct);
+router.delete('/products/delete/:id', adminAuth, productController.deleteProduct);
 
 module.exports = router;
