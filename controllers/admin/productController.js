@@ -108,23 +108,13 @@ const addProduct = async (req, res) => {
 //edit product
 const editProduct = async (req, res) => {
     try {
-        const productId = req.params.id;
-        const product = await Product.findById(productId)
-            .populate('category')
-            .populate('brand');
+        const productId=req.params.id;
+        const product=await Product.findById(productId); //fetch the details of product
+        const categories=await Category.find(); //fetch categories if needed
+        const brands=await Brand.find();
 
-        if (!product) {
-            return res.status(404).json({ message: 'Product not found' });
-        }
+        res.render('editProduct',{product,categories,brands})
 
-        const categories = await Category.find({ isListed: true });
-        const brands = await Brand.find({ isBlocked: false });
-
-        res.render('editProduct', {
-            product,
-            categories,
-            brands
-        });
     } catch (error) {
         console.error('Error in editProduct:', error);
         res.status(500).send('An error occurred while editing the product.');
@@ -132,45 +122,58 @@ const editProduct = async (req, res) => {
 };
 
 
+
+
 const updateProduct = async (req, res) => {
     try {
         const productId = req.params.id;
-        const { productName, brand, category, regularPrice, salePrice, stock } = req.body;
-        const images = req.files ? req.files.map(file => file.filename) : [];
-
         const product = await Product.findById(productId);
+
         if (!product) {
-            return res.status(404).json({ message: 'Product not found' });
+            return res.status(404).json({
+                success: false,
+                message: 'Product not found'
+            });
         }
 
-        // Update product details
-        product.name = productName;
-        product.brand = brand;
-        product.category = category;
-        product.regularPrice = regularPrice;
-        product.salePrice = salePrice;
-        product.stock = stock;
+        // Update basic product information
+        product.name = req.body.name;
+        product.description = req.body.description;
+        product.category = req.body.category;
+        product.brand = req.body.brand;
+        product.regularPrice = req.body.regularPrice;
+        product.salePrice = req.body.salePrice;
+        product.stock = req.body.stock;
 
-        // Update images if new ones are uploaded
-        if (images.length > 0) {
-            const fs = require('fs');
-            const path = require('path');
-
+        // Handle image updates if new images are uploaded
+        if (req.files && req.files.length > 0) {
             // Delete old images
-            product.productImage.forEach(image => {
-                const imagePath = path.join(__dirname, '../../public/uploads/products', image);
-                if (fs.existsSync(imagePath)) {
-                    fs.unlinkSync(imagePath);
-                }
-            });
-            product.productImage = images;
+            if (product.productImage && product.productImage.length > 0) {
+                product.productImage.forEach(image => {
+                    const imagePath = path.join(__dirname, '../../public/uploads/products', image);
+                    if (fs.existsSync(imagePath)) {
+                        try {
+                            fs.unlinkSync(imagePath);
+                        } catch (err) {
+                            console.error(`Error deleting old image ${image}:`, err);
+                        }
+                    }
+                });
+            }
+
+            // Add new images
+            product.productImage = req.files.map(file => file.filename);
         }
 
         await product.save();
-        res.redirect('/admin/products');
+        return res.redirect('/admin/products')
+
     } catch (error) {
-        console.error('Error in updateProduct:', error);
-        res.status(500).send('An error occurred while updating the product.');
+        console.error('Error updating product:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error updating product'
+        });
     }
 };
 

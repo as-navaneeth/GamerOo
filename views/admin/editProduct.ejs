@@ -1,68 +1,167 @@
-<%- include("../../views/partials/admin/header") %>
+<%- include('../partials/admin/header.ejs') %>
+
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" rel="stylesheet">
+
+<style>
+    .preview-container {
+        display: flex; 
+        gap: 10px; 
+    }
+
+    .preview-item {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .preview-image {
+        max-width: 100px; 
+        max-height: 100px; 
+        object-fit: cover; 
+        border: 1px solid #ccc; 
+        border-radius: 5px;
+        padding: 2px; 
+    }
+
+
+    .preview-container {
+        display: flex; 
+        gap: 10px; 
+    }
+
+    .preview-item {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .preview-image {
+        max-width: 100px; 
+        max-height: 100px; 
+        object-fit: cover; 
+        border: 1px solid #ccc; 
+        border-radius: 5px;
+        padding: 2px; 
+    }
+
+    /* Modal styles */
+    .modal {
+        display: none; 
+        position: fixed; 
+        z-index: 1050; 
+        left: 0; 
+        top: 0; 
+        width: 100%; 
+        height: 100%; 
+        overflow: hidden; 
+        background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-content {
+        position: relative; 
+        margin: 10% auto; 
+        padding: 20px; 
+        width: 80%; 
+        max-width: 500px; 
+        background-color: white; 
+        border-radius: 8px;
+    }
+
+    .cropper-container {
+        width: 100%; 
+        height: 300px;
+    }
+</style>
+
 
 <div class="main-panel">
     <div class="content-wrapper">
         <div class="page-header">
             <h3 class="page-title">Edit Product</h3>
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="/admin/dashboard">Dashboard</a></li>
-                    <li class="breadcrumb-item"><a href="/admin/products">Products</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Edit Product</li>
-                </ol>
-            </nav>
         </div>
-
-        <!-- Edit Product Form -->
         <div class="row">
-            <div class="col-md-8 offset-md-2">
+            <div class="col-12 grid-margin stretch-card">
                 <div class="card">
                     <div class="card-body">
-                        <form action="/admin/products/edit/<%= product._id %>" method="POST" enctype="multipart/form-data">
+                        <form method="post" action="/admin/products/edit/<%=product._id%>"  enctype="multipart/form-data" id="fromUpdate">
                             <div class="form-group">
-                                <label for="productName">Product Name</label>
-                                <input type="text" class="form-control" id="productName" name="productName" value="<%= product.name %>" required>
+                                <label for="name">Product Name</label>
+                                <input type="text" class="form-control" id="name" name="name" value="<%= product.name %>" required>
                             </div>
+
                             <div class="form-group">
-                                <label for="brand">Brand</label>
-                                <select class="form-control" id="brand" name="brand" required>
-                                    <% brands.forEach(brand => { %>
-                                        <option value="<%= brand._id %>" <%= product.brand._id.equals(brand._id) ? 'selected' : '' %>><%= brand.brandName %></option>
-                                    <% }) %>
-                                </select>
+                                <label for="description">Description</label>
+                                <textarea class="form-control" id="description" name="description" rows="4" required><%= product.description %></textarea>
                             </div>
+
                             <div class="form-group">
                                 <label for="category">Category</label>
                                 <select class="form-control" id="category" name="category" required>
+                                    <option value="">Select Category</option>
                                     <% categories.forEach(category => { %>
-                                        <option value="<%= category._id %>" <%= product.category._id.equals(category._id) ? 'selected' : '' %>><%= category.name %></option>
-                                    <% }) %>
+                                        <option value="<%= category._id %>" <%= product.category.toString() === category._id.toString() ? 'selected' : '' %>>
+                                            <%= category.name %>
+                                        </option>
+                                    <% }); %>
                                 </select>
                             </div>
+
+                            <div class="form-group">
+                                <label for="brand">Brand</label>
+                                <select class="form-control" id="brand" name="brand" required>
+                                    <option value="">Select Brand</option>
+                                    <% brands.forEach(brand => { %>
+                                        <option value="<%= brand._id %>" <%= product.brand.toString() === brand._id.toString() ? 'selected' : '' %>>
+                                            <%= brand.brandName %>
+                                        </option>
+                                    <% }); %>
+                                </select>
+                            </div>
+
                             <div class="form-group">
                                 <label for="regularPrice">Regular Price</label>
-                                <input type="number" class="form-control" id="regularPrice" name="regularPrice" value="<%= product.regularPrice %>" required>
+                                <input type="number" class="form-control" id="regularPrice" name="regularPrice" 
+                                       value="<%= product.regularPrice %>" min="0" step="0.01" required>
                             </div>
+
                             <div class="form-group">
                                 <label for="salePrice">Sale Price</label>
-                                <input type="number" class="form-control" id="salePrice" name="salePrice" value="<%= product.salePrice %>">
+                                <input type="number" class="form-control" id="salePrice" name="salePrice" 
+                                       value="<%= product.salePrice %>" min="0" step="0.01" required>
                             </div>
+
                             <div class="form-group">
-                                <label for="stock">Quantity</label>
-                                <input type="number" class="form-control" id="stock" name="stock" value="<%= product.stock %>" required>
+                                <label for="stock">Stock</label>
+                                <input type="number" class="form-control" id="stock" name="stock" 
+                                       value="<%= product.stock %>" min="0" required>
                             </div>
-                            <!-- Image Upload Section -->
+
                             <div class="form-group">
-                                <label for="productImages">Product Images</label>
-                                <input type="file" class="form-control-file" id="productImages" name="productImages" multiple>
-                                <div class="mt-2">
+                                <h4>Current Images</h4>
+                                <div id="currentImages" class="preview-container">
                                     <% product.productImage.forEach(image => { %>
-                                        <img src="/uploads/products/<%= image %>" alt="<%= product.name %>" class="img-thumbnail" style="width: 100px; height: 100px;">
-                                    <% }) %>
+                                        <div class="preview-item">
+                                            <img class="preview-image" src="/uploads/products/<%= image %>" alt="Product image">
+                                        </div>
+                                    <% }); %>
                                 </div>
                             </div>
-                            <button type="submit" class="btn btn-primary">Save Changes</button>
-                            <a href="/admin/products" class="btn btn-secondary">Cancel</a>
+                            
+                                
+                                <h4 class="mt-4">Add New Images</h4>
+                                <div class="image-upload-container">
+                                    <input class="form-control mb-2" type="file" id="imageInput" 
+                                           accept="image/png, image/jpeg, image/jpg" multiple>
+                                    <small class="text-muted">Select up to 3 images (max 5MB each)</small>
+                                    <div id="previewContainer" class="preview-container"></div>
+                                </div>
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary mr-2" >Update Product</button>
+                                <button type="button" class="btn btn-dark" onclick="window.history.back()">Cancel</button>
+                            </div>
                         </form>
                     </div>
                 </div>
@@ -71,14 +170,86 @@
     </div>
 </div>
 
-<style>
-    .form-control {
-        margin-bottom: 15px;
+
+<!-- Modal for Cropping -->
+<div class="modal" id="cropModal">
+    <div class="modal-content">
+        <h4>Crop Image</h4>
+        <div class="cropper-container">
+            <img id="imageToCrop" src="" alt="Crop image">
+        </div>
+        <button id="cropButton"                   class="btn btn-primary mt-2">Crop & Save</button>
+        <button onclick="closeModal()" class="btn btn-secondary mt-2">Cancel</button>
+    </div>
+</div>
+
+
+
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+
+<script>
+
+
+
+   
+
+
+
+    //image croping
+
+    
+
+    let cropper;
+    const cropModal = document.getElementById('cropModal');
+    const imageInput = document.getElementById('imageInput');
+    const imageToCrop = document.getElementById('imageToCrop');
+    const previewContainer = document.getElementById('previewContainer');
+
+    imageInput.addEventListener('change', (event) => {
+        const files = event.target.files;
+        if (files && files[0]) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                imageToCrop.src = e.target.result;
+                openModal();
+            };
+            reader.readAsDataURL(files[0]);
+        }
+    });
+
+    function openModal() {
+        cropModal.style.display = 'block';
+        cropper = new Cropper(imageToCrop, {
+            aspectRatio: 1,
+            viewMode: 2,
+        });
     }
-    .btn {
-        margin-right: 10px;
+
+    function closeModal() {
+        cropModal.style.display = 'none';
+        if (cropper) {
+            cropper.destroy();
+            cropper = null;
+        }
     }
-    .img-thumbnail {
-        margin-right: 10px;
-    }
-</style>
+
+    document.getElementById('cropButton').addEventListener('click', () => {
+        const canvas = cropper.getCroppedCanvas({
+            width: 200,
+            height: 200,
+        });
+        canvas.toBlob((blob) => {
+            const url = URL.createObjectURL(blob);
+            const imgElement = document.createElement('img');
+            imgElement.src = url;
+            imgElement.className = 'preview-image';
+            previewContainer.appendChild(imgElement);
+            closeModal();
+        });
+    });
+</script>

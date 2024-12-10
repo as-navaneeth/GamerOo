@@ -40,8 +40,9 @@ router.patch("/unblockBrand/:id", adminAuth, brandController.unblockBrand);
 router.get("/products", adminAuth, productController.getProduct);
 router.get("/addProduct", adminAuth, productController.getAddProduct);
 router.post("/addProducts", adminAuth, handleProductUpload, productController.addProduct);
-router.get('/products/edit/:id', adminAuth, productController.editProduct);
-// router.post('/products/edit/:id', adminAuth, productUpload.array('productImages', 3), productController.updateProduct);
 router.delete('/products/delete/:id', adminAuth, productController.deleteProduct);
+
+router.get('/products/edit/:id',adminAuth,productController.editProduct)
+router.post('/products/edit/:id', adminAuth, handleProductUpload, productController.updateProduct);
 
 module.exports = router;
