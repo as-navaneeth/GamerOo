@@ -7,6 +7,7 @@ const session=require("express-session");
 const passport=require("./config/passport")
 const env=require("dotenv").config()
 const PORT=process.env.PORT;
+const errorHandler=require('./middlewares/errorHandler');
 const db=require('./config/db');
 db()
 
@@ -41,6 +42,8 @@ app.use(express.static(path.join(__dirname,"public")));
 
 app.use("/",(userRouter));
 app.use("/admin",adminRouter);
+
+app.use(errorHandler);
 
 
 

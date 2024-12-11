@@ -23,6 +23,11 @@ router.post("/login",userController.login);
 router.get("/logout",userController.logout);
 
 
+//user product page
+router.get('/productDetails/:id',userController.loadProductPage);
+
+
+
 
 
 
