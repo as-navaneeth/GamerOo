@@ -3,6 +3,9 @@ const nodemailer = require("nodemailer"); // to sent mail
 const env = require("dotenv").config();
 const bcrypt = require("bcrypt");
 
+const Category=require('../../models/categorySchema');
+const Product=require('../../models/productSchema');
+
 
 const pageNotFound = async (req, res) => {
     try {
@@ -18,17 +21,32 @@ const pageNotFound = async (req, res) => {
 
 const loadHomePage = async (req, res) => {
     try {
-        const userId = req.session.user; // This should store the user ID
+        const userId = req.session.user;
+        
+        const productData = await Product.find({})
+            .populate('category')
+            .populate('brand')
+            .sort({ createdAt: -1 })
+            .limit(10);
+
         if (userId) {
             const userData = await User.findOne({ _id: userId });
             if (userData) {
-                return res.render("home", { user: userData }); // Pass user data to the template
+                return res.render("home", { 
+                    user: userData, 
+                    products: productData 
+                });
             }
         }
-        // Render the home page without user data
-        res.render("home");
+        
+        // Render without user data
+        res.render("home", { 
+            products: productData,
+            user: null 
+        });
+
     } catch (error) {
-        console.log("Home page not found:", error);
+        console.error("Error loading home page:", error);
         res.status(500).send("Server error");
     }
 };

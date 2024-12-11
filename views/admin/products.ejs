@@ -12,6 +12,22 @@
                 </nav>
             </div>
 
+
+
+            <!-- <div class="row mb-4">
+                <div class="col-md-6">
+                    <form method="GET" action="/admin/products" class="form-inline">
+                        <div class="input-group">
+                            <input type="text" name="search" class="form-control" placeholder="Search products..." >
+                            <div class="input-group-append">
+                                <button type="submit" class="btn btn-primary">Search</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div> -->
+            
+
             <!-- Product Table -->
             <div class="row">
                 <div class="col-md-12">
@@ -28,6 +44,7 @@
                                         <th>Quantity</th>
                                         <th>Actions</th>
                                         <th>Edit</th>
+                                        <th>Delete</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -68,7 +85,7 @@
                                             <td>
                                     
                                                 <button class="btn btn-danger btn-sm delete-btn"
-                                                    data-url="/admin/products/delete/<%= product._id %>">
+                                                    data-url="/admin/products/delete/<%= product._id%>">
                                                     Delete
                                                 </button>
 
