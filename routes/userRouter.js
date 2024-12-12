@@ -1,6 +1,7 @@
 const express=require("express");
 const router=express.Router();
 const userController=require("../controllers/user/userController")
+const productController=require('../controllers/user/productController');
 const passport=require("passport")
 const {userAuth} = require('../middlewares/auth')
 
@@ -24,7 +25,7 @@ router.get("/logout",userController.logout);
 
 
 //user product page
-router.get('/productDetails/:id',userController.loadProductPage);
+router.get('/productDetails/:id',productController.loadProductPage);
 
 
 

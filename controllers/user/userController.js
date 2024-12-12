@@ -283,33 +283,7 @@ const loadLogin = async (req, res) => {
 
 
 
-    //Product page 
-
-    const loadProductPage=async(req,res)=>{
-
-        try {
-            const productId=req.params.id;
-
-            if(!productId){
-                return res.status(400).send('Product ID is requried');
-            }
-
-            const product=await Product.findById(productId).populate('category');
-
-            if(!product){
-                return res.send(404).send('Prouct not found');
-            }
-
-
-            res.render('productDetail',{
-                product
-            })
-
-
-        } catch (error) {
-            next(error);
-        }
-    }
+ 
 
 
 
@@ -324,5 +298,4 @@ module.exports = {
     loadLogin,
     login,
     logout,
-    loadProductPage,
 }
