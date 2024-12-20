@@ -23,7 +23,7 @@ const loadHomePage = async (req, res) => {
     try {
         const userId = req.session.user;
         
-        const productData = await Product.find({})
+        const productData = await Product.find({isListed:true})
             .populate('category')
             .populate('brand')
             .sort({ createdAt: -1 })
@@ -31,6 +31,7 @@ const loadHomePage = async (req, res) => {
 
         if (userId) {
             const userData = await User.findOne({ _id: userId });
+            // console.log('the usweer',userData)
             if (userData) {
                 return res.render("home", { 
                     user: userData, 
@@ -48,6 +49,7 @@ const loadHomePage = async (req, res) => {
     } catch (error) {
         console.error("Error loading home page:", error);
         res.status(500).send("Server error");
+
     }
 };
 
@@ -92,6 +94,7 @@ function generateOtp() {
     return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
+
 async function sendVerificationEmail(email, otp) {
     try {
         const transporter = nodemailer.createTransport({
@@ -133,7 +136,7 @@ const signup = async (req, res) => {
         const findUser = await User.findOne({ email });
         if (findUser) {
             return res.render("signup", { message: "User with this email already exists" })
-        }
+        }   
 
         const otp = generateOtp();
 
@@ -145,13 +148,22 @@ const signup = async (req, res) => {
         req.session.userOtp = otp;
         req.session.userData = { name, phone, email, password };
 
-        res.render("verifyOtp");
+        res.redirect("/verifyOtp");
 
         console.log("OTP Sent", otp);
 
     } catch (error) {
         console.error("signup error", error);
         res.render("signup", { message: "An Error Occured. Please try again" })
+    }
+}
+
+//load Verify otp
+const loadVerifyOtp= async(req,res)=>{
+    try {
+        res.render("verifyOtp");
+    } catch (error) {
+        console.error("loadVerifyError:",error)
     }
 }
 
@@ -165,7 +177,7 @@ const securePassword = async (password) => {
 
         return passwordHash;
     } catch (error) {
-
+        console.error('SecurePasswrod:',error)
     }
 }
 
@@ -211,13 +223,15 @@ const resendOtp = async (req, res) => {
     try {
         console.log("resend");
 
-        const { email } = req.session.userData;
+        const  email  = req.session.userData.email;
         if (!email) {
             return res.status(400).json({ success: false, message: "Email not found in session" })
         }
 
+
         const otp = generateOtp();
         req.session.userOtp = otp;
+        
 
         const emailSent = await sendVerificationEmail(email, otp);
         if (emailSent) {
@@ -269,7 +283,7 @@ const loadLogin = async (req, res) => {
             const passwordMatch = await bcrypt.compare(password, findUser.password);
 
             if(!passwordMatch){
-                return res.status(400).json({message:"Password do not matc"})
+                return res.status(400).json({message:"Password do not match"})
 
             }
             req.session.user=findUser._id;
@@ -283,6 +297,27 @@ const loadLogin = async (req, res) => {
 
 
 
+
+//shopping page 
+const loadShoppingPage=async(req,res)=>{
+    
+    try {
+        
+        const products=await Product.find({isListed:true}).populate("category");
+        if(!products){
+             return res.status(404).send({json:'product not found'});
+        }
+
+
+
+    res.render('shop',{products});
+
+    } catch (error) {
+        console.log(error);
+        
+    }
+    
+}
  
 
 
@@ -298,4 +333,6 @@ module.exports = {
     loadLogin,
     login,
     logout,
+    loadShoppingPage,
+    loadVerifyOtp,
 }

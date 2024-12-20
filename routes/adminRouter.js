@@ -28,6 +28,8 @@ router.post('/block/:userId', adminAuth, customerController.blockUser);
 router.get("/category", adminAuth, categoryController.getCategory);
 router.post("/category/add", adminAuth, categoryController.addCategory);
 router.put("/category/edit/:id", adminAuth, categoryController.editCategory);
+router.post("/category/list/:id",adminAuth,categoryController.listCategory);
+router.post("/category/unlist/:id",adminAuth,categoryController.unlistCategory);
 
 //brand management
 router.get("/brands", adminAuth, brandController.getBrand);
@@ -41,6 +43,8 @@ router.get("/products", adminAuth, productController.getProduct);
 router.get("/addProduct", adminAuth, productController.getAddProduct);
 router.post("/addProducts", adminAuth, handleProductUpload, productController.addProduct);
 router.delete('/products/delete/:id', adminAuth, productController.deleteProduct);
+router.post('/products/unlist/:id',adminAuth,productController.unlistProduct);
+router.post('/products/list/:id',adminAuth,productController.listProduct);
 
 router.get('/products/edit/:id',adminAuth,productController.editProduct)
 router.post('/products/edit/:id', adminAuth, handleProductUpload, productController.updateProduct);

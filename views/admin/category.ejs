@@ -399,24 +399,60 @@
 
 
     //toggle button
-    document.addEventListener("DOMContentLoaded", () => {
-      // Attach event listener to all toggle switches
-      document.querySelectorAll(".toggle-switch").forEach((switchElement) => {
-        switchElement.addEventListener("change", (e) => {
-          const statusSpan = switchElement.nextElementSibling.querySelector(".listed-status");
+    documet.querySelectorAll('.toggle-switch').forEach(switchElement=>{
+      switchElement.addEventListener('change',async (e)=>{
+        const checkbox=e.target;
+        const categoryId=checkbox.getAttribute('data-id');
+        const isListed=checkbox.checked;
 
-          if (switchElement.checked) {
-            statusSpan.textContent = "Listed";
-          } else {
-            statusSpan.textContent = "Unlisted";
+        const url=isListed
+        ?`/admin/category/list/${categoryId}` :`/admin/categoey/unlist/${categoryId}`;
+
+        try {
+          const result=await Swal.fire({
+            title:"Are you sure",
+            icon:'warning',
+            showCancelButton:true,
+            confirmButtonText:`Yes ${isListed ? 'list':'unlist'} it!`,
+            cancelButtonText:'Cancel'
+          });
+
+          if(result.isConfirmed){
+            const response=await fetch(url,{
+              method:'POST',
+              headers:{
+                'Content-Type':'application/json'
+              }
+            });
+
+            const data=await response.json();
+
+            if(data.success){
+              await Swal.fire({
+                icon:"success",
+                text:data.message
+              });
+
+              const statusLabel=checkbox.parentElement.querySelector('.listed-status');
+              statusLabel.textContent=isListed?'Listed':'Unlisted';
+            }else{
+              throw new Error(data.message);
+            }
+
+
           }
+        } catch (error) {
+          console.error("Error:",error);
+          Swal.fire({
+            title:'Error!',
+            text:error.message|| "Something went wrong",
+            icon:'error'
+          });
+          checkbox.checked=isListed
+        }
 
-          // Optional: Log or store the change for future implementation
-          console.log(`Category ID: ${switchElement.getAttribute("data-id")}, New Status: ${switchElement.checked ? "Listed" : "Unlisted"}`);
-        });
-      });
-    });
-
+      })
+    })
 
 
   </script>

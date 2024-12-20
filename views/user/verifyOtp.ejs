@@ -22,7 +22,7 @@
                 <div class="otp-timer">
                     <span id="timerValue">30</span>
                 </div>
-                <button type="button" onclick="resendOTP()" class="btn-secondary">Resend OTP</button>
+                <button type="button" id="resendOtp" onclick="resendOTP()" disabled class="btn-muted">Resend OTP</button>
 
                 <% if (locals.message && message.length > 0) { %>
                     <div class="alert alert-danger"><%= message %></div>
@@ -41,6 +41,7 @@
 
     <script>
         document.getElementById("otp").focus();
+        let resendButton=document.getElementById("resendOtp");
     
         let timer = 30;
         let timerInterval;
@@ -51,9 +52,11 @@
                 document.getElementById("timerValue").textContent = timer;
                 if (timer <= 0) {
                     clearInterval(timerInterval);
+                    resendButton.disabled=false;
                     document.getElementById("timerValue").classList.add("expired");
                     document.getElementById("timerValue").textContent = "Expired";
                     document.getElementById("otp").disabled = true;
+                    document.getElementById("otp").style.color = "red";
                 }
             }, 1000);
         }
@@ -101,7 +104,7 @@
         function resendOTP(){
             clearInterval(timerInterval);
             timer=30;
-            document.getElementById("otp").disabled=false;
+            document.getElementById("otp").disabled=true;
             // document.getElementById("timervalue").classList.remove("expired");
             document.getElementById("timerValue").classList.remove("expired");
 
@@ -118,6 +121,8 @@
                             timer:1500,
                         }).then(()=>{
                             startTimer();
+                            window.location.reload();
+                    
                         })
                     }else{
                         Swal.fire({
@@ -130,6 +135,9 @@
             })
             return false;
         }
+
+
+
 
 
     </script>

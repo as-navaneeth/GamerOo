@@ -224,6 +224,61 @@ const deleteProduct = async (req, res) => {
     }
 };
 
+//unlist product
+const unlistProduct=async(req,res)=>{
+    try {
+        const productId=req.params.id;
+        const product= await Product.findById(productId);
+
+        if(!product){
+            return res.status(404).json({success:false,message:"Product not found"});
+        }
+
+        product.isListed=false;   //evide namal product list chyune block akkum
+        await product.save();
+
+        res.status(200).json({
+            success:true,
+            message:'Product has been unlisted successfully',
+        });
+    
+    } catch (error) {
+        console.error("Error unlisting product:",error);
+        res.status(500).json({
+            success:false,
+            message:'Failed to unlist the product',
+        })    
+    }
+}
+
+//listProduct
+
+const listProduct=async(req,res)=>{
+    try {
+        const productId=req.params.id;
+        const product= await Product.findById(productId);
+
+        if(!product){
+            return res.status(404).json({success:false,message:'Product not found'});
+        }
+
+        product.isListed=true;
+        await product.save();
+
+        res.status(200).json({
+            success:true,
+            message:"Product has been listed successfully"
+        })
+
+    } catch (error) {
+        console.error("Error listing product:",error);
+        res.status(500).json({
+            success:false,
+            message:"Failed to list the products",
+        })
+    }
+}
+
 
 module.exports = {
     getProduct,
@@ -231,5 +286,7 @@ module.exports = {
     addProduct,
     editProduct,
     updateProduct,
-    deleteProduct
+    deleteProduct,
+    unlistProduct,
+    listProduct
 }

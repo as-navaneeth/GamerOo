@@ -1,4 +1,4 @@
-// const Category = require('../../models/categorySchema');
+
 const category=require('../../models/categorySchema');
 
 
@@ -59,11 +59,61 @@ const editCategory=async(req,res)=>{
 
 
 
+const listCategory=async(req,res)=>{
+    try {
+        const categoryId=req.params.id;
+
+        const category=await Category.findByIdAndUpdate(
+            categoryId,
+            {isListed:true},
+            {new:true}
+        );
+
+        if(!category){
+            return res.status(404).json({success:false,message:'Category not found'});
+        }
+        res.json({success:true,message:'Category listed successfully',category})
+        
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+}
+
+
+// Unlist a category
+const unlistCategory = async (req, res) => {
+    try {
+        const categoryId = req.params.id;
+
+        const category = await Category.findByIdAndUpdate(
+            categoryId,
+            { isListed: false },
+            { new: true }
+        );
+
+        if (!category) {
+            return res.status(404).json({ success: false, message: 'Category not found' });
+        }
+
+        res.json({ success: true, message: 'Category unlisted successfully', category });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+};
+
+
+
 
 
 
 module.exports={
     getCategory,
     addCategory,
-    editCategory
+    editCategory,
+    listCategory,
+    unlistCategory,
+    
+    
 }

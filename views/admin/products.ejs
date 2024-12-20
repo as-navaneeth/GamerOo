@@ -69,11 +69,21 @@
                                             </td>
                                             <td>
                                                 <!--Block and unblock button-->
-                                                <% if(product.isBlocked) {%>
-                                                    <button class="btn btn-warning btn-sm">Unblock</button>
+                                                <% if(product.isListed){%>
+                                                   <a href="/admin/products/unlist/<%=product._id%>"> 
+                                                   <button class="btn btn-danger btn-sm toggle-list-btn"
+                                                    data-status="unlist">
+                                                        Unlist
+                                                    </button>
+                                                    </a> 
                                                     <%}else{%>
-                                                        <button class="btn btn-warning btn-sm">Block</button>
-                                                        <%}%>
+                                                       <a href="/admin/products/list/<%=product._id%>">
+                                                        <button class="btn btn-warning btn-sm toggle-list-btn"
+                                                        data-status="list">
+                                                            List
+                                                        </button>
+                                                     </a>
+                                                <%}%>
                                             </td>
                                             <td>
                                                 <!--Edit button-->
@@ -135,6 +145,59 @@
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
+
+
+        document.querySelectorAll('.toggle-list-btn').forEach(button=>{
+            button.addEventListener('click',async(e)=>{
+                e.preventDefault();
+
+                const action=button.getAttribute('data-status'); 
+                const url=button.parentElement.getAttribute('href');
+
+
+                try {
+                    const result=await Swal.fire({
+                        
+                        text:`Are you sure you want to ${action} this product`,
+                        icon:'warning',
+                        showCancelButton:"true",
+                        cancelButtonText:'Cancel',
+                        confirmButtonText:`Yes, ${action} it!`
+                    });
+                    if(result.isConfirmed){
+                        const response=await fetch(url,{
+                            method:'POST',
+                            headers:{
+                                'Content-Type':'application/json'
+                            }
+                        });
+
+                        const data=await response.json();
+
+                        if(data.success){
+                            await Swal.fire({
+                                icon:'success',
+                                text:data.message,
+                            });
+                            window.location.reload();
+                        }
+                    }
+
+                } catch (error) {
+                    console.error("Error :",error);
+                    Swal.fire({
+                        title:'Error!',
+                        text:error.message || "something went wrong",
+                        icon:'error'
+                    })
+                }
+            })
+        })
+
+
+
+
+
         document.querySelectorAll('.delete-btn').forEach(button => {
             button.addEventListener('click', async (e) => {
                 e.preventDefault();
