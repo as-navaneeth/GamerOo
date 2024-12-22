@@ -4,9 +4,14 @@ const {Schema}=mongoose;
 const categorySchema=new mongoose.Schema({
     name:{
         type:String,
-        required:true,
-        unique:true
+        required:true,        
     },
+
+    nameLower:{
+        type:String,    
+        unique:true,
+    },
+
     description:{
         type:String,
     },
@@ -20,6 +25,16 @@ const categorySchema=new mongoose.Schema({
     },
     
 })
+
+
+
+//middleware to set the 'nameLower' filed
+categorySchema.pre("save",function(next){
+     this.nameLower=this.name.toLowerCase();
+     next();
+})
+
+categorySchema.index({nameLower:1},{unique:true})
 
 
 

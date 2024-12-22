@@ -9,13 +9,25 @@ const getCategory= async(req,res)=>{
     } catch (error) {
         res.status(500).send("error")
     }
-}
+}  
 
 const addCategory=async(req,res)=>{
     try {
         const {name,description}=req.body;
+        console.log(req.body)
+       
+
+        const existingCategory=await category.findOne({nameLower:name.toLowerCase()});
+        console.log(existingCategory);
+        if(existingCategory){
+            return res.status(400).json({success:false,message:"Category Already Exists!"});
+        }
+
+
+
         const newCategory=new category({name,description});
-        await newCategory.save();                  //saving the newcategory
+        await newCategory.save();                  //saving the newcategory 
+        console.log("Category saved successfully")
 
         res.status(201).json({success:true,message:"Category Added Successfully"})  //created and sending the msg back to client
 

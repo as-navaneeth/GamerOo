@@ -9,7 +9,7 @@ const userList = async (req,res)=>{
         const skip = (page - 1) * limit;
     
         // Fetch users with pagination
-        const users = await User.find({isAdmin:false})
+        const users = await User.find({isAdmin:false}).sort({createdOn:-1})
           .skip(skip)
           .limit(limit);
     

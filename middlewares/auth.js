@@ -1,23 +1,47 @@
 const User=require("../models/userSchema");
 
-const userAuth =(req,res,next)=>{
-    if(req.session.user){
-        User.findById(req.session.user)
+const userAuth = async(req,res,next)=>{
+    // if(req.session.user){
+    //     User.findById(req.session.user)
   
-        .then(data=>{
-            if(data && !data.isBlocked){
-                next();
-            }else{
-                res.redirect("/login");
-            }
-        })
-        .catch(error=>{
-            console.log("Error in User auth middleware");
-            res.status(500).send("Internal Server Error")
-        })
-    }else{
-        res.redirect("/login")
+    //     .then(data=>{
+    //         if(data && !data.isBlocked){
+    //             next();
+    //         }else{
+    //             res.redirect("/login");
+    //         }
+    //     })
+    //     .catch(error=>{
+    //         console.log("Error in User auth middleware");
+    //         res.status(500).send("Internal Server Error")
+    //     })
+    // }else{
+    //     res.redirect("/login")
+    // }
+
+
+
+    try {
+        if(!req.session.user){
+            return res.redirect("/login");
+        }
+
+        const user= await User.findById(req.session.user);
+
+        if(user && !user.isBlocked){
+            res.locals.user=user;
+            return next();
+        }else{
+            return res.redirect("/login")
+        }
+
+
+    } catch (error) {
+        console.error("Error in userAuth middlware:",error.message);
+        res.status(500).send("Interal Server Error");
     }
+
+
 }
 
 

@@ -13,11 +13,13 @@ const getProduct = async (req, res) => {
 
         // Fetch all products with pagination
         const productData = await Product.find()
+            .sort({createdAt:-1})
             .limit(limit)
             .skip((page - 1) * limit)
             .populate("category")
             .populate("brand")
-            .exec();
+            .exec()
+            
 
         // Count the total number of products
         const count = await Product.countDocuments();

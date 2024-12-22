@@ -29,7 +29,7 @@ router.get('/shop',userController.loadShoppingPage);
 
 
 //user product page
-router.get('/productDetails/:id',productController.loadProductPage);
+router.get('/productDetails/:id',userAuth,productController.loadProductPage);
 
 
 
