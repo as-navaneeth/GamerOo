@@ -35,4 +35,9 @@ router.get('/productDetails/:id',userAuth,productController.loadProductPage);
 router.get('/userProfile',userAuth,userController.getUserProfile);
 router.post('/userProfile/update-profile', userAuth, userController.updateProfile);
 
+// Order routes
+router.get('/orders', userAuth, userController.getOrders);
+router.get('/userProfile/order/:orderId', userAuth, userController.getOrderDetails);
+router.get('/userProfile/order/:orderId/invoice', userAuth, userController.downloadInvoice);
+
 module.exports=router;

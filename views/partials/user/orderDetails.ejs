@@ -1,0 +1,191 @@
+<div class="order-details">
+    <div class="order-summary">
+        <div class="summary-row">
+            <span>Order ID:</span>
+            <strong>#<%= order._id.toString().slice(-8).toUpperCase() %></strong>
+        </div>
+        <div class="summary-row">
+            <span>Order Date:</span>
+            <strong><%= new Date(order.orderDate).toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            }) %></strong>
+        </div>
+        <div class="summary-row">
+            <span>Status:</span>
+            <strong class="status <%= order.status.toLowerCase() %>"><%= order.status %></strong>
+        </div>  
+    </div>
+
+    <div class="shipping-details">
+        <h5>Shipping Address</h5>
+        <p>
+            <%= order.shippingAddress.name %><br>
+            <%= order.shippingAddress.address %><br>
+            <%= order.shippingAddress.city %>, <%= order.shippingAddress.state %><br>
+            <%= order.shippingAddress.pincode %><br>
+            Phone: <%= order.shippingAddress.phone %>
+        </p>
+    </div>
+
+    <div class="order-items-details">
+        <h5>Order Items</h5>
+        <div class="items-table">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% order.items.forEach(item => { %>
+                        <tr>
+                            <td>
+                                <div class="product-info">
+                                    <img src="<%= item.product.images[0] %>" alt="<%= item.product.name %>">
+                                    <span><%= item.product.name %></span>
+                                </div>
+                            </td>
+                            <td>₹<%= item.price.toFixed(2) %></td>
+                            <td><%= item.quantity %></td>
+                            <td>₹<%= (item.price * item.quantity).toFixed(2) %></td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="price-summary">
+        <div class="summary-row">
+            <span>Subtotal:</span>
+            <strong>₹<%= order.totalAmount.toFixed(2) %></strong>
+        </div>
+        <% if (order.discount) { %>
+            <div class="summary-row">
+                <span>Discount:</span>
+                <strong>-₹<%= order.discount.toFixed(2) %></strong>
+            </div>
+        <% } %>
+        <div class="summary-row">
+            <span>Shipping:</span>
+            <strong>₹<%= order.shippingCost ? order.shippingCost.toFixed(2) : '0.00' %></strong>
+        </div>
+        <div class="summary-row total">
+            <span>Total:</span>
+            <strong>₹<%= order.totalAmount.toFixed(2) %></strong>
+        </div>
+    </div>
+</div>
+
+<style>
+.order-details {
+    padding: 20px;
+}
+
+.order-summary {
+    margin-bottom: 30px;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    padding: 5px 0;
+}
+
+.summary-row span {
+    color: #666;
+}
+
+.summary-row strong {
+    color: #333;
+}
+
+.status {
+    padding: 3px 10px;
+    border-radius: 15px;
+    font-size: 14px;
+}
+
+.shipping-details {
+    margin-bottom: 30px;
+}
+
+.shipping-details h5 {
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.shipping-details p {
+    color: #666;
+    line-height: 1.6;
+}
+
+.order-items-details {
+    margin-bottom: 30px;
+}
+
+.order-items-details h5 {
+    color: #333;
+    margin-bottom: 15px;
+}
+
+.items-table {
+    overflow-x: auto;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table th {
+    background: #f8f9fa;
+    padding: 12px;
+    text-align: left;
+    color: #333;
+    font-weight: 600;
+}
+
+.table td {
+    padding: 12px;
+    border-top: 1px solid #dee2e6;
+}
+
+.product-info {
+    display: flex;
+    align-items: center;
+}
+
+.product-info img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 4px;
+    margin-right: 10px;
+}
+
+.price-summary {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.price-summary .summary-row.total {
+    border-top: 2px solid #dee2e6;
+    margin-top: 10px;
+    padding-top: 10px;
+    font-size: 18px;
+}
+
+.price-summary .summary-row.total strong {
+    color: #ff0000;
+}
+</style>

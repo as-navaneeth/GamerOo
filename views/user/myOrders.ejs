@@ -1,0 +1,351 @@
+<!--Header-->
+<%- include("../../views/partials/user/header") %>
+
+<!-- BREADCRUMB -->
+<div id="breadcrumb" class="section">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h3 class="breadcrumb-header">My Orders</h3>
+                <ul class="breadcrumb-tree">
+                    <li><a href="/">Home</a></li>
+                    <li class="active">My Orders</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /BREADCRUMB -->
+
+<!-- SECTION -->
+<div class="section">
+    <div class="container">
+        <div class="row">
+            <!-- Include Profile Sidebar -->
+            <%- include("../../views/partials/user/profileSidebar") %>
+
+            <!-- Main Content -->
+            <div class="col-md-9">
+                <div class="orders-container">
+                    <% if (orders && orders.length > 0) { %>
+                        <% orders.forEach(order => { %>
+                            <div class="order-card">
+                                <div class="order-header">
+                                    <div class="order-info">
+                                        <h4>Order #<%= order._id.toString().slice(-8).toUpperCase() %></h4>
+                                        <span class="order-date">
+                                            Ordered on <%= new Date(order.orderDate).toLocaleDateString('en-US', { 
+                                                year: 'numeric', 
+                                                month: 'long', 
+                                                day: 'numeric' 
+                                            }) %>
+                                        </span>
+                                    </div>
+                                    <div class="order-status <%= order.status.toLowerCase() %>">
+                                        <%= order.status %>
+                                    </div>
+                                </div>
+                                <div class="order-items">
+                                    <% order.items.forEach(item => { %>
+                                        <div class="order-item">
+                                            <div class="item-image">
+                                                <img src="<%= item.product.images[0] %>" alt="<%= item.product.name %>">
+                                            </div>
+                                            <div class="item-details">
+                                                <h5><%= item.product.name %></h5>
+                                                <p class="item-price">₹<%= item.price.toFixed(2) %></p>
+                                                <p class="item-quantity">Quantity: <%= item.quantity %></p>
+                                            </div>
+                                        </div>
+                                    <% }) %>
+                                </div>
+                                <div class="order-footer">
+                                    <div class="order-total">
+                                        <span>Total:</span>
+                                        <strong>₹<%= order.totalAmount.toFixed(2) %></strong>
+                                    </div>
+                                    <div class="order-actions">
+                                        <button class="btn view-details" onclick="viewOrderDetails('<%= order._id %>')">
+                                            View Details
+                                        </button>
+                                        <% if (order.status === 'Delivered') { %>
+                                            <button class="btn download-invoice" onclick="downloadInvoice('<%= order._id %>')">
+                                                Download Invoice
+                                            </button>
+                                        <% } %>
+                                    </div>
+                                </div>
+                            </div>
+                        <% }) %>
+                    <% } else { %>
+                        <div class="no-orders">
+                            <img src="/img/empty-order.png" alt="No Orders">
+                            <h3>No Orders Yet</h3>
+                            <p>Looks like you haven't made your choice yet...</p>
+                            <a href="/shop" class="btn">Start Shopping</a>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+            <!-- /Main Content -->
+        </div>
+    </div>
+</div>
+<!-- /SECTION -->
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Order Details Modal -->
+<div class="modal fade" id="orderDetailsModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Order Details</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="orderDetailsContent">
+                <!-- Content will be loaded dynamically -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.orders-container {
+    padding: 20px;
+}
+
+.order-card {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+.order-header {
+    padding: 15px 20px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.order-info h4 {
+    margin: 0;
+    color: #333;
+    font-size: 16px;
+}
+
+.order-date {
+    color: #666;
+    font-size: 14px;
+}
+
+.order-status {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.order-status.pending {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.order-status.processing {
+    background: #cce5ff;
+    color: #004085;
+}
+
+.order-status.shipped {
+    background: #d4edda;
+    color: #155724;
+}
+
+.order-status.delivered {
+    background: #d1e7dd;
+    color: #0f5132;
+}
+
+.order-status.cancelled {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.order-items {
+    padding: 15px 20px;
+}
+
+.order-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.order-item:last-child {
+    border-bottom: none;
+}
+
+.item-image {
+    width: 80px;
+    height: 80px;
+    margin-right: 15px;
+}
+
+.item-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.item-details h5 {
+    margin: 0 0 5px;
+    font-size: 16px;
+    color: #333;
+}
+
+.item-price {
+    color: #ff0000;
+    font-weight: 600;
+    margin: 0 0 5px;
+}
+
+.item-quantity {
+    color: #666;
+    margin: 0;
+}
+
+.order-footer {
+    padding: 15px 20px;
+    background: #f8f9fa;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.order-total {
+    font-size: 16px;
+}
+
+.order-total strong {
+    color: #ff0000;
+    margin-left: 5px;
+}
+
+.order-actions .btn {
+    margin-left: 10px;
+    padding: 8px 15px;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.view-details {
+    background: #ff0000;
+    color: #fff;
+    border: none;
+}
+
+.download-invoice {
+    background: #fff;
+    color: #ff0000;
+    border: 1px solid #ff0000;
+}
+
+.no-orders {
+    text-align: center;
+    padding: 40px 20px;
+}
+
+.no-orders img {
+    width: 200px;
+    margin-bottom: 20px;
+}
+
+.no-orders h3 {
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.no-orders p {
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.no-orders .btn {
+    background: #ff0000;
+    color: #fff;
+    padding: 10px 25px;
+    border-radius: 4px;
+    text-decoration: none;
+}
+
+/* Modal Styles */
+.modal-content {
+    border-radius: 8px;
+}
+
+.modal-header {
+    background: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.modal-title {
+    color: #333;
+}
+
+.close {
+    color: #666;
+}
+
+#orderDetailsContent {
+    padding: 20px;
+}
+</style>
+
+<!-- Add necessary scripts -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+function viewOrderDetails(orderId) {
+    fetch(`/userProfile/order/${orderId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                $('#orderDetailsContent').html(data.html);
+                $('#orderDetailsModal').modal('show');
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: data.message || 'Failed to load order details',
+                    confirmButtonColor: '#d33'
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: 'Failed to load order details',
+                confirmButtonColor: '#d33'
+            });
+        });
+}
+
+function downloadInvoice(orderId) {
+    window.location.href = `/userProfile/order/${orderId}/invoice`;
+}
+</script>
+
+<!-- Footer-->
+<%- include("../../views/partials/user/footer") %>

@@ -7,28 +7,28 @@
         <!-- Sidebar -->
         <div class="col-md-3">
           <div class="sidebar" style="border-radius:5px;">
-            <h2><%=user.name%></h2>
+            <h2><%= user.name %></h2>
             <ul>
               <li>
-                <a class="active" href="/userProfile">
+                <a class="<%= currentPage === 'profile' ? 'active' : '' %>" href="/userProfile">
                   <i class="fas fa-user"></i>
                   Account Overview
                 </a>
               </li>
               <li>
-                <a href="/orders">
+                <a class="<%= currentPage === 'orders' ? 'active' : '' %>" href="/orders">
                   <i class="fas fa-box"></i>
                   My Orders
                 </a>
               </li>   
               <li>
-                <a href="#">
+                <a class="<%= currentPage === 'addresses' ? 'active' : '' %>" href="#">
                   <i class="fas fa-map-marker-alt"></i>
                   Manage Addresses
                 </a>
               </li>
               <li>
-                <a href="#">
+                <a class="<%= currentPage === 'wallet' ? 'active' : '' %>" href="#">
                   <i class="fas fa-wallet"></i>
                   Wallet
                 </a>
@@ -38,7 +38,6 @@
           </div>
         </div>
         <!-- /Sidebar -->
-  
 
 
         <style>
@@ -96,14 +95,14 @@
               text-align: center;
               padding: 10px;
               border-radius: 5px;
-              margin-top: 20px;
+              margin-top: 180px;
               text-decoration: none;
               display: block;
             }
           
             .content {
               width: 100%;
-              padding: 20px;
+              padding: 0px;
               box-sizing: border-box;
               display: flex;
               justify-content: center;

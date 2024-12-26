@@ -2,10 +2,12 @@ const User = require("../../models/userSchema");
 const nodemailer = require("nodemailer"); // to sent mail 
 const env = require("dotenv").config();
 const bcrypt = require("bcrypt");
+const { generateInvoice } = require('../../utils/invoiceGenerator');
+const ejs = require('ejs');
 
 const Category = require('../../models/categorySchema');
 const Product = require('../../models/productSchema');
-
+const Order = require('../../models/orderSchema'); // Added Order model
 
 const pageNotFound = async (req, res) => {
     try {
@@ -329,13 +331,14 @@ const getUserProfile = async (req, res) => {
         if (userId) {
             const userData = await User.findOne({ _id: userId });
             if (userData) {
-                return res.render("userProfile",{user:userData})
+                return res.render("userProfile", {
+                    user: userData,
+                    currentPage: 'profile'
+                });
             }
         }
-    } catch (error) {        
-        console.error("Error loading Profile:", error);
-        res.status(500).send("Internal Server Error");
-
+    } catch (error) {
+        console.log(error.message);
     }
 }
 
@@ -366,6 +369,95 @@ const updateProfile = async (req, res) => {
     }
 };
 
+
+
+
+const getOrders = async (req, res) => {
+    try {
+        const userId=req.session.user;
+        // Fetch orders for the current user
+        const orders = await Order.find({ user:userId })
+            .populate({
+                path: 'items.product',
+                select: 'name images price'
+            })
+            .sort({ orderDate: -1 }); // Most recent orders first
+
+        const userData=await User.findById(userId);
+
+        res.render("myOrders", {
+            orders,
+            userData,
+            currentPage: 'orders'
+        });
+    } catch (error) {
+        console.error('Error fetching orders:', error);
+        res.status(500).render("myOrders", {
+            orders: [],
+            user: req.session.user,
+            currentPage: 'orders',
+            error: 'Failed to load orders'
+        });
+    }
+};
+
+// Get order details for modal
+const getOrderDetails = async (req, res) => {
+    try {
+        const orderId = req.params.orderId;
+        const order = await Order.findOne({ 
+            _id: orderId,
+            user: req.session.user 
+        }).populate('items.product');
+
+        if (!order) {
+            return res.json({ 
+                success: false, 
+                message: 'Order not found' 
+            });
+        }
+
+        // Render order details partial view
+        const html = await ejs.renderFile('views/partials/user/orderDetails.ejs', { order });
+        
+        res.json({
+            success: true,
+            html
+        });
+    } catch (error) {
+        console.error('Error fetching order details:', error);
+        res.json({ 
+            success: false, 
+            message: 'Failed to load order details' 
+        });
+    }
+};
+
+// Download invoice
+const downloadInvoice = async (req, res) => {
+    try {
+        const orderId = req.params.orderId;
+        const order = await Order.findOne({ 
+            _id: orderId,
+            user: req.session.user 
+        }).populate('items.product');
+
+        if (!order) {
+            return res.status(404).send('Order not found');
+        }
+
+        if (order.status !== 'Delivered') {
+            return res.status(400).send('Invoice is only available for delivered orders');
+        }
+
+        const invoicePath = await generateInvoice(order);
+        res.download(invoicePath, `invoice-${orderId}.pdf`);
+    } catch (error) {
+        console.error('Error downloading invoice:', error);
+        res.status(500).send('Failed to download invoice');
+    }
+};
+
 module.exports = {
     loadHomePage,
     pageNotFound,
@@ -379,5 +471,8 @@ module.exports = {
     loadShoppingPage,
     loadVerifyOtp,
     getUserProfile,
-    updateProfile
+    updateProfile,
+    getOrders,
+    getOrderDetails,
+    downloadInvoice
 }
