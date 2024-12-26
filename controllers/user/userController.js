@@ -3,8 +3,8 @@ const nodemailer = require("nodemailer"); // to sent mail
 const env = require("dotenv").config();
 const bcrypt = require("bcrypt");
 
-const Category=require('../../models/categorySchema');
-const Product=require('../../models/productSchema');
+const Category = require('../../models/categorySchema');
+const Product = require('../../models/productSchema');
 
 
 const pageNotFound = async (req, res) => {
@@ -22,28 +22,27 @@ const pageNotFound = async (req, res) => {
 const loadHomePage = async (req, res) => {
     try {
         const userId = req.session.user;
-        
-        const productData = await Product.find({isListed:true})
+
+        const productData = await Product.find({ isListed: true })
             .populate('category')
             .populate('brand')
             .sort({ createdAt: -1 })
             .limit(10);
 
         if (userId) {
-            const userData = await User.findOne({ _id: userId });
-            // console.log('the usweer',userData)
+            const userData = await User.findOne({ _id: userId });        
             if (userData) {
-                return res.render("home", { 
-                    user: userData, 
-                    products: productData 
+                return res.render("home", {
+                    user: userData,
+                    products: productData
                 });
             }
         }
-        
+
         // Render without user data
-        res.render("home", { 
+        res.render("home", {
             products: productData,
-            user: null 
+            user: null
         });
 
     } catch (error) {
@@ -55,20 +54,20 @@ const loadHomePage = async (req, res) => {
 
 //logout
 
-const logout=async(req,res)=>{
+const logout = async (req, res) => {
     try {
-        req.session.destroy((err)=>{
-            if(err){
-                console.log("Session destruction error",err.message);
+        req.session.destroy((err) => {
+            if (err) {
+                console.log("Session destruction error", err.message);
                 return res.redirect("/pageNotFound");
             }
             return res.redirect("/login")
         })
 
     } catch (error) {
-        console.log("Logout Error",error)
+        console.log("Logout Error", error)
         res.redirect("/PageNotFound")
-}
+    }
 }
 
 
@@ -136,7 +135,7 @@ const signup = async (req, res) => {
         const findUser = await User.findOne({ email });
         if (findUser) {
             return res.render("signup", { message: "User with this email already exists" })
-        }   
+        }
 
         const otp = generateOtp();
 
@@ -159,11 +158,11 @@ const signup = async (req, res) => {
 }
 
 //load Verify otp
-const loadVerifyOtp= async(req,res)=>{
+const loadVerifyOtp = async (req, res) => {
     try {
         res.render("verifyOtp");
     } catch (error) {
-        console.error("loadVerifyError:",error)
+        console.error("loadVerifyError:", error)
     }
 }
 
@@ -177,7 +176,7 @@ const securePassword = async (password) => {
 
         return passwordHash;
     } catch (error) {
-        console.error('SecurePasswrod:',error)
+        console.error('SecurePasswrod:', error)
     }
 }
 
@@ -200,8 +199,8 @@ const verifyOtp = async (req, res) => {
             await saveUserData.save();
             // req.session.user = saveUserData._id;
 
-            req.session.userOtp=null;
-            req.session.userData=null;
+            req.session.userOtp = null;
+            req.session.userData = null;
 
             res.json({ success: true, redirectUrl: "/login" })
 
@@ -223,7 +222,7 @@ const resendOtp = async (req, res) => {
     try {
         console.log("resend");
 
-        const  email  = req.session.userData.email;
+        const email = req.session.userData.email;
         if (!email) {
             return res.status(400).json({ success: false, message: "Email not found in session" })
         }
@@ -231,7 +230,7 @@ const resendOtp = async (req, res) => {
 
         const otp = generateOtp();
         req.session.userOtp = otp;
-        
+
 
         const emailSent = await sendVerificationEmail(email, otp);
         if (emailSent) {
@@ -259,69 +258,113 @@ const loadLogin = async (req, res) => {
     } catch (error) {
         // res.redirect("/pageNotFound")
         console.log(error)
-        return res.status(500).json({success:false})
+        return res.status(500).json({ success: false })
     }
 }
 
-    const login = async (req, res) => {
-      
+const login = async (req, res) => {
 
-        try {
-            const { email, password } = req.body; 
-           
-            const findUser = await User.findOne({ isAdmin: 0, email: email });
 
-            if (!findUser) {
-            
-                return res.status(400).json({message:"User is not found"})
-            }
-            if (findUser.isBlocked) {
-                return res.status(400).json({message:"User is blocked by admin"})
+    try {
+        const { email, password } = req.body;
 
-            }
+        const findUser = await User.findOne({ isAdmin: 0, email: email });
 
-            const passwordMatch = await bcrypt.compare(password, findUser.password);
+        if (!findUser) {
 
-            if(!passwordMatch){
-                return res.status(400).json({message:"Password do not match"})
-
-            }
-            req.session.user=findUser._id;
-            res.redirect("/")
-
-        } catch (error) {
-            console.log("Login Error",error);
-    
+            return res.status(400).json({ message: "User is not found" })
         }
+        if (findUser.isBlocked) {
+            return res.status(400).json({ message: "User is blocked by admin" })
+
+        }
+
+        const passwordMatch = await bcrypt.compare(password, findUser.password);
+
+        if (!passwordMatch) {
+            return res.status(400).json({ message: "Password do not match" })
+
+        }
+        req.session.user = findUser._id;
+        res.redirect("/")
+
+    } catch (error) {
+        console.log("Login Error", error);
+
     }
+}
 
 
 
 
 //shopping page 
-const loadShoppingPage=async(req,res)=>{
-    
+const loadShoppingPage = async (req, res) => {
+
     try {
-        
-        const products=await Product.find({isListed:true}).populate("category");
-        if(!products){
-             return res.status(404).send({json:'product not found'});
+
+        const products = await Product.find({ isListed: true }).populate("category");
+        if (!products) {
+            return res.status(404).send({ json: 'product not found' });
         }
 
 
 
-    res.render('shop',{products});
+        res.render('shop', { products });
 
     } catch (error) {
         console.log(error);
-        
+
     }
-    
+
 }
- 
 
 
 
+
+//User Profile getting
+
+const getUserProfile = async (req, res) => {
+    try {
+        const userId = req.session.user;
+        if (userId) {
+            const userData = await User.findOne({ _id: userId });
+            if (userData) {
+                return res.render("userProfile",{user:userData})
+            }
+        }
+    } catch (error) {        
+        console.error("Error loading Profile:", error);
+        res.status(500).send("Internal Server Error");
+
+    }
+}
+
+// Update user profile
+const updateProfile = async (req, res) => {
+    try {
+        const { name, phone, email } = req.body;
+        const userId = req.session.user;
+
+        // Update user in database
+        const updatedUser = await User.findByIdAndUpdate(
+            userId,
+            { name, phone, email},
+            { new: true }
+        );
+
+        if (!updatedUser) {
+            return res.json({ success: false, message: 'User not found' });
+        }
+
+        // Update session
+        req.session.user = updatedUser;
+
+        res.json({ success: true, message: 'Profile updated successfully' });
+    } catch (error) {
+        console.error('Error updating profile:', error);
+        res.json({ success: false, message: 'Failed to update profile' });
+    }
+};
 
 module.exports = {
     loadHomePage,
@@ -335,4 +378,6 @@ module.exports = {
     logout,
     loadShoppingPage,
     loadVerifyOtp,
+    getUserProfile,
+    updateProfile
 }

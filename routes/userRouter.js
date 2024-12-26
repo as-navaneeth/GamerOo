@@ -5,7 +5,6 @@ const productController=require('../controllers/user/productController');
 const passport=require("passport")
 const {userAuth, adminAuth} = require('../middlewares/auth')
 
-
 router.get('/pageNotFound',userController.pageNotFound);
 router.get('/',userController.loadHomePage)
 
@@ -32,16 +31,8 @@ router.get('/shop',userController.loadShoppingPage);
 router.get('/productDetails/:id',userAuth,productController.loadProductPage);
 
 
-
-
-
-
-
-
-
-
-
-
-
+//UserProfileSection
+router.get('/userProfile',userAuth,userController.getUserProfile);
+router.post('/userProfile/update-profile', userAuth, userController.updateProfile);
 
 module.exports=router;
