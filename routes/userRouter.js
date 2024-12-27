@@ -2,6 +2,7 @@ const express=require("express");
 const router=express.Router();
 const userController=require("../controllers/user/userController")
 const productController=require('../controllers/user/productController');
+const addressController=require('../controllers/user/addressController');
 const passport=require("passport")
 const {userAuth, adminAuth} = require('../middlewares/auth')
 
@@ -38,6 +39,21 @@ router.post('/userProfile/update-profile', userAuth, userController.updateProfil
 // Order routes
 router.get('/orders', userAuth, userController.getOrders);
 router.get('/userProfile/order/:orderId', userAuth, userController.getOrderDetails);
-router.get('/userProfile/order/:orderId/invoice', userAuth, userController.downloadInvoice);
+router.get('/userProfile/order/:orderId/invoice', userAuth, userController.downloadInvoice);   //look after sometimes
+
+
+//Address routes
+router.get('/manageAddress', userAuth, addressController.getAddress);
+router.get('/manageAddress/addAddress',userAuth,addressController.getAddAddress);
+router.post('/manageAddress/addAddress',userAuth,addressController.postaddAddress)
+router.get('/manageAddress/editAddress/:id',userAuth,addressController.getEditAddress);
+router.post('/manageAddress/editAddress/:id',userAuth,addressController.updateAddress);
+router.get('/manageAddress/setDefault/:id',userAuth,addressController.setDefaultAddress);
+router.delete('/manageAddress/deleteAddress/:id',userAuth,addressController.deleteAddress);
+
+
+
+
+
 
 module.exports=router;

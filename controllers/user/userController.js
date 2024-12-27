@@ -9,6 +9,10 @@ const Category = require('../../models/categorySchema');
 const Product = require('../../models/productSchema');
 const Order = require('../../models/orderSchema'); // Added Order model
 
+
+
+
+
 const pageNotFound = async (req, res) => {
     try {
         res.render("page-404")
@@ -457,6 +461,12 @@ const downloadInvoice = async (req, res) => {
         res.status(500).send('Failed to download invoice');
     }
 };
+
+
+
+
+
+
 
 module.exports = {
     loadHomePage,

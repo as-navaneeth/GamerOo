@@ -40,6 +40,11 @@
 		href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Keania+One&display=swap"
 		rel="stylesheet">
 
+		<!--Font Awesome link-->
+
+		<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
+
 </head>
 
 <body>
@@ -50,15 +55,15 @@
 
 			<div class="container">
 				<ul class="header-links pull-left">		
-					<li><a href="#"><i class="fa fa-envelope-o"></i>gameroocontact@gmail.com</a></li>
-					<li><a href="#"><i class="fa fa-map-marker"></i> Kerala</a></li>
+					<li><a href="#"><i class="fas fa-envelope"></i>gameroocontact@gmail.com</a></li>
+					<li><a href="#"><i class="fas fa-map-marker-alt"></i> Kerala</a></li>
 				</ul>
 				<ul class="header-links pull-right">
-					<li><a href="#"><i class="fa fa-inr"></i> Wallet</a></li>
+					<li><a href="#"><i class="fas fa-indian-rupee-sign"></i> Wallet</a></li>
 
 					<%if(locals.user){ %>
 						<div class="dropdown">
-							<a class="nameColor" href="#"><i class="fa fa-user-o" style="color: red;"></i>
+							<a class="nameColor" href="#"><i class="fas fa-user" style="color: red;"></i>
 								<%=locals.user.name%>
 							</a>
 							<div class="dropdown-content">
@@ -114,7 +119,7 @@
 							<!-- Wishlist -->
 							<div>
 								<a href="#">
-									<i class="fa fa-heart-o"></i>
+									<i class="fas fa-heart-o"></i>
 									<span>Your Wishlist</span>
 									<div class="qty">2</div>
 								</a>
@@ -124,7 +129,7 @@
 							<!-- Cart -->
 							<div class="dropdown">
 								<a class="dropdown-toggle" data-toggle="dropdown" aria-expanded="true">
-									<i class="fa fa-shopping-cart"></i>
+									<i class="fas fa-shopping-cart"></i>
 									<span>Your Cart</span>
 									<div class="qty">3</div>
 								</a>
@@ -158,7 +163,7 @@
 									</div>
 									<div class="cart-btns">
 										<a href="#">View Cart</a>
-										<a href="#">Checkout <i class="fa fa-arrow-circle-right"></i></a>
+										<a href="#">Checkout <i class="fas fa-arrow-circle-right"></i></a>
 									</div>
 								</div>
 							</div>

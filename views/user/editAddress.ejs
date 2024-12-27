@@ -1,0 +1,241 @@
+<!--Header-->
+<%- include("../../views/partials/user/header") %>
+
+<!-- BREADCRUMB -->
+<div id="breadcrumb" class="section">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h3 class="breadcrumb-header">Edit Address</h3>
+                <ul class="breadcrumb-tree">
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/manageAddress">Manage Addresses</a></li>
+                    <li class="active">Edit Address</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /BREADCRUMB -->
+
+<!-- SECTION -->
+<div class="section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow-sm">
+                    <div class="card-body p-4">
+                        <h4 class="card-title mb-4 text-center">Update Address Details</h4>
+                        
+
+                        <form action="/manageAddress/editAddress/<%= address._id %>" id="formBtn"  class="needs-validation">
+                            
+        
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <input type="hidden" name="user" value="<%= user._id %>">
+                                        <label for="name" class="form-label">Full Name</label>
+                                        <input type="text" class="form-control" id="name" name="name" 
+                                               value="<%= address.name %>" required>
+                                        
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="phone" class="form-label">Phone Number</label>
+                                        <input type="tel" class="form-control" id="phone" name="phone" 
+                                               value="<%= address.phone %>"
+                                               pattern="[0-9]{10}" title="Enter a 10-digit phone number" required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label for="address" class="form-label">Address</label>
+                                <textarea class="form-control" id="address" name="address" 
+                                          rows="3" required><%= address.address %></textarea>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="city" class="form-label">City</label>
+                                        <input type="text" class="form-control" id="city" name="city" 
+                                               value="<%= address.city %>" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="state" class="form-label">State</label>
+                                        <input type="text" class="form-control" id="state" name="state" 
+                                               value="<%= address.state %>" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="pincode" class="form-label">Pincode</label>
+                                        <input type="text" class="form-control" id="pincode" name="pincode" 
+                                               value="<%= address.pincode %>"
+                                               pattern="[0-9]{6}" title="Enter a 6-digit pincode" required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group mb-4">
+                                <label for="type" class="form-label">Address Type</label>
+                                <select class="form-control" id="type" name="type" required>
+                                    <option value="Home" <%= address.type === 'Home' ? 'selected' : '' %>>Home</option>
+                                    <option value="Work" <%= address.type === 'Work' ? 'selected' : '' %>>Work</option>
+                                    <option value="Other" <%= address.type === 'Other' ? 'selected' : '' %>>Other</option>
+                                </select>
+                            </div>
+
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <a href="/manageAddress" class="btn btn-secondary me-md-2">Cancel</a>
+                                <button type="submit" class="btn btn-primary">Update Address</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /SECTION -->
+
+<style>
+    .card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    }
+
+    .card-body {
+        padding: 2rem;
+    }
+
+    .form-control {
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        border: 1px solid #ced4da;
+        transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    }
+
+    .form-control:focus {
+        border-color: #80bdff;
+        box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
+    }
+
+    .form-label {
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        color: #000000;
+        font-size: large;
+    }
+
+    .btn {
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 500;
+    }
+
+    .btn-primary {
+        background-color: #D10024;
+        border-color: #D10024;
+    }
+
+    .btn-primary:hover {
+        background-color: #A6001C;
+        border-color: #A6001C;
+    }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        border-color: #6c757d;
+    }
+
+    .btn-secondary:hover {
+        background-color: #5a6268;
+        border-color: #545b62;
+    }
+
+    .invalid-feedback {
+        font-size: 0.875rem;
+    }
+
+    textarea.form-control {
+        min-height: 100px;
+    }
+
+    .breadcrumb-header {
+        color: #2B2D42;
+        font-weight: 700;
+    }
+
+    .breadcrumb-tree a {
+        color: #2B2D42;
+        font-weight: 500;
+    }
+
+    .breadcrumb-tree a:hover {
+        color: #D10024;
+    }
+</style>
+
+<!-- Form validation script -->
+<script>
+
+document.addEventListener('DOMContentLoaded',()=>{
+    const form=document.getElementById('formBtn');
+
+    form.addEventListener("submit",async(event)=>{
+        event.preventDefault();
+
+        const formData=new FormData(form); //get the form data
+        const data=Object.fromEntries(formData.entries()); //convert from data to json-firendly object
+
+        console.log(data)
+
+        try {
+            const response=await fetch(form.action,{
+                method:'POST',
+                headers:{
+                    "Content-Type":"application/json",
+                },
+                body:JSON.stringify(data),
+            });
+
+            const result=await response.json();
+
+            if(result.success){
+                alert(result.message);
+                window.location.href="/manageAddress";
+            }else{
+                alert(result.message);  
+            }
+
+        } catch (error) {
+            console.error("Error submiting form:",error);
+            alert("An Error occured");
+        }
+    })
+})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</script>
+
+<!-- Footer -->
+<%- include("../../views/partials/user/footer") %>
