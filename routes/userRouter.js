@@ -3,6 +3,7 @@ const router=express.Router();
 const userController=require("../controllers/user/userController")
 const productController=require('../controllers/user/productController');
 const addressController=require('../controllers/user/addressController');
+const cartController=require('../controllers/user/cartController');
 const passport=require("passport")
 const {userAuth, adminAuth} = require('../middlewares/auth')
 
@@ -51,9 +52,10 @@ router.post('/manageAddress/editAddress/:id',userAuth,addressController.updateAd
 router.get('/manageAddress/setDefault/:id',userAuth,addressController.setDefaultAddress);
 router.delete('/manageAddress/deleteAddress/:id',userAuth,addressController.deleteAddress);
 
-
-
-
+//Cart Routes
+router.get('/cart', userAuth, cartController.getAddtoCart);
+router.post('/cart/add',userAuth,cartController.addToCart);
+router.delete('/cart/delete/:itemId',userAuth,cartController.deleteCartItem);
 
 
 module.exports=router;

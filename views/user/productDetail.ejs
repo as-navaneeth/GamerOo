@@ -130,7 +130,7 @@
                                     <span class="qty-down">-</span>
                                 </div>
                             </div>
-                            <button class="add-to-cart-btn" data-id="<%=product._id%>">
+                            <button class="add-to-cart-btn"   id="addToCart" data-product-id="<%=product._id%>" data-price="<%=product.salePrice%>">
                                 <i class="fa fa-shopping-cart"></i> add to cart</button>
                         </div>
 
@@ -436,9 +436,9 @@
                                     </div>
                                 </div>
                                 <div class="add-to-cart">
-                                    <button class="add-to-cart-btn"><i class="fa fa-shopping-cart"></i> add to
+                                    <button class="add-to-cart-btn" id="addToCart" data-product-id="<%=product._id%>" data-price="<%=product.price%>" ><i class="fa fa-shopping-cart"></i> add to
                                         cart</button>
-                                </div>
+                                </div>  
                             </div>
                         </a>
                     </div>
@@ -521,6 +521,24 @@
 
 
 
+
+
+        document.getElementById('addToCart').addEventListener('click',async function () {
+            const productId=this.getAttribute('data-product-id');
+            const price=this.getAttribute('data-price');
+
+            const response=await fetch('/cart/add',{
+                method:'POST',
+                headers:{
+                    'Content-Type':'application/json'
+                },
+                body:JSON.stringify({productId,price,quantity:1})
+            })
+            
+            const message=await response.text();
+            alert(message);
+        })
+       
 
     </script>
 
