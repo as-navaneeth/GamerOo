@@ -1,32 +1,55 @@
 <%- include("../../views/partials/admin/header") %>
 
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
     <div class="main-panel">
         <div class="content-wrapper">
             <div class="page-header">
                 <h3 class="page-title">Product List</h3>
-                <nav aria-label="breadcrumb">
+                <!-- <nav aria-label="breadcrumb">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a href="/admin/dashboard">Dashboard</a></li>
                         <li class="breadcrumb-item active" aria-current="page">Products</li>
                     </ol>
-                </nav>
+                </nav> -->
             </div>
 
-
-
-            <!-- <div class="row mb-4">
-                <div class="col-md-6">
-                    <form method="GET" action="/admin/products" class="form-inline">
-                        <div class="input-group">
-                            <input type="text" name="search" class="form-control" placeholder="Search products..." >
-                            <div class="input-group-append">
-                                <button type="submit" class="btn btn-primary">Search</button>
+            <div class="row mb-4">
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-body p-3">
+                            <div class="d-flex align-items-center">
+                                <div class="input-group mr-3" style="width: 250px;">
+                                    <select id="categoryFilter" class="form-control">
+                                        <option value="">All Categories</option>
+                                        <% categories.forEach(function(category) { %>
+                                            <option value="<%= category._id %>" <%= selectedCategory === category._id.toString() ? 'selected' : '' %>>
+                                                <%= category.name %>
+                                            </option>
+                                        <% }); %>
+                                    </select>
+                                </div>
+                                <div class="input-group flex-grow-1">
+                                    <input type="text" id="searchInput" class="form-control" 
+                                           placeholder="Search products..." 
+                                           value="<%= search || '' %>">
+                                    <div class="input-group-append">
+                                        <button id="searchBtn" class="btn btn-primary">
+                                            <i class="fas fa-search"></i>
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </form>
+                    </div>
                 </div>
-            </div> -->
-            
+                <div class="col-md-4 text-right">
+                    <a href="/admin/addProduct" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Add Product
+                    </a>
+                </div>
+            </div>
 
             <!-- Product Table -->
             <div class="row">
@@ -48,7 +71,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <% data.forEach(product=> { %>
+                                    <% products.forEach(product=> { %>
                                         <tr>
                                             <td>
                                                 <%= product.name %>
@@ -145,7 +168,50 @@
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Category filter change
+            document.getElementById('categoryFilter').addEventListener('change', function() {
+                const category = this.value;
+                const searchParams = new URLSearchParams(window.location.search);
+                if (category) {
+                    searchParams.set('category', category);
+                } else {
+                    searchParams.delete('category');
+                }
+                searchParams.set('page', '1');
+                // Preserve search if exists
+                const searchQuery = document.getElementById('searchInput').value;
+                if (searchQuery) {
+                    searchParams.set('search', searchQuery);
+                }
+                window.location.href = `?${searchParams.toString()}`;
+            });
 
+            // Search functionality
+            document.getElementById('searchBtn').addEventListener('click', function() {
+                const searchQuery = document.getElementById('searchInput').value;
+                const searchParams = new URLSearchParams(window.location.search);
+                if (searchQuery) {
+                    searchParams.set('search', searchQuery);
+                } else {
+                    searchParams.delete('search');
+                }
+                searchParams.set('page', '1');
+                // Preserve category if selected
+                const category = document.getElementById('categoryFilter').value;
+                if (category) {
+                    searchParams.set('category', category);
+                }
+                window.location.href = `?${searchParams.toString()}`;
+            });
+
+            // Handle search on enter key
+            document.getElementById('searchInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    document.getElementById('searchBtn').click();
+                }
+            });
+        });
 
         document.querySelectorAll('.toggle-list-btn').forEach(button=>{
             button.addEventListener('click',async(e)=>{

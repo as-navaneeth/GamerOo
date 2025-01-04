@@ -1,0 +1,298 @@
+<%- include('../partials/admin/header') %>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!-- Order Details -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Order Details</h3>
+                    <div class="card-tools">
+                        <a href="/admin/orders" class="btn btn-sm btn-default">
+                            <i class="fas fa-arrow-left"></i> Back to Orders
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Order Information</h5>
+                            <table class="table table-bordered">
+                                <tr>
+                                    <th style="width: 150px">Order ID</th>
+                                    <td><%= order._id %></td>
+                                </tr>
+                                <tr>
+                                    <th>Order Date</th>
+                                    <td><%= new Date(order.orderDate).toLocaleString() %></td>
+                                </tr>
+                                <tr>
+                                    <th>Status</th>
+                                    <td>
+                                        <span class="badge badge-<%= getStatusBadgeClass(order.status) %>">
+                                            <%= order.status %>
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Payment Method</th>
+                                    <td><%= order.paymentMethod %></td>
+                                </tr>
+                                <tr>
+                                    <th>Payment Status</th>
+                                    <td>
+                                        <span class="badge badge-<%= getPaymentStatusBadgeClass(order.paymentStatus) %>">
+                                            <%= order.paymentStatus %>
+                                        </span>
+                                    </td>
+                                </tr>
+                                <% if (order.trackingNumber) { %>
+                                    <tr>
+                                        <th>Tracking Number</th>
+                                        <td><%= order.trackingNumber %></td>
+                                    </tr>
+                                <% } %>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Customer Information</h5>
+                            <table class="table table-bordered">
+                                <tr>
+                                    <th style="width: 150px">Name</th>
+                                    <td><%= order.shippingAddress.name %></td>
+                                </tr>
+                                <tr>
+                                    <th>Email</th>
+                                    <td><%= order.user.email %></td>
+                                </tr>
+                                <tr>
+                                    <th>Phone</th>
+                                    <td><%= order.shippingAddress.phone %></td>
+                                </tr>
+                                <tr>
+                                    <th>Address</th>
+                                    <td>
+                                        <%= order.shippingAddress.address %><br>
+                                        <%= order.shippingAddress.city %>, <%= order.shippingAddress.state %><br>
+                                        <%= order.shippingAddress.pincode %>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+
+                    <h5 class="mt-4">Order Items</h5>
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Image</th>
+                                    <th>Price</th>
+                                    <th>Quantity</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% order.items.forEach(item => { %>
+                                    <tr>
+                                        <td><%= item.product.name %></td>
+                                        <td>
+                                            <img src="/uploads/products/<%= item.product.productImage[0] %>" 
+                                                alt="<%= item.product.name %>"
+                                                style="max-width: 50px;">
+                                        </td>
+                                        <td>₹<%= item.price %></td>
+                                        <td><%= item.quantity %></td>
+                                        <td>₹<%= item.price * item.quantity %></td>
+                                    </tr>
+                                <% }); %>
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="4" class="text-right"><strong>Subtotal:</strong></td>
+                                    <td>₹<%= order.totalAmount - order.shippingCost + order.discount %></td>
+                                </tr>
+                                <% if (order.discount > 0) { %>
+                                    <tr>
+                                        <td colspan="4" class="text-right"><strong>Discount:</strong></td>
+                                        <td>-₹<%= order.discount %></td>
+                                    </tr>
+                                <% } %>
+                                <tr>
+                                    <td colspan="4" class="text-right"><strong>Shipping:</strong></td>
+                                    <td>₹<%= order.shippingCost %></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="4" class="text-right"><strong>Total:</strong></td>
+                                    <td><strong>₹<%= order.totalAmount %></strong></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+
+                    <% if (order.status === 'Cancelled') { %>
+                        <div class="alert alert-danger mt-3">
+                            <h5><i class="icon fas fa-ban"></i> Order Cancelled</h5>
+                            <p><strong>Cancelled on:</strong> <%= new Date(order.cancelledAt).toLocaleString() %></p>
+                            <p><strong>Reason:</strong> <%= order.cancellationReason %></p>
+                        </div>
+                    <% } %>
+
+                    <% if (order.status === 'Delivered') { %>
+                        <div class="alert alert-success mt-3">
+                            <h5><i class="icon fas fa-check"></i> Order Delivered</h5>
+                            <p><strong>Delivered on:</strong> <%= new Date(order.deliveredAt).toLocaleString() %></p>
+                        </div>
+                    <% } %>
+                </div>
+                <div class="card-footer">
+                    <% if (order.status !== 'Cancelled' && order.status !== 'Delivered') { %>
+                        <div class="float-right">
+                            <button type="button" class="btn btn-danger cancel-order" data-order-id="<%= order._id %>">
+                                Cancel Order
+                            </button>
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                                    Update Status
+                                </button>
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item update-status" href="#" 
+                                        data-order-id="<%= order._id %>" 
+                                        data-status="Processing">Mark as Processing</a>
+                                    <a class="dropdown-item update-status" href="#" 
+                                        data-order-id="<%= order._id %>" 
+                                        data-status="Shipped">Mark as Shipped</a>
+                                    <a class="dropdown-item update-status" href="#" 
+                                        data-order-id="<%= order._id %>" 
+                                        data-status="Delivered">Mark as Delivered</a>
+                                </div>
+                            </div>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function getStatusBadgeClass(status) {
+    switch(status) {
+        case 'Pending': return 'warning';
+        case 'Processing': return 'info';
+        case 'Shipped': return 'primary';
+        case 'Delivered': return 'success';
+        case 'Cancelled': return 'danger';
+        default: return 'secondary';
+    }
+}
+
+function getPaymentStatusBadgeClass(status) {
+    switch(status) {
+        case 'Completed': return 'success';
+        case 'Failed': return 'danger';
+        default: return 'warning';
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Update status
+    document.querySelectorAll('.update-status').forEach(btn => {
+        btn.addEventListener('click', async function(e) {
+            e.preventDefault();
+            const orderId = this.dataset.orderId;
+            const status = this.dataset.status;
+
+            try {
+                const response = await fetch('/admin/orders/update-status', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ orderId, status })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: 'Order status updated successfully',
+                        showConfirmButton: false,
+                        timer: 1500
+                    }).then(() => {
+                        location.reload();
+                    });
+                } else {
+                    throw new Error(data.message);
+                }
+            } catch (error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: error.message || 'Failed to update order status'
+                });
+            }
+        });
+    });
+
+    // Cancel order
+    document.querySelector('.cancel-order')?.addEventListener('click', async function(e) {
+        e.preventDefault();
+        const orderId = this.dataset.orderId;
+
+        const { value: reason } = await Swal.fire({
+            title: 'Cancel Order',
+            input: 'text',
+            inputLabel: 'Cancellation Reason',
+            inputPlaceholder: 'Enter reason for cancellation',
+            showCancelButton: true,
+            inputValidator: (value) => {
+                if (!value) {
+                    return 'Please enter a reason for cancellation';
+                }
+            }
+        });
+
+        if (reason) {
+            try {
+                const response = await fetch('/admin/orders/update-status', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        orderId,
+                        status: 'Cancelled',
+                        reason
+                    })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: 'Order cancelled successfully',
+                        showConfirmButton: false,
+                        timer: 1500
+                    }).then(() => {
+                        location.reload();
+                    });
+                } else {
+                    throw new Error(data.message);
+                }
+            } catch (error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: error.message || 'Failed to cancel order'
+                });
+            }
+        }
+    });
+});
+</script>
+
+<%- include('../partials/admin/footer') %>

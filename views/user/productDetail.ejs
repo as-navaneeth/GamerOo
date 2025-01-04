@@ -28,6 +28,8 @@
     </div>
     <!-- /BREADCRUMB -->
 
+
+
     <!-- SECTION -->
     <div class="section">
         <!-- container -->
@@ -56,6 +58,8 @@
                 </div>
                 <!-- /Product main img -->
 
+
+
                 <!-- Product thumb imgs -->
                 <div class="col-md-2  col-md-pull-5">
                     <div id="product-imgs">
@@ -78,6 +82,8 @@
                 </div>
                 <!-- /Product thumb imgs -->
 
+
+
                 <!-- Product details -->
                 <div class="col-md-5">
                     <div class="product-details">
@@ -95,12 +101,24 @@
                             <a class="review-link" href="#">10 Review(s) | Add your review</a>
                         </div>
                         <div>
-                            <h3 class="product-price"><i class="fa fa-inr"></i>
-                                <%=product.salePrice%><del class="product-old-price"><i class="fa fa-inr"></i>
-                                        <%=product.regularPrice%>
-                                    </del>
+                            <h3 class="product-price">
+                                <i class="fa fa-inr"></i><%=product.salePrice%>
+                                <del class="product-old-price">
+                                    <i class="fa fa-inr"></i><%=product.regularPrice%>
+                                </del>
                             </h3>
-                            <span class="product-available">Stock Avaliable: <%=product.stock%></span>
+                            <span class="product-available" id="stockStatus">
+                                <% if (product.stock > 0) { %>
+                                    <i class="fa fa-check-circle"></i>
+                                    <% if (product.stock < 10) { %>
+                                        Only <span id="stockCount"><%=product.stock%></span> items left in stock!
+                                    <% } else { %>
+                                        In Stock (<span id="stockCount"><%=product.stock%></span> available)
+                                    <% } %>
+                                <% } else { %>
+                                    <i class="fa fa-times-circle"></i> Out of Stock
+                                <% } %>
+                            </span>
                         </div>
                         <p>
                             <%=product.description%>
@@ -125,13 +143,24 @@
                             <div class="qty-label">
                                 Qty
                                 <div class="input-number">
-                                    <input type="number" id="quantity" value="1" min="1" max="<%=product.stock%>" disabled>
-                                    <span class="qty-up">+</span>
-                                    <span class="qty-down">-</span>
+                                    <input type="number" 
+                                           id="quantity" 
+                                           value="1" 
+                                           min="1" 
+                                           max="<%=product.stock%>" 
+                                           <%= product.stock <= 0 ? 'disabled' : '' %>>
+                                    <button type="button" class="qty-up">+</button>
+                                    <button type="button" class="qty-down">-</button>
                                 </div>
                             </div>
-                            <button class="add-to-cart-btn"   id="addToCart" data-product-id="<%=product._id%>" data-price="<%=product.salePrice%>">
-                                <i class="fa fa-shopping-cart"></i> add to cart</button>
+                            <button class="add-to-cart-btn" 
+                                    id="addToCart" 
+                                    data-product-id="<%=product._id%>" 
+                                    data-price="<%=product.salePrice%>"
+                                    <%= product.stock <= 0 ? 'disabled' : '' %>>
+                                <i class="fa fa-shopping-cart"></i> 
+                                <%= product.stock <= 0 ? 'Out of Stock' : 'Add to Cart' %>
+                            </button>
                         </div>
 
                         <ul class="product-btns">
@@ -159,6 +188,8 @@
                 </div>
                 <!-- /Product details -->
 
+
+
                 <!-- Product tab -->
                 <div class="col-md-12">
                     <div id="product-tab">
@@ -169,6 +200,8 @@
                             <li><a data-toggle="tab" href="#tab3">Reviews (3)</a></li>
                         </ul>
                         <!-- /product tab nav -->
+
+
 
                         <!-- product tab content -->
                         <div class="tab-content">
@@ -273,6 +306,8 @@
                                     </div>
                                     <!-- /Rating -->
 
+
+
                                     <!-- Reviews -->
                                     <div class="col-md-6">
                                         <div id="reviews">
@@ -347,6 +382,8 @@
                                     </div>
                                     <!-- /Reviews -->
 
+
+
                                     <!-- Review Form -->
                                     <div class="col-md-3">
                                         <div id="review-form">
@@ -389,6 +426,8 @@
     </div>
     <!-- /SECTION -->
 
+
+
     <!-- Section -->
     <div class="section">
         <!-- container -->
@@ -396,11 +435,15 @@
             <!-- row -->
             <div class="row">
 
+
+
                 <div class="col-md-12">
                     <div class="section-title text-center">
                         <h3 class="title">Related Products</h3>
                     </div>
                 </div>
+
+
 
                 <!-- product -->
                 <% similarProducts.forEach((product)=>{%>
@@ -418,33 +461,39 @@
                                     <h3 class="product-name"><a href="<%=product._id%>">
                                             <%=product.name%>
                                         </a></h3>
-                                    <h4 class="product-price">
-                                        <%=product.salePrice%><del class="product-old-price">
-                                                <%=product.regularPrice%>
+
+
+
+                                        <h3 class="product-price">
+                                            <i class="fa fa-inr"></i><%=product.salePrice%>
+                                            <del class="product-old-price">
+                                                <i class="fa fa-inr"></i><%=product.regularPrice%>
                                             </del>
-                                    </h4>
-                                    <div class="product-rating">
+                                        </h3>
+                                        <!-- <% if (product.stock > 0) { %>
+                                            <span class="product-available <%= product.stock < 10 ? 'low-stock' : '' %>">
+                                                <i class="fa fa-check-circle"></i>
+                                                <% if (product.stock < 10) { %>
+                                                    Only <%=product.stock%> items left in stock!
+                                                <% } else { %>
+                                                    In Stock (<%=product.stock%> available)
+                                                <% } %>
+                                            </span>
+                                        <% } else { %>
+                                            <span class="product-unavailable">
+                                                <i class="fa fa-times-circle"></i> Out of Stock
+                                            </span>
+                                        <% } %> -->
                                     </div>
-                                    <div class="product-btns">
-                                        <button class="add-to-wishlist"><i class="fa fa-heart-o"></i><span
-                                                class="tooltipp">add
-                                                to wishlist</span></button>
-                                        <!-- <button class="add-to-compare"><i class="fa fa-exchange"></i><span class="tooltipp">add
-                                        to compare</span></button>
-                                <button class="quick-view"><i class="fa fa-eye"></i><span class="tooltipp">quick
-                                        view</span></button> -->
-                                    </div>
+
+                                    
                                 </div>
-                                <div class="add-to-cart">
-                                    <button class="add-to-cart-btn" id="addToCart" data-product-id="<%=product._id%>" data-price="<%=product.price%>" ><i class="fa fa-shopping-cart"></i> add to
-                                        cart</button>
-                                </div>  
-                            </div>
-                        </a>
-                    </div>
-                    <%})%>
+                            </a>
+                        </div>
+                        <%})%>
                         <!-- /product -->
-                    
+
+
 
             </div>
             <!-- /row -->
@@ -452,6 +501,8 @@
         <!-- /container -->
     </div>
     <!-- /Section -->
+
+
 
     <!-- NEWSLETTER -->
     <div id="newsletter" class="section">
@@ -490,56 +541,140 @@
     <!-- /NEWSLETTER -->
 
 
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
+        // Wait for DOM to be fully loaded
+        document.addEventListener('DOMContentLoaded', function() {
             const quantityInput = document.getElementById('quantity');
-            const qtyUp = document.getElementById('.qty-up');
-            const qtyDown = document.getElementById('.qty-down');
+            const addToCartBtn = document.getElementById('addToCart');
+            const qtyUpBtn = document.querySelector('.qty-up');
+            const qtyDownBtn = document.querySelector('.qty-down');
+            const maxStock = '<%=product.stock%>';
 
+            // Prevent direct input of numbers
+            quantityInput.addEventListener('keydown', function(e) {
+                e.preventDefault();
+            });
 
-            //increase
-            qtyUp.addEventListener('click', () => {
-                let currentQty = parseInt(quantityInput.value);
-                
-
-                if(currentQty>maxStock){
-                    quantityInput.value=currentQty+1;
-                }else{
-                    quantityInput.value=maxStock;
+            // Quantity up button
+            qtyUpBtn.addEventListener('click', function(e) {
+                e.preventDefault(); // Prevent any default button behavior
+                e.stopPropagation(); // Stop event bubbling
+                const currentVal = parseInt(quantityInput.value);
+                if (currentVal < maxStock) {
+                    quantityInput.value = currentVal + 0;
+                } else {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Maximum Stock Reached',
+                        text: `Only ${maxStock} items available in stock`
+                    });
                 }
             });
 
-            //decrease
-            qtyDown.addEventListener('click', () => {
-                let currentQty = parseInt(quantityInput.value);
-                if (currentQty > 1) {
-                    quantityInput.value = currentQty - 1; 
+            // Quantity down button
+            qtyDownBtn.addEventListener('click', function(e) {
+                e.preventDefault(); // Prevent any default button behavior
+                e.stopPropagation(); // Stop event bubbling
+                const currentVal = parseInt(quantityInput.value);
+                if (currentVal > 1) {
+                    quantityInput.value = currentVal - 0;
                 }
             });
 
+            // Function to update stock display
+            function updateStockDisplay(newStock) {
+                const stockStatus = document.getElementById('stockStatus');
+                const stockCount = document.getElementById('stockCount');
+                const addToCartBtn = document.getElementById('addToCart');
+                const quantityInput = document.getElementById('quantity');
+
+                if (newStock <= 0) {
+                    stockStatus.innerHTML = '<i class="fa fa-times-circle"></i> Out of Stock';
+                    stockStatus.classList.remove('product-available');
+                    stockStatus.classList.add('product-unavailable');
+                    addToCartBtn.disabled = true;
+                    addToCartBtn.innerHTML = '<i class="fa fa-ban"></i> Out of Stock';
+                    quantityInput.disabled = true;
+                } else if (newStock < 10) {
+                    stockStatus.innerHTML = `<i class="fa fa-check-circle"></i> Only <span id="stockCount">${newStock}</span> items left in stock!`;
+                    stockStatus.classList.add('product-available', 'low-stock');
+                    stockStatus.classList.remove('product-unavailable');
+                    addToCartBtn.disabled = false;
+                    addToCartBtn.innerHTML = '<i class="fa fa-shopping-cart"></i> Add to Cart';
+                    quantityInput.disabled = false;
+                    quantityInput.max = newStock;
+                } else {
+                    stockStatus.innerHTML = `<i class="fa fa-check-circle"></i> In Stock (<span id="stockCount">${newStock}</span> available)`;
+                    stockStatus.classList.add('product-available');
+                    stockStatus.classList.remove('product-unavailable', 'low-stock');
+                    addToCartBtn.disabled = false;
+                    addToCartBtn.innerHTML = '<i class="fa fa-shopping-cart"></i> Add to Cart';
+                    quantityInput.disabled = false;
+                    quantityInput.max = newStock;
+                }
+            }
+
+            // Add to cart functionality
+            addToCartBtn.addEventListener('click', async function(e) {
+                e.preventDefault(); // Prevent any default button behavior
+                const productId = this.dataset.productId;
+                const price = this.dataset.price;
+                const quantity = parseInt(quantityInput.value);
+
+                try {
+                    const response = await fetch('/cart/add', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            productId,
+                            price,
+                            quantity
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        // Update stock display if new stock is provided
+                        if (data.newStock !== undefined) {
+                            updateStockDisplay(data.newStock);
+                        }
+
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success!',
+                            text: 'Item added to cart successfully!',
+                            showConfirmButton: true,
+                            confirmButtonText: 'View Cart',
+                            showCancelButton: true,
+                            cancelButtonText: 'Continue Shopping'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.href = '/cart';
+                            }
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: data.message || 'Failed to add item to cart'
+                        });
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Something went wrong!'
+                    });
+                }
+            });
         });
-
-
-
-
-
-        document.getElementById('addToCart').addEventListener('click',async function () {
-            const productId=this.getAttribute('data-product-id');
-            const price=this.getAttribute('data-price');
-
-            const response=await fetch('/cart/add',{
-                method:'POST',
-                headers:{
-                    'Content-Type':'application/json'
-                },
-                body:JSON.stringify({productId,price,quantity:1})
-            })
-            
-            const message=await response.text();
-            alert(message);
-        })
-       
-
     </script>
 
 

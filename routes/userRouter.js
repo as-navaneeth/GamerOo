@@ -4,6 +4,8 @@ const userController=require("../controllers/user/userController")
 const productController=require('../controllers/user/productController');
 const addressController=require('../controllers/user/addressController');
 const cartController=require('../controllers/user/cartController');
+const checkoutController=require('../controllers/user/checkoutController');
+const orderController = require('../controllers/user/orderController');
 const passport=require("passport")
 const {userAuth, adminAuth} = require('../middlewares/auth')
 
@@ -36,9 +38,17 @@ router.get('/productDetails/:id',userAuth,productController.loadProductPage);
 //UserProfileSection
 router.get('/userProfile',userAuth,userController.getUserProfile);
 router.post('/userProfile/update-profile', userAuth, userController.updateProfile);
+//change password
+router.get('/userProfile/change-password',userAuth,userController.getChangePassword);
+router.post('/userProfile/change-password',userAuth,userController.postChangePassword);
+
+// Order Routes
+router.get('/orders', userAuth, orderController.getMyOrders);
+router.get('/orders/:orderId', userAuth, orderController.getOrderDetails);
+router.post('/orders/:orderId/cancel', userAuth, orderController.cancelOrder);
 
 // Order routes
-router.get('/orders', userAuth, userController.getOrders);
+router.get('/userProfile/orders', userAuth, userController.getOrders);
 router.get('/userProfile/order/:orderId', userAuth, userController.getOrderDetails);
 router.get('/userProfile/order/:orderId/invoice', userAuth, userController.downloadInvoice);   //look after sometimes
 
@@ -57,5 +67,8 @@ router.get('/cart', userAuth, cartController.getAddtoCart);
 router.post('/cart/add',userAuth,cartController.addToCart);
 router.delete('/cart/delete/:itemId',userAuth,cartController.deleteCartItem);
 
+router.get('/checkout/validate', userAuth, checkoutController.validateCheckout);
+router.get('/checkout', userAuth, checkoutController.getCheckout);
+router.post('/checkout/process', userAuth, checkoutController.processCheckout);
 
 module.exports=router;

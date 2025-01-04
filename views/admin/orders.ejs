@@ -1,0 +1,285 @@
+<% function getStatusBadgeClass(status) { switch(status.toLowerCase()) { case 'pending' : return 'warning' ;
+    case 'processing' : return 'info' ; case 'shipped' : return 'primary' ; case 'delivered' : return 'success' ;
+    case 'cancelled' : return 'danger' ; default: return 'secondary' ; } } %>
+
+    <!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+
+    <%- include('../partials/admin/header') %>
+
+    <style>
+        .product-item {
+            margin-bottom: 4px;
+            font-size: 0.9em;
+            padding: 2px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .product-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+      
+    </style>
+
+    <div class="main-panel">
+        <div class="content-wrapper">
+
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Order Management</h3>
+                                <div class="card-tools">
+                                    <div class="input-group">
+                                        <select id="statusFilter" class="form-control mr-2">
+                                            <option value="all" <%=status==='all' ? 'selected' : '' %>>All Orders
+                                            </option>
+                                            <option value="Pending" <%=status==='Pending' ? 'selected' : '' %>
+                                                >Pending</option>
+                                            <option value="Processing" <%=status==='Processing' ? 'selected' : '' %>
+                                                >Processing</option>
+                                            <option value="Shipped" <%=status==='Shipped' ? 'selected' : '' %>
+                                                >Shipped</option>
+                                            <option value="Delivered" <%=status==='Delivered' ? 'selected' : '' %>
+                                                >Delivered</option>
+                                            <option value="Cancelled" <%=status==='Cancelled' ? 'selected' : '' %>
+                                                >Cancelled</option>
+                                        </select>
+                                        <input type="text" id="searchInput" class="form-control"
+                                            placeholder="Search orders...">
+                                        <div class="input-group-append">
+                                            <button id="searchBtn" class="btn btn-primary">
+                                                <i class="fas fa-search"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body table-responsive p-0">
+                                <table class="table table-hover text-nowrap">
+                                    <thead>
+                                        <tr>
+                                            <th>Order ID</th>
+                                            <th>Customer</th>
+                                            <th>Products</th>
+                                            <th>Date</th>
+                                            <th>Total</th>
+                                            <th>Status</th>
+                                            <th>Payment</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% orders.forEach(order=> { %>
+                                            <tr>
+                                                <td><a href="/admin/orders/<%= order._id %>">
+                                                        <%= order._id %>
+                                                    </a></td>
+                                                <td>
+                                                    <%= order.user.name %>
+                                                </td>
+                                                <td>
+                                                    <% order.items.forEach(item => { %>
+                                                        <div class="product-item">
+                                                            <%= item.product.name %> (<%= item.quantity %>)
+                                                        </div>
+                                                    <% }); %>
+                                                </td>
+                                                <td>
+                                                    <%= new Date(order.orderDate).toLocaleDateString() %>
+                                                </td>
+                                                <td>₹<%= order.totalAmount %>
+                                                </td>
+                                                <td>
+                                                    <span class="badge">
+                                                        <%= order.status %>
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <span class="badge">
+                                                        <%= order.paymentStatus %>
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <div class="btn-group">
+                                                        <button type="button"
+                                                            class="btn btn-sm btn-primary dropdown-toggle"
+                                                            data-toggle="dropdown">
+                                                            Update Status
+                                                        </button>
+                                                        <div class="dropdown-menu">
+                                                            <% if (order.status !=='Cancelled' && order.status
+                                                                !=='Delivered' ) { %>
+                                                                <a class="dropdown-item update-status" href="#"
+                                                                    data-order-id="<%= order._id %>"
+                                                                    data-status="Processing">Mark as Processing</a>
+                                                                <a class="dropdown-item update-status" href="#"
+                                                                    data-order-id="<%= order._id %>"
+                                                                    data-status="Shipped">Mark as Shipped</a>
+                                                                <a class="dropdown-item update-status" href="#"
+                                                                    data-order-id="<%= order._id %>"
+                                                                    data-status="Delivered">Mark as Delivered</a>
+                                                                <div class="dropdown-divider"></div>
+                                                                <a class="dropdown-item text-danger cancel-order"
+                                                                    href="#" data-order-id="<%= order._id %>">Cancel
+                                                                    Order</a>
+                                                                <% } %>
+                                                        </div>
+                                                    </div>
+                                                    <a href="/admin/orders/<%= order._id %>"
+                                                        class="btn btn-sm btn-info">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                            <% }); %>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="card-footer clearfix">
+                                <ul class="pagination pagination-sm m-0 float-right">
+                                    <% for(let i=1; i <=totalPages; i++) { %>
+                                        <li class="page-item <%= currentPage == i ? 'active' : '' %>">
+                                            <a class="page-link" href="?page=<%= i %>&status=<%= status %>">
+                                                <%= i %>
+                                            </a>
+                                        </li>
+                                        <% } %>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function getPaymentStatusBadgeClass(status) {
+            switch (status) {
+                case 'Completed': return 'success';
+                case 'Failed': return 'danger';
+                default: return 'warning';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            // Status filter change
+            document.getElementById('statusFilter').addEventListener('change', function () {
+                const status = this.value;
+                const searchParams = new URLSearchParams(window.location.search);
+                searchParams.set('status', status);
+                searchParams.set('page', '1');
+                window.location.href = `?${searchParams.toString()}`;
+            });
+
+            // Search functionality
+            document.getElementById('searchBtn').addEventListener('click', function () {
+                const searchQuery = document.getElementById('searchInput').value;
+                const searchParams = new URLSearchParams(window.location.search);
+                searchParams.set('search', searchQuery);
+                searchParams.set('page', '1');
+                window.location.href = `?${searchParams.toString()}`;
+            });
+
+            // Update status
+            document.querySelectorAll('.update-status').forEach(btn => {
+                btn.addEventListener('click', async function (e) {
+                    e.preventDefault();
+                    const orderId = this.dataset.orderId;
+                    const status = this.dataset.status;
+
+                    try {
+                        const response = await fetch('/admin/orders/update-status', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ orderId, status })
+                        });
+
+                        const data = await response.json();
+                        if (data.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Success',
+                                text: 'Order status updated successfully',
+                                showConfirmButton: false,
+                                timer: 1500
+                            }).then(() => {
+                                location.reload();
+                            });
+                        } else {
+                            throw new Error(data.message);
+                        }
+                    } catch (error) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: error.message || 'Failed to update order status'
+                        });
+                    }
+                });
+            });
+
+            // Cancel order
+            document.querySelectorAll('.cancel-order').forEach(btn => {
+                btn.addEventListener('click', async function (e) {
+                    e.preventDefault();
+                    const orderId = this.dataset.orderId;
+
+                    const { value: reason } = await Swal.fire({
+                        title: 'Cancel Order',
+                        input: 'text',
+                        inputLabel: 'Cancellation Reason',
+                        inputPlaceholder: 'Enter reason for cancellation',
+                        showCancelButton: true,
+                        inputValidator: (value) => {
+                            if (!value) {
+                                return 'Please enter a reason for cancellation';
+                            }
+                        }
+                    });
+
+                    if (reason) {
+                        try {
+                            const response = await fetch('/admin/orders/update-status', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({
+                                    orderId,
+                                    status: 'Cancelled',
+                                    reason
+                                })
+                            });
+
+                            const data = await response.json();
+                            if (data.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Success',
+                                    text: 'Order cancelled successfully',
+                                    showConfirmButton: false,
+                                    timer: 1500
+                                }).then(() => {
+                                    location.reload();
+                                });
+                            } else {
+                                throw new Error(data.message);
+                            }
+                        } catch (error) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: error.message || 'Failed to cancel order'
+                            });
+                        }
+                    }
+                });
+            });
+        });
+    </script>

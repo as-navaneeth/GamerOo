@@ -1,4 +1,3 @@
-
 <%- include("../../views/partials/user/header") %>
 
 
@@ -85,11 +84,11 @@
                                             <p class="text-muted">₹<%= item.price %></p>
                                         </div>
                                         <div class="col-md-3">
-                                            <div class="quantity-controls">
+                                            <!-- <div class="quantity-controls">
                                                 <button class="btn btn-sm btn-secondary decrease-qty">-</button>
                                                 <input type="number" class="form-control qty-input" value="<%= item.quantity %>">
                                                 <button class="btn btn-sm btn-secondary increase-qty">+</button>
-                                            </div>
+                                            </div> -->
                                         </div>
                                         <div class="col-md-2">
                                             <p class="item-total">₹<%= item.price * item.quantity %></p>
@@ -125,7 +124,7 @@
                             <strong>Total</strong>
                             <strong>₹<%= cart ? cart.totalAmount : 0 %></strong>
                         </div>
-                        <button class="btn btn-primary w-100" style="background-color: #D10024;" <%= !cart || cart.items.length === 0 ? 'disabled' : '' %>>
+                        <button class="btn btn-primary w-100" style="background-color: #D10024;" onclick="proceedToCheckout()" <%= !cart || cart.items.length === 0 ? 'disabled' : '' %>>
                             Proceed to Checkout
                         </button>
                     </div>
@@ -188,6 +187,42 @@ function deleteCartItem(itemId){
     })
 }
 
+
+
+function proceedToCheckout(){
+    //check user has a default addres
+
+    fetch('/checkout/validate')
+    .then(response=>response.json())
+    .then(data=>{
+        if(data.success){
+            window.location.href='/checkout';
+        }else{
+            Swal.fire({
+                title:'Address Required',
+                text: 'Please add a delivery address before checkout',
+                icon:'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#D10024',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Add Address',
+                cancelButtonText: 'Cancel'
+            }).then((result)=>{
+                if(result.isConfirmed){
+                    window.location.href='/manageAddress';
+                }
+            })
+        }
+    })
+    .catch(error=>{
+        console.error("Error:",error);
+        Swal.fire(
+            'Error!',
+            'Something went wrong',
+            'error'
+        )
+    })
+}
 
 
 </script>

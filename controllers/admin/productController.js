@@ -10,39 +10,54 @@ const getProduct = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
         const limit = 7;
+        const search = req.query.search || '';
+        const categoryId = req.query.category || '';
 
-        // Fetch all products with pagination
-        const productData = await Product.find()
-            .sort({createdAt:-1})
+        // Build the query
+        let query = {};
+        
+        // Add search condition if search query exists
+        if (search) {
+            query.name = { $regex: new RegExp(search, 'i') };
+        }
+
+        // Add category filter if category is selected
+        if (categoryId) {
+            query.category = categoryId;
+        }
+
+        // Fetch products with filters and pagination
+        const productData = await Product.find(query)
+            .sort({createdAt: -1})
             .limit(limit)
             .skip((page - 1) * limit)
             .populate("category")
             .populate("brand")
-            .exec()
-            
+            .exec();
 
-        // Count the total number of products
-        const count = await Product.countDocuments();
+        // Count total filtered products
+        const count = await Product.countDocuments(query);
+
+        // Calculate total pages
+        const totalPages = Math.ceil(count / limit);
 
         // Fetch categories and brands
         const categories = await Category.find({ isListed: true });
         const brands = await Brand.find({ isBlocked: false });
 
         // Render the products page
-        if (categories && brands) {
-            res.render("products", {
-                data: productData,
-                currentPage: page,
-                totalPages: Math.ceil(count / limit),
-                cat: categories,
-                brand: brands,
-            });
-        } else {
-            res.render("page-404");
-        }
+        res.render("products", {
+            products: productData,
+            categories,
+            brands,
+            currentPage: page,
+            totalPages,
+            search,
+            selectedCategory: categoryId
+        });
     } catch (error) {
-        console.error("Error in getProduct:", error);
-        res.status(500).send("An error occurred while fetching products.");
+        console.error('Error in getProduct:', error);
+        res.status(500).render('admin/error', { error: 'Internal Server Error' });
     }
 };
 
@@ -57,7 +72,7 @@ const getAddProduct = async (req, res) => {
         res.render('addProduct', { categories, brands, message: '' });
     } catch (error) {
         console.error('Error in getAddProduct:', error);
-        res.status(500).send("Error loading add product page");
+        res.status(500).render('admin/error', { error: 'Internal Server Error' });
     }
 }
 
@@ -115,11 +130,19 @@ const editProduct = async (req, res) => {
         const categories=await Category.find(); //fetch categories if needed
         const brands=await Brand.find();
 
+        if (!product) {
+            return res.status(404).send('Product not found');
+        }
+
         res.render('editProduct',{product,categories,brands})
 
     } catch (error) {
         console.error('Error in editProduct:', error);
-        res.status(500).send('An error occurred while editing the product.');
+        // Check if it's an invalid ObjectId error
+        if (error.name === 'CastError' && error.kind === 'ObjectId') {
+            return res.status(400).send('Invalid product ID');
+        }
+        res.status(500).send('Internal Server Error');
     }
 };
 
@@ -168,7 +191,7 @@ const updateProduct = async (req, res) => {
         }
 
         await product.save();
-        return res.redirect('/admin/products')
+        return res.redirect('/admin/products');
 
     } catch (error) {
         console.error('Error updating product:', error);
@@ -279,6 +302,18 @@ const listProduct=async(req,res)=>{
             message:"Failed to list the products",
         })
     }
+}
+
+
+module.exports = {
+    getProduct,
+    getAddProduct,
+    addProduct,
+    editProduct,
+    updateProduct,
+    deleteProduct,
+    unlistProduct,
+    listProduct
 }
 
 

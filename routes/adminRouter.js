@@ -7,6 +7,7 @@ const customerController = require("../controllers/admin/customerController");
 const categoryController = require("../controllers/admin/categoryController");
 const brandController = require("../controllers/admin/brandController");
 const productController = require("../controllers/admin/productController");
+const orderController=require("../controllers/admin/orderController");
 
 const { userAuth, adminAuth } = require("../middlewares/auth");
 
@@ -48,5 +49,10 @@ router.post('/products/list/:id',adminAuth,productController.listProduct);
 
 router.get('/products/edit/:id',adminAuth,productController.editProduct)
 router.post('/products/edit/:id', adminAuth, handleProductUpload, productController.updateProduct);
+
+//order controller
+router.get('/orders',adminAuth,orderController.listOrders);
+router.get('/orders/:id',adminAuth,orderController.getOrderDetails);
+router.post('/orders/update-status',adminAuth,orderController.updateOrderStatus)
 
 module.exports = router;

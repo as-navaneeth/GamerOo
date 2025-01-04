@@ -1,0 +1,206 @@
+<%- include("../../views/partials/user/header") %>
+
+<style>
+    .cart-item {
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .cart-item:last-child {
+        border-bottom: none;
+    }
+    
+    .cart-item .img-fluid {
+        width: 100%;
+        height: 80px;
+        object-fit: contain;
+        border: 1px solid #eee;
+        padding: 5px;
+    }
+    
+    .cart-item .col-md-2 {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .item-total {
+        color: #D10024;
+        font-weight: 500;
+        font-size: 1.1rem;
+    }
+    
+    .card {
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-bottom: 1.5rem;
+    }
+    
+    .card-body {
+        padding: 1.5rem;
+    }
+    
+    .payment-methods {
+        margin: 1rem 0;
+    }
+</style>
+
+<!-- BREADCRUMB -->
+<div id="breadcrumb" class="section">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <ul class="breadcrumb-tree">
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/cart">Cart</a></li>
+                    <li class="active">Checkout</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /BREADCRUMB -->
+
+<!-- SECTION -->
+<div class="section">
+    <div class="container">
+        <div class="row">
+            <!-- Order Summary -->
+            <div class="col-md-7">
+                <div class="card">
+                    <div class="card-body">
+                        <h4>Order Summary</h4>
+                        <% cart.items.forEach(item => { %>
+                            <div class="cart-item">
+                                <div class="row align-items-center">
+                                    <div class="col-md-2">
+                                        <img src="/uploads/products/<%= item.product.productImage[0] %>" class="img-fluid">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h5><%= item.product.name %></h5>
+                                        <p class="text-muted">Quantity: <%= item.quantity %></p>
+                                    </div>
+                                    <div class="col-md-4 text-right">
+                                        <p class="item-total">₹<%= item.price * item.quantity %></p>
+                                    </div>
+                                </div>
+                            </div>
+                        <% }); %>
+                        <hr>
+                        <div class="d-flex justify-content-between">
+                            <h5>Total Amount:</h5>
+                            <h5>₹<%= totalAmount %></h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Shipping Address and Payment -->
+            <div class="col-md-5">
+                <!-- Shipping Address -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h4>Shipping Address</h4>
+                        <div class="address-details">
+                            <p><strong><%= address.name %></strong></p>
+                            <p><%= address.streetAddress %></p>
+                            <p><%= address.city %>, <%= address.state %> <%= address.pinCode %></p>
+                            <p>Phone: <%= address.mobile %></p>
+                        </div>
+                        <a href="/manageAddress" class="btn btn-outline-primary btn-sm">Change Address</a>
+                    </div>
+                </div>
+
+                <!-- Payment Method -->
+                <div class="card">
+                    <div class="card-body">
+                        <h4>Payment Method</h4>
+                        <div class="payment-methods">
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="radio" name="paymentMethod" id="cod" value="cod" checked>
+                                <label class="form-check-label" for="cod">
+                                    Cash on Delivery
+                                </label>
+                            </div>
+                            <!-- Add more payment methods here -->
+                        </div>
+                        <button onclick="placeOrder()" class="btn btn-primary w-100" style="background-color: #D10024;">
+                            Place Order
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /SECTION -->
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+function placeOrder() {
+    const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+
+    Swal.fire({
+        title: 'Confirm Order',
+        text: 'Are you sure you want to place this order?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#D10024',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, Place Order!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Show loading state
+            Swal.fire({
+                title: 'Processing Order',
+                text: 'Please wait while we process your order...',
+                allowOutsideClick: false,
+                showConfirmButton: false,
+                willOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            fetch('/checkout/process', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ paymentMethod })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: data.message || 'Your order has been placed successfully!',
+                        confirmButtonColor: '#D10024'
+                    }).then(() => {
+                        window.location.href = `/orders/${data.orderId}`;
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: data.message || 'Failed to place order',
+                        confirmButtonColor: '#D10024'
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Something went wrong while processing your order',
+                    confirmButtonColor: '#D10024'
+                });
+            });
+        }
+    });
+}
+</script>
+
+<%- include("../../views/partials/user/footer") %>

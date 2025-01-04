@@ -8,6 +8,7 @@ const ejs = require('ejs');
 const Category = require('../../models/categorySchema');
 const Product = require('../../models/productSchema');
 const Order = require('../../models/orderSchema'); // Added Order model
+const Brand = require('../../models/brandSchema'); // Added Brand model
 
 
 
@@ -305,27 +306,146 @@ const login = async (req, res) => {
 
 //shopping page 
 const loadShoppingPage = async (req, res) => {
-
     try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = 6; // Show 6 products per page
+        const hideOutOfStock = req.query.hideOutOfStock === 'true';
+        const sortBy = req.query.sortBy || 'default';
+        const selectedCategory = req.query.category || '';
+        const selectedBrand = req.query.brand || '';
 
-        const products = await Product.find({ isListed: true }).populate("category");
-        if (!products) {
-            return res.status(404).send({ json: 'product not found' });
+        // Build the query
+        let query = { isListed: true };
+        if (selectedCategory) {
+            query.category = selectedCategory;
+        }
+        if (selectedBrand) {
+            // Find brand by name and get its ID
+            const brand = await Brand.findOne({ brandName: selectedBrand });
+            if (brand) {
+                query.brand = brand._id;
+            }
         }
 
+        let sortOptions = {};
+        switch(sortBy) {
+            case 'popularity':
+                sortOptions = { views: -1 };
+                break;
+            case 'priceLowToHigh':
+                sortOptions = { salePrice: 1 };
+                break;
+            case 'priceHighToLow':
+                sortOptions = { salePrice: -1 };
+                break;
+            case 'newArrivals':
+                sortOptions = { createdAt: -1 };
+                break;
+            case 'nameAZ':
+                sortOptions = { name: 1 };
+                break;
+            case 'nameZA':
+                sortOptions = { name: -1 };
+                break;
+            default:
+                sortOptions = { createdAt: -1 };
+        }
 
+        // Fetch all categories for the sidebar
+        const categories = await Category.find({ isListed: true });
 
-        res.render('shop', { products });
+        // Fetch all brands and their product counts
+        const brands = await Brand.aggregate([
+            { $match: { isBlocked: false } },
+            {
+                $lookup: {
+                    from: 'products',
+                    localField: '_id',
+                    foreignField: 'brand',
+                    as: 'products'
+                }
+            },
+            {
+                $project: {
+                    name: '$brandName',
+                    count: { 
+                        $size: {
+                            $filter: {
+                                input: '$products',
+                                as: 'product',
+                                cond: { $eq: ['$$product.isListed', true] }
+                            }
+                        }
+                    }
+                }
+            },
+            { $match: { count: { $gt: 0 } } },
+            { $sort: { name: 1 } }
+        ]);
+
+        // Fetch products with pagination and sorting
+        const products = await Product.find(query)
+            .populate("category")
+            .populate("brand")
+            .sort(sortOptions)
+            .skip((page - 1) * limit)
+            .limit(limit);
+
+        if (!products) {
+            return res.status(404).send({ message: 'Products not found' });
+        }
+
+        // Get total number of products for pagination
+        const totalProducts = await Product.countDocuments(query);
+        const totalPages = Math.ceil(totalProducts / limit);
+
+        // Get product count for each category with brand filter if selected
+        const categoryProductCounts = await Promise.all(
+            categories.map(async (category) => {
+                let categoryQuery = {
+                    isListed: true,
+                    category: category._id
+                };
+                
+                if (selectedBrand) {
+                    const brand = await Brand.findOne({ brandName: selectedBrand });
+                    if (brand) {
+                        categoryQuery.brand = brand._id;
+                    }
+                }
+
+                const count = await Product.countDocuments(categoryQuery);
+                return {
+                    _id: category._id,
+                    name: category.name,
+                    count
+                };
+            })
+        );
+
+        res.render('shop', { 
+            products,
+            categories: categoryProductCounts,
+            brands,
+            hideOutOfStock,
+            currentPage: page,
+            totalPages,
+            hasNextPage: page < totalPages,
+            hasPreviousPage: page > 1,
+            nextPage: page + 1,
+            previousPage: page - 1,
+            lastPage: totalPages,
+            currentSort: sortBy,
+            selectedCategory,
+            selectedBrand
+        });
 
     } catch (error) {
         console.log(error);
-
+        // Changed error handling to redirect to shop page with error message
+        res.redirect('/shop');
     }
-
 }
-
-
-
 
 //User Profile getting
 
@@ -464,12 +584,70 @@ const downloadInvoice = async (req, res) => {
 
 
 
+//load change password
 
+const getChangePassword=async(req,res)=>{
+    try {
+        const userId=req.session.user;
+        const userData=await User.findById(userId);
+
+        res.render('change-password')
+        
+    } catch (error) {
+        console.error('Error loading change password page:',error);
+        res.redirect('/userProfile');
+    }
+}
+
+
+
+//process change password
+
+const postChangePassword=async(req,res)=>{
+    try {
+        const userId=req.session.user;
+        const {currentPassword,newPassword,confirmPassword}=req.body;
+        const userData=await User.findById(userId);
+
+        
+
+        //validate new passwrod
+        if(newPassword!=confirmPassword){
+            return res.json({
+                success:false,
+                message:'New password and confirm password do not match'
+            })
+        }
+
+        //check if current passowrd is correct  
+        const isPasswordMatch= await bcrypt.compare(currentPassword,userData.password);
+        if(!isPasswordMatch){
+            return res.json({
+                success:false,
+                message:'Current Password is incorrect'
+            })
+        }
+
+        //hash new password and update  -> securePassword function is above 179
+        const hashPassword=await securePassword(newPassword);
+        await User.findByIdAndUpdate(userId,{password:hashPassword});
+
+        return res.status(200).json({success:true,message:'Password changed sucessfully!'});
+
+
+
+
+
+    } catch (error) {
+        console.error('Error changing password:', error);
+        res.redirect('/pageNotFound');
+    }
+}
 
 
 
 module.exports = {
-    loadHomePage,
+    loadHomePage,   //28
     pageNotFound,
     loadSignup,
     signup,
@@ -477,12 +655,15 @@ module.exports = {
     resendOtp,
     loadLogin,
     login,
-    logout,
+    logout,        //63
     loadShoppingPage,
     loadVerifyOtp,
     getUserProfile,
     updateProfile,
     getOrders,
     getOrderDetails,
-    downloadInvoice
+    downloadInvoice,
+    getChangePassword, //469
+    postChangePassword, //490
+
 }
