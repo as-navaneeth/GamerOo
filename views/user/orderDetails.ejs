@@ -86,6 +86,17 @@
         border-radius: 8px;
         margin-top: 1rem;
     }
+
+    .cancel-btn{
+        background-color: #f44336;
+    color: white; 
+    border: none; 
+    border-radius: 25px; 
+    padding: 10px 20px;
+    font-size: 14px; 
+    cursor: pointer; 
+    }
+
 </style>
 
 <!-- BREADCRUMB -->
@@ -123,7 +134,7 @@
                                     }) %>
                                 </p>
                             </div>
-                            <div class="col-md-6 text-md-right">
+                            <div class="col-md-6 text-md-right" style="color: green; font-size: large;">
                                 <span class="order-status status-<%= order.status.toLowerCase() %>">
                                     <%= order.status %>
                                 </span>
@@ -198,8 +209,37 @@
                         <h5 class="mb-0">Payment Information</h5>
                     </div>
                     <div class="order-body">
-                        <p class="mb-1">Payment Method: <%= order.paymentMethod %></p>
-                        <p class="mb-0">Payment Status: <%= order.paymentStatus %></p>
+                        <p><strong>Payment Method:</strong> <%= order.paymentMethod %></p>
+                        <p><strong>Payment Status:</strong> <%= order.paymentStatus %></p>
+                        <p><strong>Total Amount:</strong> ₹<%= order.totalAmount %></p>
+                        <% if (order.discount > 0) { %>
+                            <p><strong>Discount:</strong> ₹<%= order.discount %></p>
+                        <% } %>
+
+                        <% if (order.status === 'Delivered' && !['Return Requested', 'Return Approved', 'Return Completed','Return Rejected'].includes(order.returnStatus)) { %>
+                            <div class="mt-3 pt-3 border-top">
+                                <button class="primary-btn" onclick="openReturnModal()">
+                                    Request Return
+                                </button>
+                            </div>
+                        <% } %>
+
+
+                        <% if (order.returnStatus !== 'Not Returned') { %>
+                            <div class="alert alert-info mb-3">
+                                <h4>Return Information</h4>
+                                <p><strong>Status:</strong> <%= order.returnStatus %></p>
+                                <% if (order.returnReason) { %>
+                                    <p><strong>Reason:</strong> <%= order.returnReason %></p>
+                                <% } %>
+                                <% if (order.returnDate) { %>
+                                    <p><strong>Requested On:</strong> <%= new Date(order.returnDate).toLocaleDateString() %></p>
+                                <% } %>
+                                <% if (order.returnApprovedDate) { %>
+                                    <p><strong>Approved On:</strong> <%= new Date(order.returnApprovedDate).toLocaleDateString() %></p>
+                                <% } %>
+                            </div>
+                        <% } %>
                     </div>
                 </div>
                 
@@ -271,6 +311,24 @@
                                     <% } %>
                                 </div>
                             <% } %>
+
+                            <% if (order.status === 'Returned') { %>
+                                <div class="timeline-item">
+                                    <p class="mb-1"><strong>Returned</strong></p>
+                                    <% if (order.returnReason) { %>
+                                        <p class="mb-1">Reason: <%= order.returnReason %></p>
+                                    <% } %>
+                                    <% if (order.returnDate) { %>
+                                        <p class="timeline-date">
+                                            <%= new Date(order.returnDate).toLocaleDateString('en-US', {
+                                                year: 'numeric',
+                                                month: 'long',
+                                                day: 'numeric'
+                                            }) %>
+                                        </p>
+                                    <% } %>
+                                </div>
+                            <% } %>
                         </div>
                     </div>
                 </div>
@@ -279,5 +337,74 @@
     </div>
 </div>
 <!-- /SECTION -->
+
+
+
+
+<!-- Return Requst Modal -->
+<div class="modal fade" id="returnModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Request Return</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="returnForm">
+                    <div class="form-group">
+                        <label for="returnReason">Reason for Return</label>
+                        <textarea class="form-control" id="returnReason" rows="3" required 
+                            placeholder="Please provide a detailed reason for your return request"></textarea>
+                        <!-- <small class="text-muted">
+                            Note: Returns are only accepted within 7 days of delivery
+                        </small> -->
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button"  class="cancel-btn secondary-btn" data-dismiss="modal">Cancel</button>
+                <button type="button" class="primary-btn" onclick="submitReturn()">Submit Return Request</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function openReturnModal() {
+    $('#returnModal').modal('show');
+}
+
+function submitReturn() {
+    const reason = document.getElementById('returnReason').value;
+    if (!reason) {
+        alert('Please provide a reason for return');
+        return;
+    }
+
+    // Send return request
+    fetch(`/orders/<%= order._id %>/return`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ reason })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Return request submitted successfully');
+            location.reload();
+        } else {
+            alert(data.message || 'Error submitting return request');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error submitting return request');
+    });
+}
+</script>
 
 <%- include("../../views/partials/user/footer") %>

@@ -7,13 +7,13 @@ const ejs = require('ejs');
 
 const Category = require('../../models/categorySchema');
 const Product = require('../../models/productSchema');
-const Order = require('../../models/orderSchema'); // Added Order model
-const Brand = require('../../models/brandSchema'); // Added Brand model
+const Order = require('../../models/orderSchema'); 
+const Brand = require('../../models/brandSchema'); 
 
 
 
 
-
+//page not found
 const pageNotFound = async (req, res) => {
     try {
         res.render("page-404")
@@ -36,12 +36,16 @@ const loadHomePage = async (req, res) => {
             .sort({ createdAt: -1 })
             .limit(10);
 
+        // Fetch categories for search dropdown
+        const categories = await Category.find({ isListed: true });
+
         if (userId) {
             const userData = await User.findOne({ _id: userId });        
             if (userData) {
                 return res.render("home", {
                     user: userData,
-                    products: productData
+                    products: productData,
+                    categories
                 });
             }
         }
@@ -49,6 +53,7 @@ const loadHomePage = async (req, res) => {
         // Render without user data
         res.render("home", {
             products: productData,
+            categories,
             user: null
         });
 
@@ -313,9 +318,19 @@ const loadShoppingPage = async (req, res) => {
         const sortBy = req.query.sortBy || 'default';
         const selectedCategory = req.query.category || '';
         const selectedBrand = req.query.brand || '';
+        const searchQuery = req.query.search || '';
 
         // Build the query
         let query = { isListed: true };
+
+        // Add search functionality
+        if (searchQuery) {
+            query.$or = [
+                { name: { $regex: searchQuery, $options: 'i' } },
+                { description: { $regex: searchQuery, $options: 'i' } }
+            ];
+        }
+
         if (selectedCategory) {
             query.category = selectedCategory;
         }
@@ -437,7 +452,9 @@ const loadShoppingPage = async (req, res) => {
             lastPage: totalPages,
             currentSort: sortBy,
             selectedCategory,
-            selectedBrand
+            selectedBrand,
+            searchQuery,
+            user: req.session.user ? await User.findById(req.session.user) : null
         });
 
     } catch (error) {
@@ -646,6 +663,91 @@ const postChangePassword=async(req,res)=>{
 
 
 
+// Request return for an order
+const requestReturn = async (req, res) => {
+    try {
+        const { orderId, reason } = req.body;
+        const userId = req.session.user;
+
+        const order = await Order.findOne({ _id: orderId, user: userId });
+        
+        if (!order) {
+            return res.status(404).json({ success: false, message: 'Order not found' });
+        }
+
+        // Check if order is eligible for return (e.g., within 7 days of delivery)
+        if (order.status !== 'Delivered') {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Only delivered orders can be returned' 
+            });
+        }
+
+        const deliveryDate = new Date(order.orderDate);
+        const currentDate = new Date();
+        const daysSinceDelivery = Math.floor((currentDate - deliveryDate) / (1000 * 60 * 60 * 24));
+
+        if (daysSinceDelivery > 7) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Return period has expired (7 days from delivery)' 
+            });
+        }
+
+        // Update order status
+        order.returnStatus = 'Return Requested';
+        order.returnReason = reason;
+        order.returnDate = new Date();
+        await order.save();
+
+        res.json({ 
+            success: true, 
+            message: 'Return request submitted successfully' 
+        });
+
+    } catch (error) {
+        console.error('Error in requestReturn:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Internal server error' 
+        });
+    }
+};
+
+// Get return status
+const getReturnStatus = async (req, res) => {
+    try {
+        const { orderId } = req.params;
+        const userId = req.session.user;
+
+        const order = await Order.findOne({ _id: orderId, user: userId });
+        
+        if (!order) {
+            return res.status(404).json({ 
+                success: false, 
+                message: 'Order not found' 
+            });
+        }
+
+        res.json({
+            success: true,
+            returnStatus: order.returnStatus,
+            returnReason: order.returnReason,
+            returnDate: order.returnDate,
+            returnApprovedDate: order.returnApprovedDate
+        });
+
+    } catch (error) {
+        console.error('Error in getReturnStatus:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Internal server error' 
+        });
+    }
+};
+
+
+
 module.exports = {
     loadHomePage,   //28
     pageNotFound,
@@ -665,5 +767,7 @@ module.exports = {
     downloadInvoice,
     getChangePassword, //469
     postChangePassword, //490
+    requestReturn,
+    getReturnStatus,
 
 }

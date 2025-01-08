@@ -50,9 +50,13 @@ router.post('/products/list/:id',adminAuth,productController.listProduct);
 router.get('/products/edit/:id',adminAuth,productController.editProduct)
 router.post('/products/edit/:id', adminAuth, handleProductUpload, productController.updateProduct);
 
-//order controller
-router.get('/orders',adminAuth,orderController.listOrders);
-router.get('/orders/:id',adminAuth,orderController.getOrderDetails);
-router.post('/orders/update-status',adminAuth,orderController.updateOrderStatus)
+// Order management routes
+router.get('/orders', adminAuth, orderController.listOrders);
+router.get('/orders/:id', adminAuth, orderController.getOrderDetails);
+router.post('/orders/update-status', adminAuth, orderController.updateOrderStatus);
+
+// Return request routes
+router.get('/return-requests', adminAuth, orderController.getReturnRequests);
+router.post('/return-requests/:orderId/handle', adminAuth, orderController.handleReturnRequest);
 
 module.exports = router;

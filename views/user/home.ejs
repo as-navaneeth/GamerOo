@@ -123,17 +123,12 @@
 														<i class="fa fa-star-o"></i>
 													</div>
 													<div class="product-btns">
-														<button class="add-to-wishlist"><i
-																class="fa fa-heart-o"></i><span class="tooltipp">add to
-																wishlist</span></button>
-														<!-- <button class="add-to-compare"><i class="fa fa-exchange"></i><span class="tooltipp">add to compare</span></button> -->
-														<!-- <button class="quick-view"><i class="fa fa-eye"></i><span class="tooltipp">quick view</span></button> -->
+														<button class="add-to-wishlist" onclick="addToWishList('<%=products[i]._id%>',this)"><i
+																class="fa fa-heart-o"></i><span class="tooltipp">add to wishlist</span></button>  <!--add to wishlist funciton below-->
+														
 													</div>
 												</div>
-												<!-- <div class="add-to-cart">
-													<button class="add-to-cart-btn"><i class="fa fa-shopping-cart"></i>
-														add to cart</button>
-												</div> -->
+												
 											</a>
 										</div>
 										<% } %>
@@ -327,6 +322,60 @@
 		<!-- /container -->
 	</div>
 	<!-- /NEWSLETTER -->
+
+
+
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+	<script>
+		function addToWishList(productId,button){
+			fetch(`/wishlist/add/${productId}`,{
+				method:"POST",
+				headers: {
+					"Content-Type": "application/json"
+				}
+			})
+			.then(response=>response.json())
+			.then(data=>{
+				if(data.success){
+					//change heart icon filled and red
+					const icon=button.querySelector('i');
+					icon.className='fa fa-heart';
+					icon.style.color='#D10024';
+
+					Swal.fire({
+                title: 'Added to Wishlist!',
+                text: 'Product has been added to your wishlist',
+                icon: 'success',
+                showCancelButton: true,
+                confirmButtonColor: '#D10024',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'View Wishlist',
+                cancelButtonText: 'Continue Shopping'
+            }).then((result) => {
+				if(result.isConfirmed){
+					window.location.href="/wishlist";
+				}
+			})
+				}else{
+					Swal.fire({
+						title: 'Error!',
+						text:data.message || 'Could not add to wishlist',
+						icon:'error'
+					})
+				}
+			})
+			.catch(error=>{
+				console.error("Error:",error);
+				Swal.fire(
+					'Error!',
+					'Could not add to wishlist',
+					'error'
+				)
+			})
+		}
+	</script>
+
+
 
 
 

@@ -9,7 +9,7 @@ const categorySchema=new mongoose.Schema({
 
     nameLower:{
         type:String,    
-        unique:true,
+        
     },
 
     description:{

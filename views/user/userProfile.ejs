@@ -1,5 +1,5 @@
 <!--Header-->
-<%- include("../../views/partials/user/header") %>
+<%-include("../../views/partials/user/header") %>
 
 <!-- BREADCRUMB -->
 <div id="breadcrumb" class="section">
@@ -54,7 +54,7 @@
               <div class="form-group">
                 <div>
                   <label for="email">E-mail</label>
-                  <input id="email" readonly type="email" value="<%=user.email%>" class="form-control" />
+                  <input id="email" readonly type="email" value="<%=user.email%>" class="form-control"  disabled/>
                 </div>
               </div>
               <button type="submit" class="submit-btn">Save Changes</button>
