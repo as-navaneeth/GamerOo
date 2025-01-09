@@ -12,6 +12,7 @@ const orderController = require('../controllers/user/orderController');
 const wishlistController = require('../controllers/user/wishlistController');
 const paymentController = require('../controllers/user/paymentController');
 const couponController = require('../controllers/user/couponController');
+const walletController = require('../controllers/user/walletController');
 
 const passport = require("passport");
 const { userAuth, adminAuth } = require('../middlewares/auth');
@@ -87,6 +88,9 @@ router.post('/checkout/process', userAuth, checkoutController.processCheckout);
 router.get('/wishlist', userAuth, wishlistController.getWishlist);
 router.post('/wishlist/add/:productId', userAuth, wishlistController.addToWishlist);
 router.delete('/wishlist/remove/:productId', userAuth, wishlistController.removeFromWishlist);
+
+// Wallet routes
+router.get('/wallet', userAuth, walletController.getWallet);
 
 // Payment routes
 router.post('/payment/create-order', userAuth, paymentController.createRazorpayOrder);

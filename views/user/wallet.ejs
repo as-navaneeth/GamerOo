@@ -1,0 +1,89 @@
+<%- include("../../views/partials/user/header") %>
+
+<div id="breadcrumb" class="section">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <ul class="breadcrumb-tree">
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/userProfile">Profile</a></li>
+                    <li class="active">Wallet</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="section">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8 mx-auto">
+                <!-- Wallet Balance Card -->
+                <div class="card mb-4">
+                    <div class="card-body text-center">
+                        <h4 class="card-title">Wallet Balance</h4>
+                        <h2 class="text-primary mb-4">₹<%= wallet.balance.toFixed(2) %></h2>
+                        <p class="text-muted">This balance can be used for future purchases</p>
+                    </div>
+                </div>
+
+                <!-- Transaction History -->
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title">Transaction History</h4>
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Description</th>
+                                        <th>Type</th>
+                                        <th>Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% wallet.transactions.reverse().forEach(transaction => { %>
+                                        <tr>
+                                            <td><%= new Date(transaction.date).toLocaleDateString() %></td>
+                                            <td><%= transaction.description %></td>
+                                            <td>
+                                                <span class="badge <%= transaction.type === 'credit' ? 'badge-success' : 'badge-danger' %>">
+                                                    <%= transaction.type.toUpperCase() %>
+                                                </span>
+                                            </td>
+                                            <td class="<%= transaction.type === 'credit' ? 'text-success' : 'text-danger' %>">
+                                                <%= transaction.type === 'credit' ? '+' : '-' %>₹<%= transaction.amount.toFixed(2) %>
+                                            </td>
+                                        </tr>
+                                    <% }); %>
+                                    <% if (wallet.transactions.length === 0) { %>
+                                        <tr>
+                                            <td colspan="4" class="text-center">No transactions yet</td>
+                                        </tr>
+                                    <% } %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.badge {
+    padding: 8px 12px;
+    border-radius: 4px;
+}
+.badge-success {
+    background-color: #28a745;
+    color: white;
+}
+.badge-danger {
+    background-color: #dc3545;
+    color: white;
+}
+</style>
+
+<%- include("../../views/partials/user/footer") %>
