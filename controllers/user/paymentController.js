@@ -77,7 +77,6 @@ const createRazorpayOrder = async (req, res) => {
         }
 
         await newOrder.save();
-        console.log('New order created:', newOrder._id);
 
         // Create Razorpay order
         const razorpayOrder = await razorpay.orders.create({

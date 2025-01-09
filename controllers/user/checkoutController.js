@@ -1,6 +1,7 @@
 const Cart = require('../../models/cartSchema');
 const Address = require('../../models/addressSchema');
 const Order = require('../../models/orderSchema');
+const Coupon = require('../../models/couponSchema');
 
 // Validate checkout
 const validateCheckout = async (req, res) => {
@@ -39,6 +40,9 @@ const getCheckout = async (req, res) => {
             isDefault: true
         });
 
+        //get avaliable coupons
+        const availableCoupons=await Coupon.find({isActive:true});
+
         if (!cart || cart.items.length === 0) {
             return res.redirect('/cart');
         }
@@ -50,6 +54,7 @@ const getCheckout = async (req, res) => {
         res.render('checkout', {
             cart,
             address,
+            availableCoupons,
             totalAmount: cart.totalAmount
         });
     } catch (error) {

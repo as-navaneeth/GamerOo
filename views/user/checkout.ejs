@@ -136,7 +136,7 @@
                         <div class="input-group mb-3">
                             <input type="text" id="couponCode" class="form-control" placeholder="Enter coupon code">
                             <div class="input-group-append">
-                                <button class="btn btn-primary" type="button" onclick="applyCoupon()" style="background-color: #D10024;">Apply</button>
+                                <button class="btn btn-primary" type="button" onclick="applyCoupon()" style="background-color: #D10024; margin-top: 5px;">Apply</button>
                             </div>
                         </div>
                         <div id="appliedCouponInfo" style="display: none;">
@@ -145,6 +145,11 @@
                                 <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeCoupon()">Remove</button>
                             </div>
                         </div>
+                        <!-- Button to trigger modal -->
+            <button type="button" style="background-color: #D10024; color: #eee; margin-top: 5px;" class="btn btn-outline-secondary w-100" data-toggle="modal" data-target="#availableCouponsModal">
+                <i class="fa fa-tag"></i> View Available Coupons
+            </button>
+
                     </div>
                 </div>
 
@@ -175,6 +180,60 @@
     </div>
 </div>
 <!-- /SECTION -->
+
+
+<div class="modal fade" id="availableCouponsModal" tabindex="-1" role="dialog" aria-labelledby="availableCouponsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="availableCouponsModalLabel">Available Coupons</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <% if (availableCoupons && availableCoupons.length > 0) { %>
+                    <div class="row">
+                        <% availableCoupons.forEach(coupon => { %>
+                            <div class="col-md-6 mb-3">
+                                <div class="card h-100">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div>
+                                                <h5 class="card-title text-primary"><%= coupon.code %></h5>
+                                                <p class="card-text"><%= coupon.description %></p>
+                                            </div>
+                                            <span class="badge badge-success">
+                                                <%= coupon.discountType === 'percentage' ? 
+                                                    `${coupon.discountAmount}% OFF` : 
+                                                    `₹${coupon.discountAmount} OFF` %>
+                                            </span>
+                                        </div>
+                                        <div class="mt-2">
+                                            <small class="text-muted">
+                                                Min. Purchase: ₹<%= coupon.minimumPurchase %><br>
+                                                Valid till: <%= new Date(coupon.endDate).toLocaleDateString() %>
+                                            </small>
+                                        </div>                                    
+                                    </div>
+                                </div>
+                            </div>
+                        <% }); %>
+                    </div>
+                <% } else { %>
+                    <div class="text-center py-4">
+                        <i class="fa fa-ticket-alt fa-3x text-muted mb-3"></i>
+                        <p class="mb-0">No coupons available at the moment</p>
+                    </div>
+                <% } %>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
