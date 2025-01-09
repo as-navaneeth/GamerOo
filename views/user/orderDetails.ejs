@@ -161,26 +161,35 @@
                         <% }); %>
                         
                         <div class="mt-4">
-                            <div class="d-flex justify-content-between">
-                                <span>Subtotal:</span>
-                                <strong>₹<%= order.totalAmount %></strong>
-                            </div>
-                            <% if (order.discount > 0) { %>
-                                <div class="d-flex justify-content-between text-success">
-                                    <span>Discount:</span>
-                                    <strong>-₹<%= order.discount %></strong>
+                            <div class="card mb-4">
+                                <div class="card-body">
+                                    <h5 class="card-title">Order Summary</h5>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>Subtotal:</span>
+                                        <span>₹<%= order.originalAmount %></span>
+                                    </div>
+                                    
+                                    <% if (order.discount > 0) { %>
+                                        <div class="d-flex justify-content-between mb-2">
+                                            <span>Discount:</span>
+                                            <span class="text-success">-₹<%= order.discount %></span>
+                                        </div>
+                                        <% if (order.couponDiscount) { %>
+                                            <div class="text-success small mb-2">
+                                                Coupon: <%= order.couponCode %> 
+                                                (<%= order.couponDiscount.discountType === 'percentage' ? 
+                                                    `${order.couponDiscount.discountAmount}% off` : 
+                                                    `Flat ₹${order.couponDiscount.discountAmount} off` %>)
+                                            </div>
+                                        <% } %>
+                                    <% } %>
+
+                                    <hr>
+                                    <div class="d-flex justify-content-between">
+                                        <h5>Total Amount:</h5>
+                                        <h5>₹<%= order.totalAmount %></h5>
+                                    </div>
                                 </div>
-                            <% } %>
-                            <% if (order.shippingCost > 0) { %>
-                                <div class="d-flex justify-content-between">
-                                    <span>Shipping:</span>
-                                    <strong>₹<%= order.shippingCost %></strong>
-                                </div>
-                            <% } %>
-                            <hr>
-                            <div class="d-flex justify-content-between">
-                                <h5>Total:</h5>
-                                <h5>₹<%= order.totalAmount + (order.shippingCost || 0) - (order.discount || 0) %></h5>
                             </div>
                         </div>
                     </div>

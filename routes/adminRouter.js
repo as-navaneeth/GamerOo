@@ -8,6 +8,7 @@ const categoryController = require("../controllers/admin/categoryController");
 const brandController = require("../controllers/admin/brandController");
 const productController = require("../controllers/admin/productController");
 const orderController=require("../controllers/admin/orderController");
+const couponController = require('../controllers/admin/couponController');
 
 const { userAuth, adminAuth } = require("../middlewares/auth");
 
@@ -49,6 +50,15 @@ router.post('/products/list/:id',adminAuth,productController.listProduct);
 
 router.get('/products/edit/:id',adminAuth,productController.editProduct)
 router.post('/products/edit/:id', adminAuth, handleProductUpload, productController.updateProduct);
+
+// Coupon Management Routes
+router.get('/coupons', adminAuth, couponController.getCoupons);
+router.get('/coupons/add', adminAuth, couponController.getAddCoupon);
+router.post('/coupons/add', adminAuth, couponController.addCoupon);
+router.get('/coupons/edit/:id', adminAuth, couponController.getEditCoupon);
+router.put('/coupons/edit/:id', adminAuth, couponController.updateCoupon);
+router.delete('/coupons/:id', adminAuth, couponController.deleteCoupon);
+router.patch('/coupons/:id/toggle', adminAuth, couponController.toggleCouponStatus);
 
 // Order management routes
 router.get('/orders', adminAuth, orderController.listOrders);

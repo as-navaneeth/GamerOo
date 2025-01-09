@@ -72,13 +72,60 @@ const processCheckout = async (req, res) => {
             user: userId,
             isDefault: true
         });
+        
 
-        if (!cart || !address) {
+        if (!cart || cart.items.length === 0) {
             return res.status(400).json({
                 success: false,
-                message: "Cart or address not found"
+                message: "Cart is empty"
             });
         }
+
+        if (!address) {
+            return res.status(400).json({
+                success: false,
+                message: "No default address found"
+            });
+        }
+
+        //calute amount
+        let originalAmount=0;
+        let finalAmount=0;
+        let discount=0;
+
+
+        // Calculate original amount from cart
+        cart.items.forEach(item => {
+            if (item.product && typeof item.price === 'number' && typeof item.quantity === 'number') {
+                originalAmount += item.price * item.quantity;
+            }
+        });
+        
+
+        // Validate original amount
+        if (isNaN(originalAmount) || originalAmount <= 0) {
+            return res.status(400).json({ success: false, message: 'Invalid cart amount' });
+        }
+
+        finalAmount = originalAmount;
+
+        // Check for applied coupon
+        let appliedCoupon = null;
+        if (cart.coupon) {
+            appliedCoupon = await Coupon.findOne({ code: cart.coupon });
+            if (appliedCoupon && appliedCoupon.isActive) {
+                discount = appliedCoupon.discountAmount;
+                finalAmount = originalAmount - discount;
+            }
+        }
+
+        // Validate final amount
+        if (isNaN(finalAmount) || finalAmount < 0) {
+            return res.status(400).json({ success: false, message: 'Invalid final amount' });
+        }
+
+
+        
 
         // Format shipping address
         const shippingAddress = {
@@ -90,20 +137,25 @@ const processCheckout = async (req, res) => {
             phone: address.phone
         };
 
-
-
-        // Create order items
-        const orderItems = cart.items.map(item => ({
-            product: item.product._id,
-            quantity: item.quantity,
-            price: item.price
-        }));
+        // Create order items with validation
+        const orderItems = cart.items.map(item => {
+            if (!item.product || typeof item.price !== 'number') {
+                throw new Error('Invalid product price in cart');
+            }
+            return {
+                product: item.product._id,
+                quantity: item.quantity,
+                price: item.price
+            };
+        });
 
         // Create new order
-        const order = new Order({
+        const newOrder = new Order({
             user: userId,
             items: orderItems,
-            totalAmount: cart.totalAmount,
+            totalAmount: finalAmount,
+            originalAmount: originalAmount,
+            discount: discount,
             shippingAddress: shippingAddress,
             paymentMethod: paymentMethod === 'cod' ? 'COD' : 'Online Payment',
             paymentStatus: 'Pending',
@@ -111,22 +163,55 @@ const processCheckout = async (req, res) => {
             orderDate: new Date()
         });
 
-        await order.save();
+        // If there's a coupon applied, store the coupon details
+        if (appliedCoupon) {
+            newOrder.couponCode = appliedCoupon.code;
+            newOrder.couponDiscount = {
+                code: appliedCoupon.code,
+                discountType: appliedCoupon.discountType,
+                discountAmount: appliedCoupon.discountAmount
+            };
+        }
 
-        // Clear cart after successful order
-        await Cart.findOneAndDelete({ user: userId });
+        await newOrder.save();
 
-        res.json({
-            success: true,
-            orderId: order._id,
-            message: 'Order placed successfully'
-        });
-        
+        if (paymentMethod === 'cod') {
+            // For COD, clear cart and redirect
+            await Cart.findOneAndDelete({ user: userId });
+            delete req.session.appliedCoupon;
+
+            res.json({
+                success: true,
+                message: "Order placed successfully",
+                orderId: newOrder._id
+            });
+        } else {
+            // For online payment
+            try {
+                const razorpayOrder = await razorpay.orders.create({
+                    amount: Math.round(finalAmount * 100),
+                    currency: 'INR',
+                    receipt: newOrder._id.toString()
+                });
+
+                res.json({
+                    success: true,
+                    order: razorpayOrder,
+                    key: process.env.RAZORPAY_KEY_ID,
+                    orderId: newOrder._id
+                });
+            } catch (error) {
+                console.error('Razorpay order creation error:', error);
+                // Delete the order if Razorpay order creation fails
+                await Order.findByIdAndDelete(newOrder._id);
+                throw new Error('Error creating payment order');
+            }
+        }
     } catch (error) {
         console.error('Error processing checkout:', error);
         res.status(500).json({
             success: false,
-            message: 'Error processing checkout'
+            message: error.message || 'Error processing checkout'
         });
     }
 };

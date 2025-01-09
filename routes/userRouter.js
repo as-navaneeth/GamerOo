@@ -11,6 +11,8 @@ const checkoutController = require('../controllers/user/checkoutController');
 const orderController = require('../controllers/user/orderController');
 const wishlistController = require('../controllers/user/wishlistController');
 const paymentController = require('../controllers/user/paymentController');
+const couponController = require('../controllers/user/couponController');
+
 const passport = require("passport");
 const { userAuth, adminAuth } = require('../middlewares/auth');
 
@@ -86,10 +88,15 @@ router.get('/wishlist', userAuth, wishlistController.getWishlist);
 router.post('/wishlist/add/:productId', userAuth, wishlistController.addToWishlist);
 router.delete('/wishlist/remove/:productId', userAuth, wishlistController.removeFromWishlist);
 
-// Payment Routes
-router.post('/payment/razorpay/create', userAuth, paymentController.createRazorpayOrder);
-router.post('/payment/razorpay/verify', userAuth, paymentController.verifyPayment);
+// Payment routes
+router.post('/payment/create-order', userAuth, paymentController.createRazorpayOrder);
+router.post('/payment/verify', userAuth, paymentController.verifyPayment);
+router.post('/payment/cod', userAuth, paymentController.handleCodOrder);
 
+// Coupon routes
+router.post('/coupons/apply', userAuth, couponController.applyCoupon);
+router.post('/coupons/remove', userAuth, couponController.removeCoupon);
+router.get('/coupons/applied', userAuth, couponController.getAppliedCoupon);
 
 
 module.exports=router;

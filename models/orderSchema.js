@@ -31,6 +31,25 @@ const orderSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
+    originalAmount: {
+        type: Number,
+        required: true
+    },
+    discount: {
+        type: Number,
+        default: 0
+    },
+    couponCode: {
+        type: String
+    },
+    couponDiscount: {
+        code: String,
+        discountType: {
+            type: String,
+            enum: ['percentage', 'fixed']
+        },
+        discountAmount: Number
+    },
     shippingAddress: {
         name: String,
         address: String,
@@ -42,19 +61,23 @@ const orderSchema = new mongoose.Schema({
     paymentMethod: {
         type: String,
         required: true,
-        enum: ['COD', 'Online Payment']
+        enum: ['COD', 'Online Payment', 'RAZORPAY']
     },
     paymentStatus: {
         type: String,
-        required: true,
-        enum: ['Pending', 'Completed', 'Failed'],
+        enum: ['Pending', 'Success', 'Failed','Completed'],
         default: 'Pending'
+    },
+    paymentId: {
+        type: String
+    },
+    razorpayOrderId: {
+        type: String
     },
     status: {
         type: String,
-        required: true,
-        enum: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled','Returned'],
-        default: 'Pending'
+        enum: ['Processing', 'Confirmed', 'Shipped', 'Delivered', 'Cancelled', 'Failed', 'Returned'],
+        default: 'Processing'
     },
     returnStatus:{
         type:String,
@@ -70,10 +93,6 @@ const orderSchema = new mongoose.Schema({
     },
     returnApprovedDate:{
         type:Date
-    },
-    discount: {
-        type: Number,
-        default: 0
     },
     shippingCost: {
         type: Number,
@@ -92,4 +111,5 @@ orderSchema.index({ user: 1, orderDate: -1 });
 orderSchema.index({ status: 1 });
 orderSchema.index({ 'items.product': 1 });
 
-module.exports = mongoose.model('Order', orderSchema);
+const Order=mongoose.model('Order', orderSchema);
+module.exports=Order;

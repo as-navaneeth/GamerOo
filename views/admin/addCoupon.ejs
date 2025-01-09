@@ -1,0 +1,151 @@
+<%- include('../partials/admin/header.ejs') %>
+
+<div class="container-fluid">
+    <div class="row">
+
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">Add New Coupon</h1>
+                <div class="btn-toolbar mb-2 mb-md-0">
+                    <a href="/admin/coupons" class="btn btn-secondary">Back to Coupons</a>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-8">
+                    <form id="addCouponForm" class="needs-validation" novalidate>
+                        <div class="mb-3">
+                            <label for="code" class="form-label">Coupon Code</label>
+                            <input type="text" class="form-control" id="code" name="code" required>
+                            <div class="invalid-feedback">Please provide a coupon code.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description" required></textarea>
+                            <div class="invalid-feedback">Please provide a description.</div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="discountType" class="form-label">Discount Type</label>
+                                <select class="form-select" id="discountType" name="discountType" required>
+                                    <option value="percentage">Percentage</option>
+                                    <option value="fixed">Fixed Amount</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="discountAmount" class="form-label">Discount Amount</label>
+                                <input type="number" class="form-control" id="discountAmount" name="discountAmount" required>
+                                <div class="invalid-feedback">Please provide a discount amount.</div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="minimumPurchase" class="form-label">Minimum Purchase Amount</label>
+                                <input type="number" class="form-control" id="minimumPurchase" name="minimumPurchase" required>
+                                <div class="invalid-feedback">Please provide a minimum purchase amount.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="maximumDiscount" class="form-label">Maximum Discount (Optional)</label>
+                                <input type="number" class="form-control" id="maximumDiscount" name="maximumDiscount">
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="startDate" class="form-label">Start Date</label>
+                                <input type="datetime-local" class="form-control" id="startDate" name="startDate" required>
+                                <div class="invalid-feedback">Please provide a start date.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="endDate" class="form-label">End Date</label>
+                                <input type="datetime-local" class="form-control" id="endDate" name="endDate" required>
+                                <div class="invalid-feedback">Please provide an end date.</div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="usageLimit" class="form-label">Usage Limit Per User</label>
+                            <input type="number" class="form-control" id="usageLimit" name="usageLimit" required min="1">
+                            <div class="invalid-feedback">Please provide a usage limit.</div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Create Coupon</button>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script>
+document.getElementById('addCouponForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    // Form validation
+    if (!this.checkValidity()) {
+        e.stopPropagation();
+        this.classList.add('was-validated');
+        return;
+    }
+
+    // Get form data
+    const formData = {
+        code: document.getElementById('code').value,
+        description: document.getElementById('description').value,
+        discountType: document.getElementById('discountType').value,
+        discountAmount: parseFloat(document.getElementById('discountAmount').value),
+        minimumPurchase: parseFloat(document.getElementById('minimumPurchase').value),
+        maximumDiscount: document.getElementById('maximumDiscount').value ? parseFloat(document.getElementById('maximumDiscount').value) : null,
+        startDate: document.getElementById('startDate').value,
+        endDate: document.getElementById('endDate').value,
+        usageLimit: parseInt(document.getElementById('usageLimit').value)
+    };
+
+    try {
+        const response = await fetch('/admin/coupons/add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Success',
+                text: data.message,
+                showConfirmButton: false,
+                timer: 1500
+            }).then(() => {
+                window.location.href = '/admin/coupons';
+            });
+        } else {
+            throw new Error(data.message);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: error.message || 'Error creating coupon'
+        });
+    }
+});
+
+// Set minimum date for start date and end date
+const today = new Date().toISOString().slice(0, 16);
+document.getElementById('startDate').min = today;
+document.getElementById('endDate').min = today;
+
+// Update end date minimum when start date changes
+document.getElementById('startDate').addEventListener('change', function() {
+    document.getElementById('endDate').min = this.value;
+});
+</script>
+

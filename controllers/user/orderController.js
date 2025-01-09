@@ -1,13 +1,6 @@
 const Order = require('../../models/orderSchema');
 const Cart = require('../../models/cartSchema');
 const User = require('../../models/userSchema');
-const Razorpay = require('razorpay');
-require('dotenv').config();
-
-const razorpay = new Razorpay({
-    key_id: process.env.RAZORPAY_ID,
-    key_secret: process.env.RAZORPAY_SECRET
-});
 
 // Get all orders for a user
 const getMyOrders = async (req, res) => {
@@ -211,14 +204,31 @@ const createOrder = async (req, res) => {
         const { addressId, paymentMethod, totalAmount } = req.body;
         const userId = req.session.user;
 
+        // Get cart items
+        const cart = await Cart.findOne({ userId }).populate('products.productId');
+        if (!cart || cart.products.length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'Cart is empty'
+            });
+        }
+
+        // Prepare order items
+        const orderItems = cart.products.map(item => ({
+            product: item.productId._id,
+            quantity: item.quantity,
+            price: item.productId.price
+        }));
+
         // Create base order
         const order = new Order({
-            userId,
+            user: userId,
             shippingAddress: addressId,
+            items: orderItems,
             paymentMethod,
             totalAmount,
-            orderStatus: 'pending',
-            paymentStatus: paymentMethod === 'COD' ? 'pending' : 'initiated'
+            status: 'Pending',
+            paymentStatus: paymentMethod === 'COD' ? 'Pending' : 'Initiated'
         });
 
         // Save the order
@@ -232,19 +242,10 @@ const createOrder = async (req, res) => {
                 orderId: order._id,
                 message: 'Order placed successfully'
             });
-        } else if (paymentMethod === 'RAZORPAY') {
-            // Create Razorpay order
-            const razorpayOrder = await razorpay.orders.create({
-                amount: totalAmount * 100, // Convert to paise
-                currency: 'INR',
-                receipt: order._id.toString()
-            });
-
+        } else {
             res.json({
                 success: true,
-                order: razorpayOrder,
-                orderId: order._id,
-                key_id: process.env.RAZORPAY_ID
+                orderId: order._id
             });
         }
     } catch (error) {
@@ -261,8 +262,8 @@ const processOrder = async (userId, orderId) => {
     try {
         // Update order status
         await Order.findByIdAndUpdate(orderId, {
-            orderStatus: 'processing',
-            paymentStatus: 'pending'
+            status: 'Processing',
+            paymentStatus: 'Pending'
         });
 
         // Clear cart
@@ -278,87 +279,16 @@ const processOrder = async (userId, orderId) => {
     }
 };
 
-// Verify Razorpay payment
-const verifyPayment = async (req, res) => {
-    try {
-        const {
-            razorpay_order_id,
-            razorpay_payment_id,
-            razorpay_signature,
-            orderId
-        } = req.body;
-
-        // Verify signature
-        const generated_signature = crypto
-            .createHmac('sha256', process.env.RAZORPAY_SECRET)
-            .update(razorpay_order_id + '|' + razorpay_payment_id)
-            .digest('hex');
-
-        if (generated_signature !== razorpay_signature) {
-            await updateOrderStatus(orderId, 'failed');
-            return res.status(400).json({
-                success: false,
-                message: 'Payment verification failed'
-            });
-        }
-
-        // Update order status
-        await updateOrderStatus(orderId, 'paid');
-        
-        // Process the order
-        await processOrder(req.session.user, orderId);
-
-        res.json({
-            success: true,
-            message: 'Payment verified successfully'
-        });
-    } catch (error) {
-        console.error('Payment verification error:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Payment verification failed'
-        });
-    }
-};
-
 // Update order status
 const updateOrderStatus = async (orderId, status) => {
     try {
         await Order.findByIdAndUpdate(orderId, {
             paymentStatus: status,
-            orderStatus: status === 'paid' ? 'processing' : 'failed'
+            status: status === 'paid' ? 'Processing' : 'Pending'
         });
     } catch (error) {
         console.error('Error updating order status:', error);
         throw error;
-    }
-};
-
-// Get order details
-const getOrderDetailsNew = async (req, res) => {
-    try {
-        const orderId = req.params.orderId;
-        const order = await Order.findById(orderId)
-            .populate('userId')
-            .populate('shippingAddress');
-        
-        if (!order) {
-            return res.status(404).json({
-                success: false,
-                message: 'Order not found'
-            });
-        }
-
-        res.json({
-            success: true,
-            order
-        });
-    } catch (error) {
-        console.error('Error fetching order details:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Error fetching order details'
-        });
     }
 };
 
@@ -369,6 +299,5 @@ module.exports = {
     requestReturn,
     getReturnStatus,
     createOrder,
-    verifyPayment,
-    getOrderDetailsNew
+    processOrder
 };
