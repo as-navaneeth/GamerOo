@@ -123,7 +123,7 @@ const handleReturnRequest = async (req, res) => {
     try {
         const orderId = req.params.orderId;
         const { action, reason } = req.body;
-        console.log('Return Request Data:', { orderId, action, reason });
+        
 
         const order = await Order.findById(orderId);
         if (!order) {
@@ -148,7 +148,7 @@ const handleReturnRequest = async (req, res) => {
             }
         } else if (action === 'reject') {
             order.returnStatus = 'Return Rejected';
-            order.returnRejectionReason = reason;
+            order.returnReason = reason;
         }
 
         await order.save();

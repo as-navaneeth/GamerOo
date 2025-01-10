@@ -85,7 +85,7 @@ const createRazorpayOrder = async (req, res) => {
             receipt: newOrder._id.toString()
         });
 
-        console.log('Razorpay order created:', razorpayOrder);
+        // console.log('Razorpay order created:', razorpayOrder);
 
         res.json({
             success: true,
@@ -106,7 +106,7 @@ const createRazorpayOrder = async (req, res) => {
 // Verify Razorpay payment
 const verifyPayment = async (req, res) => {
     try {
-        console.log('Received verification request:', req.body);
+        
         const { razorpay_payment_id, razorpay_order_id, razorpay_signature, receipt } = req.body;
 
         // Verify signature
@@ -116,10 +116,7 @@ const verifyPayment = async (req, res) => {
             .update(sign.toString())
             .digest("hex");
 
-        console.log('Signature verification:', {
-            received: razorpay_signature,
-            expected: expectedSign
-        });
+    
 
         if (razorpay_signature === expectedSign) {
             // Find and update order
@@ -133,7 +130,6 @@ const verifyPayment = async (req, res) => {
                 });
             }
 
-            console.log('Found order:', order._id);
 
             // Update order status
             order.paymentStatus = 'Success';
@@ -141,8 +137,7 @@ const verifyPayment = async (req, res) => {
             order.paymentId = razorpay_payment_id;
             order.razorpayOrderId = razorpay_order_id;
             await order.save();
-
-            console.log('Order updated successfully');
+           
 
             // Clear cart after successful payment
             await Cart.findOneAndDelete({ user: req.session.user });

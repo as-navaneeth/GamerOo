@@ -33,7 +33,7 @@ const loadHomePage = async (req, res) => {
         const productData = await Product.find({ isListed: true })
             .populate('category')
             .populate('brand')
-            .sort({ createdAt: -1 })
+            .sort({stock:-1, createdAt: -1 })
             .limit(10);
 
         // Fetch categories for search dropdown
@@ -370,7 +370,7 @@ const loadShoppingPage = async (req, res) => {
                 sortOptions = { name: -1 };
                 break;
             default:
-                sortOptions = { createdAt: -1 };
+                sortOptions = {stock:-1, createdAt: -1 };
         }
 
         // Fetch all categories for the sidebar
