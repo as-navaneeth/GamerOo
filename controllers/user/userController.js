@@ -332,8 +332,15 @@ const loadShoppingPage = async (req, res) => {
         }
 
         if (selectedCategory) {
-            query.category = selectedCategory;
+            // // Find category by name first
+            const category = await Category.findOne({ name: selectedCategory });
+            if (category) {
+                query.category = category._id;
+            } else {
+                query.category = selectedCategory
+            }
         }
+
         if (selectedBrand) {
             // Find brand by name and get its ID
             const brand = await Brand.findOne({ brandName: selectedBrand });

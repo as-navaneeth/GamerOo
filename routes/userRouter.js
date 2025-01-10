@@ -38,6 +38,12 @@ router.get("/logout",userController.logout);
 //shop page
 router.get('/shop',userController.loadShoppingPage);
 
+// Temporary route to check categories
+router.get('/check-categories', async (req, res) => {
+    const Category = require('../models/categorySchema');
+    const categories = await Category.find({});
+    res.json(categories);
+});
 
 //user product page
 router.get('/productDetails/:id',userAuth,productController.loadProductPage);
