@@ -9,6 +9,7 @@ const brandController = require("../controllers/admin/brandController");
 const productController = require("../controllers/admin/productController");
 const orderController=require("../controllers/admin/orderController");
 const couponController = require('../controllers/admin/couponController');
+const salesReportController = require('../controllers/admin/salesReportController');
 
 const { userAuth, adminAuth } = require("../middlewares/auth");
 
@@ -68,5 +69,10 @@ router.post('/orders/update-status', adminAuth, orderController.updateOrderStatu
 // Return request routes
 router.get('/return-requests', adminAuth, orderController.getReturnRequests);
 router.post('/return-requests/:orderId/handle', adminAuth, orderController.handleReturnRequest);
+
+// Sales Report Routes
+router.get('/sales-report', adminAuth, salesReportController.getSalesReport);
+router.get('/sales-report/download-excel', adminAuth, salesReportController.downloadExcel);
+router.get('/sales-report/download-pdf', adminAuth, salesReportController.downloadPDF);
 
 module.exports = router;

@@ -97,6 +97,7 @@ const addProduct = async (req, res) => {
                 productImages.push(file.filename); // Store just the filename
             }
         }
+        let saleOffer = regularPrice - ((regularPrice * offer)/ 100)
 
         // Create new product
         const product = new Product({
