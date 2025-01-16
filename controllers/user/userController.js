@@ -330,7 +330,8 @@ const loadShoppingPage = async (req, res) => {
                 { description: { $regex: searchQuery, $options: 'i' } }
             ];
         }
-
+        
+        
         if (selectedCategory) {
             // // Find category by name first
             const category = await Category.findOne({ name: selectedCategory });
@@ -413,6 +414,8 @@ const loadShoppingPage = async (req, res) => {
             .skip((page - 1) * limit)
             .limit(limit);
 
+        const noProductMessage=products.length===0?"No Items Avaliable":null;
+
         if (!products) {
             return res.status(404).send({ message: 'Products not found' });
         }
@@ -461,7 +464,8 @@ const loadShoppingPage = async (req, res) => {
             selectedCategory,
             selectedBrand,
             searchQuery,
-            user: req.session.user ? await User.findById(req.session.user) : null
+            user: req.session.user ? await User.findById(req.session.user) : null,
+            noProductMessage,
         });
 
     } catch (error) {

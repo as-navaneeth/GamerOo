@@ -247,7 +247,7 @@ function cancelOrder(orderId) {
                 if (data.success) {
                     Swal.fire(
                         'Cancelled!',
-                        'Your order has been cancelled.',
+                        data.message,
                         'success'
                     ).then(() => {
                         window.location.reload();

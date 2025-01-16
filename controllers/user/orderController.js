@@ -1,6 +1,8 @@
 const Order = require('../../models/orderSchema');
 const Cart = require('../../models/cartSchema');
 const User = require('../../models/userSchema');
+const Wallet=require('../../models/walletSchema');
+const { OrderedBulkOperation } = require('mongodb');
 
 // Get all orders for a user
 const getMyOrders = async (req, res) => {
@@ -67,7 +69,9 @@ const getOrderDetails = async (req, res) => {
 
 // Cancel order
 const cancelOrder = async (req, res) => {
-    try {
+    try 
+    
+    {
         const orderId = req.params.orderId;
         const userId = req.session.user;
         const { reason } = req.body;
@@ -90,10 +94,34 @@ const cancelOrder = async (req, res) => {
         order.cancellationReason = reason;
 
         await order.save();
+        let walletBalance=null;
+
+        //wallet management
+        if(order.paymentStatus ==='Success' && order.paymentMethod!=='COD'){
+        let wallet=await Wallet.findOne({user:userId});
+        if(!wallet){
+            wallet=new Wallet({user:userId});
+        }
+        
+        const {totalAmount}=order;
+        wallet.balance+=totalAmount;        
+        wallet.transactions.push({
+            type:'credit',
+            amount:totalAmount,
+            description:`Refund for cancelled Order: ${orderId}`,
+            orderId:orderId,           
+        })
+
+        await wallet.save();
+        walletBalance=wallet.balance;
+    }
+
 
         res.json({
             success: true,
-            message: 'Order cancelled successfully'
+            message:order.paymentMethod==='COD'?'Order cancelled successfully.'
+            :'Order cancelled successfully and refund added to wallet.',
+            walletBalance,
         });
     } catch (error) {
         console.error('Error cancelling order:', error);
@@ -219,6 +247,7 @@ const createOrder = async (req, res) => {
             quantity: item.quantity,
             price: item.productId.price
         }));
+
 
         // Create base order
         const order = new Order({

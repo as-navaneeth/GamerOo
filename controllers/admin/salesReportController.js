@@ -45,7 +45,6 @@ const getSalesReport = async (req, res) => {
         const { startDate, endDate, reportType, page=1, limit=10 } = req.query;
         let dateRange;
 
-        console.log(req.query);
 
         if (startDate && endDate) {
             dateRange = {

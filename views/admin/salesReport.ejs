@@ -128,7 +128,7 @@
                         </thead>
                         <tbody>
                             <% orders.forEach(order => { %>
-                                <tr>
+                                <tr style="color:#fff">
                                     <td><span class="text-primary"><%= order._id %></span></td>
                                     <td><%= order.createdAt.toLocaleDateString() %></td>
                                     <td><%= order.shippingAddress.name %></td>

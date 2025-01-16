@@ -2,69 +2,68 @@
 <%-include("../../views/partials/user/header")%>
 
 
-<!-- BREADCRUMB -->
-<div id="breadcrumb" class="section">
-    <!-- container -->
-    <div class="container">
-        <!-- row -->
-        <div class="row">
-            <div class="col-md-12">
-                <ul class="breadcrumb-tree">
-                    <li><a href="">Home</a></li>
-                    <li><a href="#">All Categories</a></li>
-                    
-                </ul>
+    <!-- BREADCRUMB -->
+    <div id="breadcrumb" class="section">
+        <!-- container -->
+        <div class="container">
+            <!-- row -->
+            <div class="row">
+                <div class="col-md-12">
+                    <ul class="breadcrumb-tree">
+                        <li><a href="">Home</a></li>
+                        <li><a href="#">All Categories</a></li>
+
+                    </ul>
+                </div>
             </div>
+            <!-- /row -->
         </div>
-        <!-- /row -->
+        <!-- /container -->
     </div>
-    <!-- /container -->
-</div>
-<!-- /BREADCRUMB -->
+    <!-- /BREADCRUMB -->
 
 
 
-<!-- SECTION -->
-<div class="section">
-    <!-- container -->
-    <div class="container">
-        <!-- row -->
-        <div class="row">
-            <!-- ASIDE -->
-            <div id="aside" class="col-md-3">
-                <!-- aside Widget -->
-                <div class="aside">
-                    <h3 class="aside-title">Categories</h3>
-                    <div class="checkbox-filter">
-                        <div class="input-checkbox">
-                            <input type="radio" name="category" id="category-all" 
-                                <%= !selectedCategory ? 'checked' : '' %>
-                                value="">
-                            <label for="category-all">
-                                <span></span>
-                                All Categories
-                                <small>(<%= categories.reduce((total, cat) => total + cat.count, 0) %>)</small>
-                            </label>
-                        </div>
-                        <% categories.forEach(category => { %>
+    <!-- SECTION -->
+    <div class="section">
+        <!-- container -->
+        <div class="container">
+            <!-- row -->
+            <div class="row">
+                <!-- ASIDE -->
+                <div id="aside" class="col-md-3">
+                    <!-- aside Widget -->
+                    <div class="aside">
+                        <h3 class="aside-title">Categories</h3>
+                        <div class="checkbox-filter">
                             <div class="input-checkbox">
-                                <input type="radio" name="category" 
-                                    id="category-<%= category._id %>"
-                                    value="<%= category._id %>"
-                                    <%= selectedCategory === category._id.toString() ? 'checked' : '' %>>
-                                <label for="category-<%= category._id %>">
+                                <input type="radio" name="category" id="category-all" <%=!selectedCategory ? 'checked'
+                                    : '' %>
+                                value="">
+                                <label for="category-all">
                                     <span></span>
-                                    <%= category.name %>
-                                    <!-- <small>(<%= category.count %>)</small> -->
+                                    All Categories
+                                    <small>(<%= categories.reduce((total, cat)=> total + cat.count, 0) %>)</small>
                                 </label>
                             </div>
-                        <% }); %>
+                            <% categories.forEach(category=> { %>
+                                <div class="input-checkbox">
+                                    <input type="radio" name="category" id="category-<%= category._id %>"
+                                        value="<%= category._id %>" <%=selectedCategory===category._id.toString()
+                                        ? 'checked' : '' %>>
+                                    <label for="category-<%= category._id %>">
+                                        <span></span>
+                                        <%= category.name %>
+                                            <!-- <small>(<%= category.count %>)</small> -->
+                                    </label>
+                                </div>
+                                <% }); %>
+                        </div>
                     </div>
-                </div>
-                <!-- /aside Widget -->
+                    <!-- /aside Widget -->
 
-                <!-- aside Widget -->
-                <!-- <div class="aside">
+                    <!-- aside Widget -->
+                    <!-- <div class="aside">
                     <h3 class="aside-title">Price</h3>
                     <div class="price-filter">
                         <div id="price-slider"></div>
@@ -81,104 +80,120 @@
                         </div>
                     </div>
                 </div> -->
-                <!-- /aside Widget -->
+                    <!-- /aside Widget -->
 
-                <!-- aside Widget -->
-                <div class="aside">
-                    <h3 class="aside-title">Brands</h3>
-                    <div class="checkbox-filter">
-                        <div class="input-checkbox">
-                            <input type="radio" name="brand" id="brand-all" 
-                                <%= !selectedBrand ? 'checked' : '' %>
-                                value="">
-                            <label for="brand-all">
-                                <span></span>
-                                All Brands
-                                <small>(<%= brands.reduce((total, brand) => total + brand.count, 0) %>)</small>
-                            </label>
-                        </div>
-                        <% brands.forEach(brand => { 
-                            const brandId = brand.name.toLowerCase().replace(/[^a-z0-9]/g, '-');
-                        %>
+                    <!-- aside Widget -->
+                    <div class="aside">
+                        <h3 class="aside-title">Brands</h3>
+                        <div class="checkbox-filter">
                             <div class="input-checkbox">
-                                <input type="radio" name="brand" 
-                                    id="brand-<%= brandId %>"
-                                    value="<%= brand.name %>"
-                                    <%= selectedBrand === brand.name ? 'checked' : '' %>>
-                                <label for="brand-<%= brandId %>">
+                                <input type="radio" name="brand" id="brand-all" <%=!selectedBrand ? 'checked' : '' %>
+                                value="">
+                                <label for="brand-all">
                                     <span></span>
-                                    <%= brand.name %>
-                                    <small>(<%= brand.count %>)</small>
+                                    All Brands
+                                    <small>(<%= brands.reduce((total, brand)=> total + brand.count, 0) %>)</small>
                                 </label>
                             </div>
-                        <% }); %>
+                            <% brands.forEach(brand=> {
+                                const brandId = brand.name.toLowerCase().replace(/[^a-z0-9]/g, '-');
+                                %>
+                                <div class="input-checkbox">
+                                    <input type="radio" name="brand" id="brand-<%= brandId %>" value="<%= brand.name %>"
+                                        <%=selectedBrand===brand.name ? 'checked' : '' %>>
+                                    <label for="brand-<%= brandId %>">
+                                        <span></span>
+                                        <%= brand.name %>
+                                            <small>(<%= brand.count %>)</small>
+                                    </label>
+                                </div>
+                                <% }); %>
+                        </div>
                     </div>
+                    <!-- /aside Widget -->
+
+
                 </div>
-                <!-- /aside Widget -->
+                <!-- /ASIDE -->
 
-               
-            </div>
-            <!-- /ASIDE -->
-
-            <!-- STORE -->
-            <div id="store" class="col-md-9">
-                <!-- store top filter -->
-                <div class="store-filter clearfix">
-                    <div class="store-sort">
-                        <label>
-                            Sort By:
-                            <select class="input-select" id="sortSelect">
-                                <option value="default" <%= currentSort === 'default' ? 'selected' : '' %>>Default</option>
-                                <option value="popularity" <%= currentSort === 'popularity' ? 'selected' : '' %>>Popularity</option>
-                                <option value="priceLowToHigh" <%= currentSort === 'priceLowToHigh' ? 'selected' : '' %>>Price: Low to High</option>
-                                <option value="priceHighToLow" <%= currentSort === 'priceHighToLow' ? 'selected' : '' %>>Price: High to Low</option>
-                                <option value="newArrivals" <%= currentSort === 'newArrivals' ? 'selected' : '' %>>New Arrivals</option>
-                                <option value="nameAZ" <%= currentSort === 'nameAZ' ? 'selected' : '' %>>Name: A to Z</option>
-                                <option value="nameZA" <%= currentSort === 'nameZA' ? 'selected' : '' %>>Name: Z to A</option>
-                            </select>
-                        </label>
+                <!-- STORE -->
+                <div id="store" class="col-md-9">
+                    <!-- store top filter -->
+                    <div class="store-filter clearfix">
+                        <div class="store-sort">
+                            <label>
+                                Sort By:
+                                <select class="input-select" id="sortSelect">
+                                    <option value="default" <%=currentSort==='default' ? 'selected' : '' %>>Default
+                                    </option>
+                                    <option value="popularity" <%=currentSort==='popularity' ? 'selected' : '' %>
+                                        >Popularity</option>
+                                    <option value="priceLowToHigh" <%=currentSort==='priceLowToHigh' ? 'selected' : ''
+                                        %>>Price: Low to High</option>
+                                    <option value="priceHighToLow" <%=currentSort==='priceHighToLow' ? 'selected' : ''
+                                        %>>Price: High to Low</option>
+                                    <option value="newArrivals" <%=currentSort==='newArrivals' ? 'selected' : '' %>>New
+                                        Arrivals</option>
+                                    <option value="nameAZ" <%=currentSort==='nameAZ' ? 'selected' : '' %>>Name: A to Z
+                                    </option>
+                                    <option value="nameZA" <%=currentSort==='nameZA' ? 'selected' : '' %>>Name: Z to A
+                                    </option>
+                                </select>
+                            </label>
+                        </div>
                     </div>
-                </div>
-                <!-- /store top filter -->
+                    <!-- /store top filter -->
 
-                <!-- store products -->
-                <div class="row">
-                    <% let productsInRow = 0; %>
-                    <% products.forEach((product) =>{ %>
-                        <% if (product.stock > 0 || !hideOutOfStock) { %>
-                            <% productsInRow++; %>
-                            <div class="col-md-4 col-sm-6 col-xs-12 mb-4">
-                                <a href="productDetails/<%=product._id%>">
-                                    <div class="product">
-                                        <div class="product-img">
-                                            <img src="/uploads/products/<%=product.productImage[0]%>" alt="productImage">
-                                            <% if (product.stock <= 0) { %>
-                                                <div class="product-label">
-                                                    <span class="out-of-stock">Out of Stock</span>
-                                                </div>
-                                            <% } else if (product.stock < 10) { %>
-                                                <div class="product-label">
-                                                    <span class="new">Limited Stock</span>
-                                                </div>
-                                            <% } %>
-                                        </div>
-                                        <div class="product-body">
-                                            <p class="product-category"><%=product.category.name%></p>
-                                            <h3 class="product-name"><a href="#"><%=product.name%></a></h3>
-                                            <h4 class="product-price"><i class="fa fa-inr"></i> <%=product.salePrice%> <del class="product-old-price"><i class="fa fa-inr"></i><%=product.regularPrice%></del></h4>
-                                            <div class="product-rating">
-                                                <i class="fa fa-star"></i>
-                                                <i class="fa fa-star"></i>
-                                                <i class="fa fa-star"></i>
-                                                <i class="fa fa-star"></i>
-                                                <i class="fa fa-star"></i>
-                                            </div>
-                                            <div class="product-btns">
-                                                <button class="add-to-wishlist" onclick="addToWishList('<%=product._id%>',this)"><i
-                                                    class="fa fa-heart-o"></i><span class="tooltipp">add to wishlist</span></button>
-                                            </div>
-                                        </div>
-                                        <!-- <div class="add-to-cart">
+                    <!-- store products -->
+                    <div class="row">
+                        <% let productsInRow=0; %>
+                            <% products.forEach((product)=>{ %>
+                                <% if (product.stock> 0 || !hideOutOfStock) { %>
+                                    <% productsInRow++; %>
+                                        <div class="col-md-4 col-sm-6 col-xs-12 mb-4">
+                                            <a href="productDetails/<%=product._id%>">
+                                                <div class="product">
+                                                    <div class="product-img">
+                                                        <img src="/uploads/products/<%=product.productImage[0]%>"
+                                                            alt="productImage">
+                                                        <% if (product.stock <=0) { %>
+                                                            <div class="product-label">
+                                                                <span class="out-of-stock">Out of Stock</span>
+                                                            </div>
+                                                            <% } else if (product.stock < 10) { %>
+                                                                <div class="product-label">
+                                                                    <span class="new">Limited Stock</span>
+                                                                </div>
+                                                                <% } %>
+                                                    </div>
+                                                    <div class="product-body">
+                                                        <p class="product-category">
+                                                            <%=product.category.name%>
+                                                        </p>
+                                                        <h3 class="product-name"><a href="#">
+                                                                <%=product.name%>
+                                                            </a></h3>
+                                                        <h4 class="product-price"><i class="fa fa-inr"></i>
+                                                            <%=product.salePrice%> <del class="product-old-price"><i
+                                                                        class="fa fa-inr"></i>
+                                                                    <%=product.regularPrice%>
+                                                                </del>
+                                                        </h4>
+                                                        <div class="product-rating">
+                                                            <i class="fa fa-star"></i>
+                                                            <i class="fa fa-star"></i>
+                                                            <i class="fa fa-star"></i>
+                                                            <i class="fa fa-star"></i>
+                                                            <i class="fa fa-star"></i>
+                                                        </div>
+                                                        <div class="product-btns">
+                                                            <button class="add-to-wishlist"
+                                                                onclick="addToWishList('<%=product._id%>',this)"><i
+                                                                    class="fa fa-heart-o"></i><span class="tooltipp">add
+                                                                    to wishlist</span></button>
+                                                        </div>
+                                                    </div>
+                                                    <!-- <div class="add-to-cart">
                                             <% if (product.stock > 0) { %>
                                                 <button class="add-to-cart-btn" onclick="addToCart('<%=product._id%>', '<%=product.salePrice%>')">
                                                     <i class="fa fa-shopping-cart"></i> add to cart
@@ -189,388 +204,421 @@
                                                 </button>
                                             <% } %>
                                         </div> -->
-                                    </div>
-                                </a>
-                            </div>
-                            <% if (productsInRow % 3 === 0) { %>
-                                </div><div class="row">
+                                                </div>
+                                            </a>
+                                        </div>
+                                        <% if (productsInRow % 3===0) { %>
+                    </div>
+                    <div class="row">
+                        <% } %>
                             <% } %>
-                        <% } %>
-                    <% }); %>
-                    <% if (productsInRow % 3 !== 0) { %>
-                        <!-- Add empty columns to complete the last row if needed -->
-                        <% for(let i = 0; i < (3 - (productsInRow % 3)); i++) { %>
-                            <div class="col-md-4 col-sm-6 col-xs-12 mb-4"></div>
-                        <% } %>
-                    <% } %>
+                                <% }); %>
+                                    <% if (productsInRow % 3 !==0) { %>
+                                        <!-- Add empty columns to complete the last row if needed -->
+                                        <% for(let i=0; i < (3 - (productsInRow % 3)); i++) { %>
+                                            <div class="col-md-4 col-sm-6 col-xs-12 mb-4"></div>
+                                            <% } %>
+                                                <% } %>
+                    </div>
+
+                    <div class="no-products-message">
+                        <% if (noProductMessage) { %>
+                            <p class="no-products-text">
+                                <%= noProductMessage %>
+                            </p>
+                            <% } %>
+                    </div>
+
+
+                    <!-- /store products -->
+
+                    <style>
+                        .product {
+                            margin-bottom: 30px;
+                            height: 100%;
+                        }
+
+                        .product-img {
+                            position: relative;
+                            padding-top: 100%;
+                            /* 1:1 Aspect Ratio */
+                            overflow: hidden;
+                        }
+
+                        .product-img img {
+                            position: absolute;
+                            top: 0;
+                            left: 0;
+                            width: 100%;
+                            height: 100%;
+                            object-fit: cover;
+                        }
+
+                        .mb-4 {
+                            margin-bottom: 1.5rem;
+                        }
+
+                        .row {
+                            display: flex;
+                            flex-wrap: wrap;
+                            margin-right: -15px;
+                            margin-left: -15px;
+                        }
+
+                        .no-products-message {
+                            text-align: center;                        
+                            margin: 50px auto;                        
+                        }
+
+                        .no-products-text {
+                            font-size: 24px;                            
+                            color: #555;                           
+                            font-weight: 400;                            
+                            letter-spacing: 1px;                            
+                            text-transform: capitalize;                
+                        }
+                    </style>
+
+                    <!-- store bottom filter -->
+                    <div class="store-filter clearfix">
+                        <ul class="store-pagination">
+                            <% if (currentPage> 1) { %>
+                                <li><a href="?page=1"><i class="fa fa-angle-double-left"></i></a></li>
+                                <li><a href="?page=<%= currentPage - 1 %>"><i class="fa fa-angle-left"></i></a></li>
+                                <% } %>
+
+                                    <% for(let i=1; i <=totalPages; i++) { %>
+                                        <li class="<%= currentPage == i ? 'active' : '' %>">
+                                            <a href="?page=<%= i %>">
+                                                <%= i %>
+                                            </a>
+                                        </li>
+                                        <% } %>
+
+                                            <% if (currentPage < totalPages) { %>
+                                                <li><a href="?page=<%= currentPage + 1 %>"><i
+                                                            class="fa fa-angle-right"></i></a></li>
+                                                <li><a href="?page=<%= totalPages %>"><i
+                                                            class="fa fa-angle-double-right"></i></a></li>
+                                                <% } %>
+                        </ul>
+                    </div>
+                    <!-- /store bottom filter -->
                 </div>
-                <!-- /store products -->
-
-                <style>
-                    .product {
-                        margin-bottom: 30px;
-                        height: 100%;
-                    }
-                    .product-img {
-                        position: relative;
-                        padding-top: 100%; /* 1:1 Aspect Ratio */
-                        overflow: hidden;
-                    }
-                    .product-img img {
-                        position: absolute;
-                        top: 0;
-                        left: 0;
-                        width: 100%;
-                        height: 100%;
-                        object-fit: cover;
-                    }
-                    .mb-4 {
-                        margin-bottom: 1.5rem;
-                    }
-                    .row {
-                        display: flex;
-                        flex-wrap: wrap;
-                        margin-right: -15px;
-                        margin-left: -15px;
-                    }
-                </style>
-
-                <!-- store bottom filter -->
-                <div class="store-filter clearfix">
-                    <ul class="store-pagination">
-                        <% if (currentPage > 1) { %>
-                            <li><a href="?page=1"><i class="fa fa-angle-double-left"></i></a></li>
-                            <li><a href="?page=<%= currentPage - 1 %>"><i class="fa fa-angle-left"></i></a></li>
-                        <% } %>
-
-                        <% for(let i = 1; i <= totalPages; i++) { %>
-                            <li class="<%= currentPage == i ? 'active' : '' %>">
-                                <a href="?page=<%= i %>"><%= i %></a>
-                            </li>
-                        <% } %>
-
-                        <% if (currentPage < totalPages) { %>
-                            <li><a href="?page=<%= currentPage + 1 %>"><i class="fa fa-angle-right"></i></a></li>
-                            <li><a href="?page=<%= totalPages %>"><i class="fa fa-angle-double-right"></i></a></li>
-                        <% } %>
-                    </ul>
-                </div>
-                <!-- /store bottom filter -->
+                <!-- /STORE -->
             </div>
-            <!-- /STORE -->
+            <!-- /row -->
         </div>
-        <!-- /row -->
+        <!-- /container -->
     </div>
-    <!-- /container -->
-</div>
-<!-- /SECTION -->
+    <!-- /SECTION -->
 
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-<script>
-    //function to add to cart with stock avaliable
+    <script>
+        //function to add to cart with stock avaliable
 
-    async function addToCart(productId,price,maxStock) {
-        try {
-            const quantity=1;
-            const response=await fetch('/cart/add',{
-                method:"POST",
-                headers:{
-                    'Content-Type':'application/json'
-                },
-                body:JSON.stringify({
-                    productId,
-                    price,
-                    quantity
-                })
-            });
-
-            if(response.ok){
-                Swal.fire({
-                    icon:'success',
-                    title:'Success',
-                    text:'Item added to cart successfully!'
+        async function addToCart(productId, price, maxStock) {
+            try {
+                const quantity = 1;
+                const response = await fetch('/cart/add', {
+                    method: "POST",
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        productId,
+                        price,
+                        quantity
+                    })
                 });
-            }else{
-                const data=await response.json();
+
+                if (response.ok) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: 'Item added to cart successfully!'
+                    });
+                } else {
+                    const data = await response.json();
+                    Swal.fire({
+                        icon: "error",
+                        title: 'Oops...',
+                        text: data.message || 'Failed to add item to cart'
+                    })
+                }
+            } catch (error) {
+                console.error('Error to add to cart:', error);
                 Swal.fire({
-                    icon:"error",
-                    title:'Oops...',
-                    text:data.message || 'Failed to add item to cart'
+                    icon: 'error',
+                    title: 'oops.',
+                    text: 'Something went wrong'
                 })
             }
-        } catch (error) {
-            console.error('Error to add to cart:',error);
-            Swal.fire({
-                icon:'error',
-                title:'oops.',
-                text:'Something went wrong'
-            })
         }
-    }
 
-    //add filter for out of stock products
-    document.getElementById('hideOutOfStock').addEventListener('change',
-        function(){
-            const hideOutOfStock=this.checked;
-            //reload page with filter
-            window.location.href=`/shop?hideOutOfStock=${hideOutOfStock}`;
-        }
-    )
+        //add filter for out of stock products
+        document.getElementById('hideOutOfStock').addEventListener('change',
+            function () {
+                const hideOutOfStock = this.checked;
+                //reload page with filter
+                window.location.href = `/shop?hideOutOfStock=${hideOutOfStock}`;
+            }
+        )
 
 
-    // Handle sort change
-    document.getElementById('sortSelect').addEventListener('change', function() {
-        const currentUrl = new URL(window.location.href);
-        currentUrl.searchParams.set('sortBy', this.value);
-        
-        // Reset to page 1 when sorting changes
-        currentUrl.searchParams.set('page', '1');
-        
-        window.location.href = currentUrl.toString();
-    });
-
-    // Function to preserve sort parameter in pagination links
-    document.querySelectorAll('.store-pagination a').forEach(link => {
-        link.addEventListener('click', function(e) {
-            e.preventDefault();
+        // Handle sort change
+        document.getElementById('sortSelect').addEventListener('change', function () {
             const currentUrl = new URL(window.location.href);
-            const newUrl = new URL(this.href);
-            const page = newUrl.searchParams.get('page');
-            
-            // Preserve all existing query parameters
+            currentUrl.searchParams.set('sortBy', this.value);
+
+            // Reset to page 1 when sorting changes
+            currentUrl.searchParams.set('page', '1');
+
+            window.location.href = currentUrl.toString();
+        });
+
+        // Function to preserve sort parameter in pagination links
+        document.querySelectorAll('.store-pagination a').forEach(link => {
+            link.addEventListener('click', function (e) {
+                e.preventDefault();
+                const currentUrl = new URL(window.location.href);
+                const newUrl = new URL(this.href);
+                const page = newUrl.searchParams.get('page');
+
+                // Preserve all existing query parameters
+                currentUrl.searchParams.forEach((value, key) => {
+                    if (key !== 'page') {
+                        newUrl.searchParams.set(key, value);
+                    }
+                });
+
+                window.location.href = newUrl.toString();
+            });
+        });
+    </script>
+
+    <script>
+        // Handle category selection
+        document.querySelectorAll('input[name="category"]').forEach(radio => {
+            radio.addEventListener('change', function () {
+                const currentUrl = new URL(window.location.href);
+
+                if (this.value) {
+                    currentUrl.searchParams.set('category', this.value);
+                } else {
+                    currentUrl.searchParams.delete('category');
+                }
+
+                // Reset to page 1 when category changes
+                currentUrl.searchParams.set('page', '1');
+
+                window.location.href = currentUrl.toString();
+            });
+        });
+
+        // Preserve category parameter in pagination and sorting
+        function updateQueryParams(url) {
+            const currentUrl = new URL(window.location.href);
+            const newUrl = new URL(url);
+
+            // Preserve all existing query parameters except page
             currentUrl.searchParams.forEach((value, key) => {
                 if (key !== 'page') {
                     newUrl.searchParams.set(key, value);
                 }
             });
-            
-            window.location.href = newUrl.toString();
-        });
-    });
-</script>
 
-<script>
-    // Handle category selection
-    document.querySelectorAll('input[name="category"]').forEach(radio => {
-        radio.addEventListener('change', function() {
+            return newUrl.toString();
+        }
+
+        // Update pagination links
+        document.querySelectorAll('.store-pagination a').forEach(link => {
+            link.addEventListener('click', function (e) {
+                e.preventDefault();
+                window.location.href = updateQueryParams(this.href);
+            });
+        });
+
+        // Update sort select
+        document.getElementById('sortSelect').addEventListener('change', function () {
             const currentUrl = new URL(window.location.href);
-            
-            if (this.value) {
-                currentUrl.searchParams.set('category', this.value);
-            } else {
-                currentUrl.searchParams.delete('category');
-            }
-            
-            // Reset to page 1 when category changes
+            currentUrl.searchParams.set('sortBy', this.value);
             currentUrl.searchParams.set('page', '1');
-            
             window.location.href = currentUrl.toString();
         });
-    });
+    </script>
 
-    // Preserve category parameter in pagination and sorting
-    function updateQueryParams(url) {
-        const currentUrl = new URL(window.location.href);
-        const newUrl = new URL(url);
-        
-        // Preserve all existing query parameters except page
-        currentUrl.searchParams.forEach((value, key) => {
-            if (key !== 'page') {
-                newUrl.searchParams.set(key, value);
-            }
+    <script>
+        // Handle brand selection
+        document.querySelectorAll('input[name="brand"]').forEach(radio => {
+            radio.addEventListener('change', function () {
+                const currentUrl = new URL(window.location.href);
+
+                if (this.value) {
+                    currentUrl.searchParams.set('brand', this.value);
+                } else {
+                    currentUrl.searchParams.delete('brand');
+                }
+
+                // Reset to page 1 when brand changes
+                currentUrl.searchParams.set('page', '1');
+
+                window.location.href = currentUrl.toString();
+            });
         });
-        
-        return newUrl.toString();
-    }
 
-    // Update pagination links
-    document.querySelectorAll('.store-pagination a').forEach(link => {
-        link.addEventListener('click', function(e) {
-            e.preventDefault();
-            window.location.href = updateQueryParams(this.href);
-        });
-    });
-
-    // Update sort select
-    document.getElementById('sortSelect').addEventListener('change', function() {
-        const currentUrl = new URL(window.location.href);
-        currentUrl.searchParams.set('sortBy', this.value);
-        currentUrl.searchParams.set('page', '1');
-        window.location.href = currentUrl.toString();
-    });
-</script>
-
-<script>
-    // Handle brand selection
-    document.querySelectorAll('input[name="brand"]').forEach(radio => {
-        radio.addEventListener('change', function() {
+        // Update existing updateQueryParams function to preserve brand parameter
+        function updateQueryParams(url) {
             const currentUrl = new URL(window.location.href);
-            
-            if (this.value) {
-                currentUrl.searchParams.set('brand', this.value);
-            } else {
-                currentUrl.searchParams.delete('brand');
-            }
-            
-            // Reset to page 1 when brand changes
-            currentUrl.searchParams.set('page', '1');
-            
-            window.location.href = currentUrl.toString();
-        });
-    });
+            const newUrl = new URL(url);
 
-    // Update existing updateQueryParams function to preserve brand parameter
-    function updateQueryParams(url) {
-        const currentUrl = new URL(window.location.href);
-        const newUrl = new URL(url);
-        
-        // Preserve all existing query parameters except page
-        currentUrl.searchParams.forEach((value, key) => {
-            if (key !== 'page') {
-                newUrl.searchParams.set(key, value);
-            }
-        });
-        
-        return newUrl.toString();
-    }
-</script>
+            // Preserve all existing query parameters except page
+            currentUrl.searchParams.forEach((value, key) => {
+                if (key !== 'page') {
+                    newUrl.searchParams.set(key, value);
+                }
+            });
 
-	<script>
-		function addToWishList(productId,button){
-			fetch(`/wishlist/add/${productId}`,{
-				method:"POST",
-				headers: {
-					"Content-Type": "application/json"
-				}
-			})
-			.then(response=>response.json())
-			.then(data=>{
-				if(data.success){
-					//change heart icon filled and red
-					const icon=button.querySelector('i');
-					icon.className='fa fa-heart';
-					icon.style.color='#D10024';
+            return newUrl.toString();
+        }
+    </script>
 
-					Swal.fire({
-                title: 'Added to Wishlist!',
-                text: 'Product has been added to your wishlist',
-                icon: 'success',
-                showCancelButton: true,
-                confirmButtonColor: '#D10024',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: 'View Wishlist',
-                cancelButtonText: 'Continue Shopping'
-            }).then((result) => {
-				if(result.isConfirmed){
-					window.location.href="/wishlist";
-				}
-			})
-				}else{
-					Swal.fire({
-						title: 'Error!',
-						text:data.message || 'Could not add to wishlist',
-						icon:'error'
-					})
-				}
-			})
-			.catch(error=>{
-				console.error("Error:",error);
-				Swal.fire(
-					'Error!',
-					'Could not add to wishlist',
-					'error'
-				)
-			})
-		}
-	</script>
+    <script>
+        function addToWishList(productId, button) {
+            fetch(`/wishlist/add/${productId}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        //change heart icon filled and red
+                        const icon = button.querySelector('i');
+                        icon.className = 'fa fa-heart';
+                        icon.style.color = '#D10024';
 
-<style>
-    .store-sort {
-        float: left;
-        margin-right: 15px;
-    }
+                        Swal.fire({
+                            title: 'Added to Wishlist!',
+                            text: 'Product has been added to your wishlist',
+                            icon: 'success',
+                            showCancelButton: true,
+                            confirmButtonColor: '#D10024',
+                            cancelButtonColor: '#3085d6',
+                            confirmButtonText: 'View Wishlist',
+                            cancelButtonText: 'Continue Shopping'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.href = "/wishlist";
+                            }
+                        })
+                    } else {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: data.message || 'Could not add to wishlist',
+                            icon: 'error'
+                        })
+                    }
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                    Swal.fire(
+                        'Error!',
+                        'Could not add to wishlist',
+                        'error'
+                    )
+                })
+        }
+    </script>
 
-    .store-sort label {
-        font-weight: 500;
-        font-size: 14px;
-        margin-right: 10px;
-    }
+    <style>
+        .store-sort {
+            float: left;
+            margin-right: 15px;
+        }
 
-    .input-select {
-        padding: 0 10px;
-        background: #FFF;
-        border: 1px solid #E4E7ED;
-        height: 40px;
-        border-radius: 4px;
-    }
+        .store-sort label {
+            font-weight: 500;
+            font-size: 14px;
+            margin-right: 10px;
+        }
 
-    .input-select:focus {
-        outline: none;
-        border-color: #D10024;
-    }
-</style>
+        .input-select {
+            padding: 0 10px;
+            background: #FFF;
+            border: 1px solid #E4E7ED;
+            height: 40px;
+            border-radius: 4px;
+        }
 
-<style>
-    .input-checkbox {
-        margin: 10px 0;
-    }
-    
-    .input-checkbox input[type="radio"] {
-        display: none;
-    }
-    
-    .input-checkbox label {
-        display: block;
-        cursor: pointer;
-        padding-left: 30px;
-        position: relative;
-    }
-    
-    .input-checkbox label span {
-        display: block;
-        position: absolute;
-        left: 0;
-        top: 1px;
-        width: 20px;
-        height: 20px;
-        border: 2px solid #E4E7ED;
-        border-radius: 50%;
-    }
-    
-    .input-checkbox input[type="radio"]:checked + label span {
-        background-color: #D10024;
-        border-color: #D10024;
-    }
-    
-    .input-checkbox label small {
-        color: #8D99AE;
-        margin-left: 5px;
-    }
-</style>
+        .input-select:focus {
+            outline: none;
+            border-color: #D10024;
+        }
+    </style>
 
-<style>
-    .checkbox-filter {
-        max-height: 300px;
-        overflow-y: auto;
-        padding-right: 10px;
-    }
-    
-    .checkbox-filter::-webkit-scrollbar {
-        width: 5px;
-    }
-    
-    .checkbox-filter::-webkit-scrollbar-track {
-        background: #f1f1f1;
-    }
-    
-    .checkbox-filter::-webkit-scrollbar-thumb {
-        background: #D10024;
-        border-radius: 5px;
-    }
-</style>
+    <style>
+        .input-checkbox {
+            margin: 10px 0;
+        }
 
-<!--Footer-->
+        .input-checkbox input[type="radio"] {
+            display: none;
+        }
 
-<%-include("../../views/partials/user/footer")%>
+        .input-checkbox label {
+            display: block;
+            cursor: pointer;
+            padding-left: 30px;
+            position: relative;
+        }
+
+        .input-checkbox label span {
+            display: block;
+            position: absolute;
+            left: 0;
+            top: 1px;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #E4E7ED;
+            border-radius: 50%;
+        }
+
+        .input-checkbox input[type="radio"]:checked+label span {
+            background-color: #D10024;
+            border-color: #D10024;
+        }
+
+        .input-checkbox label small {
+            color: #8D99AE;
+            margin-left: 5px;
+        }
+    </style>
+
+    <style>
+        .checkbox-filter {
+            max-height: 300px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .checkbox-filter::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .checkbox-filter::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .checkbox-filter::-webkit-scrollbar-thumb {
+            background: #D10024;
+            border-radius: 5px;
+        }
+    </style>
+
+    <!--Footer-->
+
+    <%-include("../../views/partials/user/footer")%>
