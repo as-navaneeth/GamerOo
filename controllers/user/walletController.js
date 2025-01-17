@@ -26,6 +26,12 @@ const getWallet = async (req, res) => {
 // Add money to wallet (for refunds)
 const addToWallet = async (userId, amount, description, orderId = null) => {
     try {
+
+        const order=await Order.findOne({
+            user:userId,
+            'item.product':orderId
+        });
+
         let wallet = await Wallet.findOne({ user: userId });
         
         // Create wallet if it doesn't exist
@@ -38,11 +44,11 @@ const addToWallet = async (userId, amount, description, orderId = null) => {
             type: 'credit',
             amount: amount,
             description: description,
-            orderId: orderId
+            orderId: order.orderId
         });
 
         // Update balance
-        wallet.balance += amount;
+        wallet.balance += amount;    
 
         await wallet.save();
         return wallet;

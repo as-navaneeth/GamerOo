@@ -34,11 +34,9 @@ const getCheckout = async (req, res) => {
         // Get cart with products
         const cart = await Cart.findOne({ user: userId }).populate('items.product');
 
-        // Get default address
-        const address = await Address.findOne({
-            user: userId,
-            isDefault: true
-        });
+        // Get all addresses and default address
+        const addresses = await Address.find({ user: userId });
+        const address = addresses.find(addr => addr.isDefault) || addresses[0];
 
         //get avaliable coupons
         const availableCoupons=await Coupon.find({isActive:true});
@@ -51,25 +49,32 @@ const getCheckout = async (req, res) => {
             return res.redirect('/manageAddress');
         }
 
+        // Calculate total amount
+        let totalAmount = 0;
+        cart.items.forEach(item => {
+            totalAmount += item.price * item.quantity;
+        });
+
         res.render('checkout', {
             cart,
             address,
-            availableCoupons,
-            totalAmount: cart.totalAmount
+            addresses,  // Pass all addresses to the view
+            totalAmount,
+            availableCoupons
         });
     } catch (error) {
-        console.error('Error loading checkout:', error);
-        res.status(500).render('error', {
-            message: 'Error loading checkout page'
-        });
+        console.error('Error in checkout:', error);
+        res.redirect('/cart');
     }
 };
 
 // Process Checkout
-const processCheckout = async (req, res) => {
+const 
+processCheckout = async (req, res) => {
     try {
         const userId = req.session.user;
         const { paymentMethod } = req.body;
+        console.log(req.body);
 
         // Get cart and address
         const cart = await Cart.findOne({ user: userId }).populate('items.product');
@@ -163,7 +168,7 @@ const processCheckout = async (req, res) => {
             discount: discount,
             shippingAddress: shippingAddress,
             paymentMethod: paymentMethod === 'cod' ? 'COD' : 'Online Payment',
-            paymentStatus: 'Pending',
+            paymentStatus: paymentMethod==='cod'?'Pending':'Success',
             status: 'Processing',
             orderDate: new Date()
         });

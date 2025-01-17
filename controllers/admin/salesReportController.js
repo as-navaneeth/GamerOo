@@ -76,7 +76,8 @@ const getSalesReport = async (req, res) => {
             createdAt:{
                 $gte:dateRange.start,
                 $lte:dateRange.end
-            }
+            },
+            status:'Delivered'
         })
         let totalAmount = 0;
         let totalDiscount = 0;
@@ -88,6 +89,8 @@ const getSalesReport = async (req, res) => {
             }
         });
 
+        const totalAmountAfterDiscount=totalAmount-totalDiscount;
+
         const totalPages=Math.ceil(totalOrdersCount/itemPerPage);
 
         res.render('salesReport', {
@@ -95,6 +98,7 @@ const getSalesReport = async (req, res) => {
             totalOrders:totalOrdersCount,
             totalAmount,
             totalDiscount,
+            totalAmountAfterDiscount,
             totalPages,
             currentPage,
             startDate: dateRange.start.toISOString().split('T')[0],

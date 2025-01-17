@@ -80,12 +80,16 @@ router.get('/manageAddress/editAddress/:id',userAuth,addressController.getEditAd
 router.post('/manageAddress/editAddress/:id',userAuth,addressController.updateAddress);
 router.get('/manageAddress/setDefault/:id',userAuth,addressController.setDefaultAddress);
 router.delete('/manageAddress/deleteAddress/:id',userAuth,addressController.deleteAddress);
+// New address routes for checkout page
+router.post('/save-address', userAuth, addressController.saveAddress);
+router.post('/update-selected-address', userAuth, addressController.updateSelectedAddress);
 
 //Cart Routes
 router.get('/cart', userAuth, cartController.getAddtoCart);
 router.post('/cart/add',userAuth,cartController.addToCart);
 router.delete('/cart/delete/:itemId',userAuth,cartController.deleteCartItem);
 
+//checkout controller
 router.get('/checkout/validate', userAuth, checkoutController.validateCheckout);
 router.get('/checkout', userAuth, checkoutController.getCheckout);
 router.post('/checkout/process', userAuth, checkoutController.processCheckout);

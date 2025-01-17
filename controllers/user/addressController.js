@@ -135,6 +135,67 @@ const deleteAddress=async(req,res)=>{
 }
 
 
+const saveAddress = async (req, res) => {
+    try {
+        const { addressId, name, phone, address, city, state, pincode } = req.body;
+        const userId = req.session.user;
+
+        if (addressId) {
+            // Update existing address
+            await Address.findByIdAndUpdate(addressId, {
+                name,
+                phone,
+                address,
+                city,
+                state,
+                pincode
+            });
+        } else {
+            // Create new address
+            const newAddress = new Address({
+                user: userId,
+                name,
+                phone,
+                address,
+                city,
+                state,
+                pincode,
+                isDefault: false
+            });
+            await newAddress.save();
+        }
+
+        res.status(200).json({ success: true });
+    } catch (error) {
+        console.error("Error in saving address:", error);
+        res.status(500).json({ success: false, message: "Failed to save address" });
+    }
+};
+
+const updateSelectedAddress = async (req, res) => {
+    try {
+        const { addressId } = req.body;
+        const userId = req.session.user;
+
+        // Reset all addresses isDefault to false
+        await Address.updateMany(
+            { user: userId },
+            { $set: { isDefault: false } }
+        );
+
+        // Set selected address as default
+        await Address.findByIdAndUpdate(addressId, {
+            isDefault: true
+        });
+
+        res.status(200).json({ success: true });
+    } catch (error) {
+        console.error("Error in updating selected address:", error);
+        res.status(500).json({ success: false, message: "Failed to update selected address" });
+    }
+};
+
+
 
 module.exports = {
     getAddress,
@@ -144,5 +205,6 @@ module.exports = {
     updateAddress,
     setDefaultAddress,
     deleteAddress,
-
+    saveAddress,
+    updateSelectedAddress
 };

@@ -2,47 +2,158 @@
 
 <style>
     .cart-item {
-        padding: 1rem;
+        padding: 1.5rem;
         margin-bottom: 1rem;
-        border-bottom: 1px solid #eee;
+        border: 1px solid #eee;
+        border-radius: 8px;
+        transition: all 0.3s ease;
     }
     
-    .cart-item:last-child {
-        border-bottom: none;
+    .cart-item:hover {
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
     
     .cart-item .img-fluid {
         width: 100%;
-        height: 80px;
+        height: 100px;
         object-fit: contain;
-        border: 1px solid #eee;
-        padding: 5px;
+        border: 1px solid #f5f5f5;
+        padding: 8px;
+        border-radius: 6px;
     }
     
-    .cart-item .col-md-2 {
+    .cart-item .product-details {
         display: flex;
-        align-items: center;
+        flex-direction: column;
         justify-content: center;
+    }
+    
+    .cart-item .product-name {
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 0.5rem;
+    }
+    
+    .cart-item .product-quantity {
+        color: #666;
+        font-size: 0.9rem;
     }
     
     .item-total {
         color: #D10024;
-        font-weight: 500;
+        font-weight: 600;
         font-size: 1.1rem;
     }
     
-    .card {
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    .section-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #333;
         margin-bottom: 1.5rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #D10024;
+        display: inline-block;
+    }
+    
+    .card {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        margin-bottom: 2rem;
+        overflow: hidden;
+    }
+    
+    .card-header {
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #eee;
+        padding: 1.2rem 1.5rem;
     }
     
     .card-body {
         padding: 1.5rem;
     }
     
+    .address-card {
+        transition: all 0.3s ease;
+        cursor: pointer;
+        border: 2px solid #eee;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .address-card:hover {
+        border-color: #D10024;
+        background-color: #fff9f9;
+    }
+    
+    .address-card.selected {
+        border-color: #D10024;
+        background-color: #fff9f9;
+    }
+    
+    .form-check-input:checked {
+        background-color: #D10024;
+        border-color: #D10024;
+    }
+    
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.8rem;
+        color: #666;
+    }
+    
+    .summary-row.total {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #333;
+        border-top: 1px solid #eee;
+        padding-top: 1rem;
+        margin-top: 1rem;
+    }
+    
+    .btn-outline-primary {
+        color: #D10024;
+        border-color: #D10024;
+    }
+    
+    .btn-outline-primary:hover {
+        background-color: #D10024;
+        color: #fff;
+    }
+    
+    .btn-primary {
+        background-color: #D10024;
+        border-color: #D10024;
+    }
+    
+    .btn-primary:hover {
+        background-color: #b30012;
+        border-color: #b30012;
+    }
+    
     .payment-methods {
         margin: 1rem 0;
+    }
+    
+    .payment-method-card {
+        border: 2px solid #eee;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .payment-method-card:hover {
+        border-color: #D10024;
+        background-color: #fff9f9;
+    }
+    
+    .payment-method-card.selected {
+        border-color: #D10024;
+        background-color: #fff9f9;
     }
 </style>
 
@@ -66,111 +177,150 @@
 <div class="section">
     <div class="container">
         <div class="row">
-            <!-- Order Summary -->
-            <div class="col-md-7">
-                <div class="card">
+            <!-- Main Content Column -->
+            <div class="col-lg-8">
+                <!-- Order Items -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h4 class="section-title mb-0">Order Summary</h4>
+                    </div>
                     <div class="card-body">
-                        <h4>Order Summary</h4>
                         <% cart.items.forEach(item => { %>
                             <div class="cart-item">
                                 <div class="row align-items-center">
                                     <div class="col-md-2">
-                                        <img src="/uploads/products/<%= item.product.productImage[0] %>" class="img-fluid">
+                                        <img src="/uploads/products/<%= item.product.productImage[0] %>" class="img-fluid" alt="<%= item.product.name %>">
                                     </div>
-                                    <div class="col-md-6">
-                                        <h5><%= item.product.name %></h5>
-                                        <p class="text-muted">Quantity: <%= item.quantity %></p>
+                                    <div class="col-md-6 product-details">
+                                        <h5 class="product-name"><%= item.product.name %></h5>
+                                        <p class="product-quantity mb-0">Quantity: <%= item.quantity %></p>
                                     </div>
-                                    <div class="col-md-4 text-right">
+                                    <div class="col-md-4 text-end">
                                         <p class="item-total">₹<%= item.price * item.quantity %></p>
                                     </div>
                                 </div>
                             </div>
                         <% }); %>
-                        <hr>
-                        <div class="card mb-4">
-                            <div class="card-body">
-                                <h4>Order Summary</h4>
-                                <div class="d-flex justify-content-between mb-2">
-                                    <span>Subtotal:</span>
-                                    <span>₹<%= totalAmount %></span>
-                                </div>
-                                <div id="discountRow" style="display: none;">
-                                    <div class="d-flex justify-content-between mb-2">
-                                        <span>Discount:</span>
-                                        <span id="discountAmount" class="text-success">-₹0</span>
+                    </div>
+                </div>
+
+                <!-- Shipping Address -->
+                <div class="card mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h4 class="section-title mb-0">Shipping Address</h4>
+                        <button type="button" class="btn btn-outline-primary btn-sm" data-toggle="modal" data-target="#newAddressModal">
+                            <i class="fa fa-plus"></i> Add New Address
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="address-list">
+                            <% if (addresses && addresses.length > 0) { %>
+                                <% addresses.forEach((addr, index) => { %>
+                                    <div class="address-card <%= addr._id.toString() === address._id.toString() ? 'selected' : '' %>">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="selectedAddress" 
+                                                id="address<%= index %>" value="<%= addr._id %>"
+                                                <%= addr._id.toString() === address._id.toString() ? 'checked' : '' %>
+                                                onchange="updateSelectedAddress(this.value)">
+                                            <label class="form-check-label" for="address<%= index %>">
+                                                <strong><%= addr.name %></strong><br>
+                                                <%= addr.address %><br>
+                                                <%= addr.city %>, <%= addr.state %> <%= addr.pincode %><br>
+                                                Phone: <%= addr.phone %>
+                                            </label>
+                                        </div>
+                                        <% if (addr._id.toString() === address._id.toString()) { %>
+                                            <button type="button" class="btn btn-outline-secondary btn-sm mt-2" onclick="editAddress('<%= addr._id %>')">
+                                                <i class="fa fa-edit"></i> Edit
+                                            </button>
+                                        <% } %>
                                     </div>
-                                    <div class="text-success small mb-2" id="discountDetails"></div>
-                                </div>
-                                <hr>
-                                <div class="d-flex justify-content-between">
-                                    <h5>Total Amount:</h5>                            
-                                    <h5 id="finalAmount">₹<%= totalAmount %></h5>
-                                </div>
-                            </div>
+                                <% }); %>
+                            <% } else { %>
+                                <p class="text-muted">No addresses found. Please add a new address.</p>
+                            <% } %>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Shipping Address and Payment -->
-            <div class="col-md-5">
-                <!-- Shipping Address -->
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <!-- Order Total -->
                 <div class="card mb-4">
+                    <div class="card-header">
+                        <h4 class="section-title mb-0">Order Total</h4>
+                    </div>
                     <div class="card-body">
-                        <h4>Shipping Address</h4>
-                        <div class="address-details" name="shippingAddress" >
-                            <p><strong><%= address.name %></strong></p>
-                            <p><%= address.address %></p>
-                            <p><%= address.city %>, <%= address.state %> <%= address.pincode %></p>
-                            <p>Phone: <%= address.phone %></p>
+                        <div class="summary-row">
+                            <span>Subtotal:</span>
+                            <span>₹<%= totalAmount %></span>
                         </div>
-                        <a href="/manageAddress" class="btn btn-outline-primary btn-sm">Change Address</a>
+                        <div id="discountRow" style="display: none;">
+                            <div class="summary-row">
+                                <span>Discount:</span>
+                                <span id="discountAmount" class="text-success">-₹0</span>
+                            </div>
+                            <div class="text-success small mb-2" id="discountDetails"></div>
+                        </div>
+                        <div class="summary-row total">
+                            <span>Total Amount:</span>
+                            <span id="finalAmount">₹<%= totalAmount %></span>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Coupon Section -->
+                <!-- Coupon -->
                 <div class="card mb-4">
+                    <div class="card-header">
+                        <h4 class="section-title mb-0">Apply Coupon</h4>
+                    </div>
                     <div class="card-body">
-                        <h4>Apply Coupon</h4>
-                        <div class="input-group mb-3">
+                        <div class="input-group">
                             <input type="text" id="couponCode" class="form-control" placeholder="Enter coupon code">
                             <div class="input-group-append">
-                                <button class="btn btn-primary" type="button" onclick="applyCoupon()" style="background-color: #D10024; margin-top: 5px;">Apply</button>
+                                <button class="btn btn-primary" type="button" onclick="applyCoupon()">Apply</button>
                             </div>
                         </div>
-                        <div id="appliedCouponInfo" style="display: none;">
-                            <div class="alert alert-success d-flex justify-content-between align-items-center">
+                        <div id="appliedCouponInfo" style="display: none;" class="mt-3">
+                            <div class="alert alert-success d-flex justify-content-between align-items-center mb-0">
                                 <span id="couponMessage"></span>
                                 <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeCoupon()">Remove</button>
                             </div>
                         </div>
-                        <!-- Button to trigger modal -->
+                         <!-- Button to trigger modal -->
             <button type="button" style="background-color: #D10024; color: #eee; margin-top: 5px;" class="btn btn-outline-secondary w-100" data-toggle="modal" data-target="#availableCouponsModal">
                 <i class="fa fa-tag"></i> View Available Coupons
             </button>
-
                     </div>
                 </div>
 
-                <!-- Payment Method -->
-                <div class="card">
+                <!-- Payment Methods -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h4 class="section-title mb-0">Payment Method</h4>
+                    </div>
                     <div class="card-body">
-                        <h4>Payment Method</h4>
                         <div class="payment-methods">
-                            <div class="form-check mb-3">
-                                <input class="form-check-input" type="radio" name="paymentMethod" id="cod" value="cod" checked>
-                                <label class="form-check-label" for="cod">
-                                    Cash on Delivery
-                                </label>
+                            <div class="payment-method-card" >
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="paymentMethod" id="razorpay" value="RAZORPAY">
+                                    <label class="form-check-label" for="razorpay">
+                                        <strong>Razorpay</strong>
+                                        <small class="d-block text-muted">Pay securely with Razorpay</small>
+                                    </label>
+                                </div>
                             </div>
-                            <!-- Online payment options -->
-                            <div class="form-check">
-                                <input type="radio" id="razorpay" name="paymentMethod" value="RAZORPAY">
-                                <label for="razorpay">Pay Online (Razorpay)</label>
+                            <div class="payment-method-card" >
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="paymentMethod" id="cod" value="cod" checked>
+                                    <label class="form-check-label" for="cod">
+                                        <strong>Cash on Delivery</strong>                                        
+                                    </label>
+                                </div>
                             </div>
                         </div>
-                        <button onclick="placeOrder()" class="btn btn-primary w-100" style="background-color: #D10024;">
+                        <button type="button" class="btn btn-primary btn-lg w-100" onclick="placeOrder()">
                             Place Order
                         </button>
                     </div>
@@ -233,6 +383,55 @@
         </div>
     </div>
 </div>
+
+
+<!-- Address Modal -->
+<div class="modal fade" id="newAddressModal" tabindex="-1" role="dialog" aria-labelledby="newAddressModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="newAddressModalLabel">Add New Address</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="addressForm">
+                    <input type="hidden" id="addressId" name="addressId">
+                    <div class="form-group mb-3">
+                        <label for="name">Full Name</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="phone">Phone Number</label>
+                        <input type="tel" class="form-control" id="phone" name="phone" required>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="address">Address</label>
+                        <textarea class="form-control" id="address" name="address" rows="3" required></textarea>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="city">City</label>
+                        <input type="text" class="form-control" id="city" name="city" required>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="state">State</label>
+                        <input type="text" class="form-control" id="state" name="state" required>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="pincode">Pincode</label>
+                        <input type="text" class="form-control" id="pincode" name="pincode" required>
+                    </div>
+                </form>
+            </div>  
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="saveAddress()">Save Address</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -660,6 +859,106 @@ async function updateCartTotal() {
         console.error('Error updating cart total:', error);
     }
 }
+
+
+
+
+//new script
+async function updateSelectedAddress(addressId) {
+    try {
+        const response = await fetch('/update-selected-address', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ addressId })
+        });
+
+        if (response.ok) {
+            location.reload();
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Failed to update address'
+            });
+        }
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
+
+// Store addresses in a global variable
+const userAddresses = JSON.parse('<%- JSON.stringify(addresses || []) %>'.replace(/&quot;/g, '"'));
+
+function editAddress(addressId) {
+    const address = userAddresses.find(addr => addr._id === addressId);
+    if (address) {
+        document.getElementById('addressId').value = address._id;
+        document.getElementById('name').value = address.name;
+        document.getElementById('phone').value = address.phone;
+        document.getElementById('address').value = address.address;
+        document.getElementById('city').value = address.city;
+        document.getElementById('state').value = address.state;
+        document.getElementById('pincode').value = address.pincode;
+        
+        document.getElementById('newAddressModalLabel').textContent = 'Edit Address';
+        $('#newAddressModal').modal('show');
+    }
+}
+
+async function saveAddress() {
+    const form = document.getElementById('addressForm');
+    if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+    }
+
+    const formData = {
+        addressId: document.getElementById('addressId').value,
+        name: document.getElementById('name').value,
+        phone: document.getElementById('phone').value,
+        address: document.getElementById('address').value,
+        city: document.getElementById('city').value,
+        state: document.getElementById('state').value,
+        pincode: document.getElementById('pincode').value
+    };
+
+    try {
+        const response = await fetch('/save-address', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData)
+        });
+
+        if (response.ok) {
+            $('#newAddressModal').modal('hide');
+            location.reload();
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Failed to save address'
+            });
+        }
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
+
+// Reset form when modal is opened for new address
+$('#newAddressModal').on('show.bs.modal', function (event) {
+    if (!event.relatedTarget) return; // Skip if opened by edit button
+    
+    document.getElementById('addressForm').reset();
+    document.getElementById('addressId').value = '';
+    document.getElementById('newAddressModalLabel').textContent = 'Add New Address';
+});
+
+
+
 </script>
 
 <!--Rozor pay script-->

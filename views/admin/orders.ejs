@@ -79,7 +79,7 @@
                                         <% orders.forEach(order=> { %>
                                             <tr>
                                                 <td><a href="/admin/orders/<%= order._id %>">
-                                                        <%= order._id %>
+                                                        <%= order.orderId %>
                                                     </a></td>
                                                 <td>
                                                     <%= order.user.name %>
