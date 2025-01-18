@@ -187,10 +187,15 @@
                                                             <i class="fa fa-star"></i>
                                                         </div>
                                                         <div class="product-btns">
-                                                            <button class="add-to-wishlist"
-                                                                onclick="addToWishList('<%=product._id%>',this)"><i
-                                                                    class="fa fa-heart-o"></i><span class="tooltipp">add
-                                                                    to wishlist</span></button>
+                                                            <button
+                                                                class="add-to-wishlist"
+                                                                onclick="addToWishList('<%= product._id %>', this)"
+                                                            >
+                                                                <i class="<%= wishlistProductIds.includes(product._id.toString()) ? 'fa fa-heart' : 'fa fa-heart-o' %>"
+                                                                    style="color: <%= wishlistProductIds.includes(product._id.toString()) ? '#D10024' : 'inherit' %>;">
+                                                                </i>
+                                                                <span class="tooltipp">add to wishlist</span>
+                                                            </button>
                                                         </div>
                                                     </div>
                                                     <!-- <div class="add-to-cart">

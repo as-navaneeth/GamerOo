@@ -9,7 +9,8 @@ const getWishlist = async (req, res) => {
             .populate('products.product');
 
         res.render('wishlist', {
-            wishlist: wishlist ? wishlist.products : []
+            wishlist: wishlist ? wishlist.products : [],
+            
         });
     } catch (error) {
         console.error('Error fetching wishlist:', error);

@@ -99,6 +99,7 @@ router.get('/wishlist', userAuth, wishlistController.getWishlist);
 router.post('/wishlist/add/:productId', userAuth, wishlistController.addToWishlist);
 router.delete('/wishlist/remove/:productId', userAuth, wishlistController.removeFromWishlist);
 
+
 // Wallet routes
 router.get('/wallet', userAuth, walletController.getWallet);
 

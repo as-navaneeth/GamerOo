@@ -123,10 +123,17 @@
 														<i class="fa fa-star-o"></i>
 													</div>
 													<div class="product-btns">
-														<button class="add-to-wishlist" onclick="addToWishList('<%=products[i]._id%>',this)"><i
-																class="fa fa-heart-o"></i><span class="tooltipp">add to wishlist</span></button>  <!--add to wishlist funciton below-->
-														
+														<button
+															class="add-to-wishlist"
+															onclick="addToWishList('<%= products[i]._id %>', this)"
+														>
+															<i class="<%= wishlistProductIds.includes(products[i]._id.toString()) ? 'fa fa-heart' : 'fa fa-heart-o' %>"
+																style="color: <%= wishlistProductIds.includes(products[i]._id.toString()) ? '#D10024' : 'inherit' %>;">
+															</i>
+															<span class="tooltipp">add to wishlist</span>
+														</button>
 													</div>
+													
 												</div>
 												
 											</a>

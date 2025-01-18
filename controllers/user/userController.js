@@ -9,7 +9,7 @@ const Category = require('../../models/categorySchema');
 const Product = require('../../models/productSchema');
 const Order = require('../../models/orderSchema'); 
 const Brand = require('../../models/brandSchema'); 
-
+const Wishlist=require('../../models/wishlistSchema');
 
 
 
@@ -29,6 +29,7 @@ const pageNotFound = async (req, res) => {
 const loadHomePage = async (req, res) => {
     try {
         const userId = req.session.user;
+        
 
         const productData = await Product.find({ isListed: true })
             .populate('category')
@@ -38,24 +39,38 @@ const loadHomePage = async (req, res) => {
 
         // Fetch categories for search dropdown
         const categories = await Category.find({ isListed: true });
+        //collet the Ids of products in the wishlist
+        let wishlistProductIds = [];
 
+       
         if (userId) {
-            const userData = await User.findOne({ _id: userId });        
+            const userData = await User.findOne({ _id: userId });
             if (userData) {
+                // Fetch user's wishlist
+                const wishlist = await Wishlist.findOne({ user: userId });
+                if (wishlist) {
+                    wishlistProductIds = wishlist.products.map(item =>
+                        item.product.toString()
+                    );
+                }
+
                 return res.render("home", {
                     user: userData,
                     products: productData,
-                    categories
+                    categories,
+                    wishlistProductIds, // Pass the wishlist product IDs
                 });
             }
         }
 
-        // Render without user data
-        res.render("home", {
-            products: productData,
+
+        res.render("home",{
+            products:productData,
             categories,
-            user: null
+            user:null,
+            wishlistProductIds
         });
+
 
     } catch (error) {
         console.error("Error loading home page:", error);
@@ -448,6 +463,14 @@ const loadShoppingPage = async (req, res) => {
             })
         );
 
+        let wishlistProductIds=[];
+        if(req.session.user){
+            const wishlist=await Wishlist.findOne({user:req.session.user});
+            if(wishlist){
+                wishlistProductIds=wishlist.products.map(item=>item.product.toString());
+            }
+        }
+
         res.render('shop', { 
             products,
             categories: categoryProductCounts,
@@ -466,6 +489,7 @@ const loadShoppingPage = async (req, res) => {
             searchQuery,
             user: req.session.user ? await User.findById(req.session.user) : null,
             noProductMessage,
+            wishlistProductIds,
         });
 
     } catch (error) {
