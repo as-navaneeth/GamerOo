@@ -80,7 +80,7 @@ const getAddProduct = async (req, res) => {
 
 const addProduct = async (req, res) => {
     try {
-        const { name, description, category, brand, regularPrice, salePrice, stock } = req.body;
+        const { name, description, category, brand, regularPrice, salePrice, stock, offer } = req.body;
 
         // Validate prices
         if (salePrice && parseFloat(salePrice) >= parseFloat(regularPrice)) {
@@ -108,6 +108,7 @@ const addProduct = async (req, res) => {
             regularPrice: parseFloat(regularPrice),
             salePrice: salePrice ? parseFloat(salePrice) : undefined,
             stock,
+            offer,// offer added
             productImage: productImages // Use the array of filenames
         });
         
@@ -318,13 +319,3 @@ module.exports = {
 }
 
 
-module.exports = {
-    getProduct,
-    getAddProduct,
-    addProduct,
-    editProduct,
-    updateProduct,
-    deleteProduct,
-    unlistProduct,
-    listProduct
-}

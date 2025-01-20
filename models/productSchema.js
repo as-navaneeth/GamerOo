@@ -48,7 +48,34 @@ const productSchema=new Schema({
     createdAt:{
         type:Date,
         default:Date.now
-    }
+    },
+
+    offer:{
+        type:Number,
+        default:0
+    },
+
+    // //newly added
+    // offer:{
+    //     type:{
+    //         _id:mongoose.Schema.Types.ObjectId,
+    //         type:String,
+    //         enum:['Percentage','flat'],
+    //         default: 'Percentage'
+    //     },
+    //     value:{
+    //         type:Number,
+    //         required:false
+    //     },
+    //     startDate:{
+    //         type:Date,
+    //         required: false
+    //     },
+    //     endDate:{
+    //         type:Date,
+    //         required: false
+    //     }
+    // }
 
 })
 
