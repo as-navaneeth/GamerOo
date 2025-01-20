@@ -1,7 +1,54 @@
 <%- include("../../views/partials/admin/header") %>
 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        .table-responsive {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            margin-bottom: 1rem;
+        }
+        
+        .table {
+            width: 100%;
+            min-width: 1200px; /* Ensures table maintains minimum width */
+            margin-bottom: 0;
+        }
+
+        .table th, .table td {
+            white-space: nowrap;
+            padding: 12px 15px;
+        }
+
+        /* Custom scrollbar styling */
+        .table-responsive::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .table-responsive::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .table-responsive::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+
+        .table-responsive::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        /* Button styling */
+        .btn {
+            margin: 2px;
+            padding: 6px 12px;
+        }
+
+        .action-column {
+            min-width: 100px;
+        }
+    </style>
 
     <div class="main-panel">
         <div class="content-wrapper">
@@ -24,16 +71,16 @@
                                     <select id="categoryFilter" class="form-control">
                                         <option value="">All Categories</option>
                                         <% categories.forEach(function(category) { %>
-                                            <option value="<%= category._id %>" <%= selectedCategory === category._id.toString() ? 'selected' : '' %>>
+                                            <option value="<%= category._id %>"
+                                                <%=selectedCategory===category._id.toString() ? 'selected' : '' %>>
                                                 <%= category.name %>
                                             </option>
-                                        <% }); %>
+                                            <% }); %>
                                     </select>
                                 </div>
                                 <div class="input-group flex-grow-1">
-                                    <input type="text" id="searchInput" class="form-control" 
-                                           placeholder="Search products..." 
-                                           value="<%= search || '' %>">
+                                    <input type="text" id="searchInput" class="form-control"
+                                        placeholder="Search products..." value="<%= search || '' %>">
                                     <div class="input-group-append">
                                         <button id="searchBtn" class="btn btn-primary">
                                             <i class="fas fa-search"></i>
@@ -56,78 +103,96 @@
                 <div class="col-md-12">
                     <div class="card">
                         <div class="card-body">
-                            <table class="table table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>Product Name</th>
-                                        <th>Brand</th>
-                                        <th>Category</th>
-                                        <th>Sale Price</th>
-                                        <th>Offer Price</th>
-                                        <th>Quantity</th>
-                                        <th>Actions</th>
-                                        <th>Edit</th>
-                                        <th>Delete</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <% products.forEach(product=> { %>
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
                                         <tr>
-                                            <td>
-                                                <%= product.name %>
-                                            </td>
-                                            <td>
-                                                <%= product.brand ? product.brand.brandName : 'N/A' %>
-                                            </td>
-                                            <td>
-                                                <%= product.category ? product.category.name : 'N/A' %>
-                                            </td>
-                                            <td>₹<%= product.regularPrice %>
-                                            </td>
-                                            <td>
-                                                <%= product.salePrice ? '₹' + product.salePrice : 'No Offer' %>
-                                            </td>
-                                            <td>
-                                                <%= product.stock %>
-                                            </td>
-                                            <td>
-                                                <!--Block and unblock button-->
-                                                <% if(product.isListed){%>
-                                                   <a href="/admin/products/unlist/<%=product._id%>"> 
-                                                   <button class="btn btn-danger btn-sm toggle-list-btn"
-                                                    data-status="unlist">
-                                                        Unlist
-                                                    </button>
-                                                    </a> 
-                                                    <%}else{%>
-                                                       <a href="/admin/products/list/<%=product._id%>">
-                                                        <button class="btn btn-warning btn-sm toggle-list-btn"
-                                                        data-status="list">
-                                                            List
-                                                        </button>
-                                                     </a>
-                                                <%}%>
-                                            </td>
-                                            <td>
-                                                <!--Edit button-->
-                                                <a href="/admin/products/edit/<%= product._id %>">
-                                                    <button class="btn btn-primary btn-sm">Edit</button>
-                                                </a>
-
-                                            </td>
-                                            <td>
-                                    
-                                                <button class="btn btn-danger btn-sm delete-btn"
-                                                    data-url="/admin/products/delete/<%= product._id%>">
-                                                    Delete
-                                                </button>
-
-
-                                            </td>
+                                            <th>Product Name</th>
+                                            <th>Brand</th>
+                                            <th>Category</th>
+                                            <th>Regular Price</th>
+                                            <th>Sale Price</th>
+                                            <th>Quantity</th>
+                                            <th>Offer</th>
+                                            <th>Add Offer</th>
+                                            <th>Actions</th>
+                                            <th>Edit</th>
+                                            <th>Delete</th>
                                         </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% products.forEach(product=> { %>
+                                            <tr>
+                                                <td>
+                                                    <%= product.name %>
+                                                </td>
+                                                <td>
+                                                    <%= product.brand ? product.brand.brandName : 'N/A' %>
+                                                </td>
+                                                <td>
+                                                    <%= product.category ? product.category.name : 'N/A' %>
+                                                </td>
+                                                <td>₹<%= product.regularPrice %>
+                                                </td>
+                                                <td>
+                                                    <%= product.salePrice ? '₹' + product.salePrice : 'No Offer' %>
+                                                </td>
+                                                <td>
+                                                    <%= product.stock %>
+                                                </td>
+                                                <td>
+                                                    <%if(product.productOffer){%>
+                                                        <%=product.productOffer%>
+                                                    <%}else{%>
+                                                        0%
+                                                    <%}%>
+                                                </td>
+                                                <td>
+                                                    <%if(product.productOffer===0){%>
+                                                        <button class="btn btn-info" style="width: 100px">
+                                                            <a href="#" class="text-white" onclick="addOffer('<%=product._id%>')">Add Offer</a>
+                                                        </button>
+                                                    <%}else{%>
+                                                        <button class="btn btn-info" style="width: 100px">
+                                                            <a href="#" class="text-white" onclick="removeOffer('<%=product._id%>')">Remove</a>
+                                                        </button>
+                                                    <%}%>    
+                                                </td>
+                                                <td class="action-column">
+                                                    <!--Block and unblock button-->
+                                                    <% if(product.isListed){%>
+                                                        <a href="/admin/products/unlist/<%=product._id%>">
+                                                            <button class="btn btn-danger btn-sm toggle-list-btn"
+                                                                data-status="unlist">
+                                                                Unlist
+                                                            </button>
+                                                        </a>
+                                                    <%}else{%>
+                                                        <a href="/admin/products/list/<%=product._id%>">
+                                                            <button class="btn btn-warning btn-sm toggle-list-btn"
+                                                                data-status="list">
+                                                                List
+                                                            </button>
+                                                        </a>
+                                                    <%}%>
+                                                </td>
+                                                <td>
+                                                    <!--Edit button-->
+                                                    <a href="/admin/products/edit/<%= product._id %>">
+                                                        <button class="btn btn-primary btn-sm">Edit</button>
+                                                    </a>
+                                                </td>
+                                                <td>
+                                                    <button class="btn btn-danger btn-sm delete-btn"
+                                                        data-url="/admin/products/delete/<%= product._id%>">
+                                                        Delete
+                                                    </button>
+                                                </td>
+                                            </tr>
                                         <% }) %>
-                                </tbody>
-                            </table>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -166,11 +231,20 @@
         </div>
     </div>
 
+
+
+
+
+
+   
+
+
+
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             // Category filter change
-            document.getElementById('categoryFilter').addEventListener('change', function() {
+            document.getElementById('categoryFilter').addEventListener('change', function () {
                 const category = this.value;
                 const searchParams = new URLSearchParams(window.location.search);
                 if (category) {
@@ -188,7 +262,7 @@
             });
 
             // Search functionality
-            document.getElementById('searchBtn').addEventListener('click', function() {
+            document.getElementById('searchBtn').addEventListener('click', function () {
                 const searchQuery = document.getElementById('searchInput').value;
                 const searchParams = new URLSearchParams(window.location.search);
                 if (searchQuery) {
@@ -206,55 +280,55 @@
             });
 
             // Handle search on enter key
-            document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            document.getElementById('searchInput').addEventListener('keypress', function (e) {
                 if (e.key === 'Enter') {
                     document.getElementById('searchBtn').click();
                 }
             });
         });
 
-        document.querySelectorAll('.toggle-list-btn').forEach(button=>{
-            button.addEventListener('click',async(e)=>{
+        document.querySelectorAll('.toggle-list-btn').forEach(button => {
+            button.addEventListener('click', async (e) => {
                 e.preventDefault();
 
-                const action=button.getAttribute('data-status'); 
-                const url=button.parentElement.getAttribute('href');
+                const action = button.getAttribute('data-status');
+                const url = button.parentElement.getAttribute('href');
 
 
                 try {
-                    const result=await Swal.fire({
-                        
-                        text:`Are you sure you want to ${action} this product`,
-                        icon:'warning',
-                        showCancelButton:"true",
-                        cancelButtonText:'Cancel',
-                        confirmButtonText:`Yes, ${action} it!`
+                    const result = await Swal.fire({
+
+                        text: `Are you sure you want to ${action} this product`,
+                        icon: 'warning',
+                        showCancelButton: "true",
+                        cancelButtonText: 'Cancel',
+                        confirmButtonText: `Yes, ${action} it!`
                     });
-                    if(result.isConfirmed){
-                        const response=await fetch(url,{
-                            method:'POST',
-                            headers:{
-                                'Content-Type':'application/json'
+                    if (result.isConfirmed) {
+                        const response = await fetch(url, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
                             }
                         });
 
-                        const data=await response.json();
+                        const data = await response.json();
 
-                        if(data.success){
+                        if (data.success) {
                             await Swal.fire({
-                                icon:'success',
-                                text:data.message,
+                                icon: 'success',
+                                text: data.message,
                             });
                             window.location.reload();
                         }
                     }
 
                 } catch (error) {
-                    console.error("Error :",error);
+                    console.error("Error :", error);
                     Swal.fire({
-                        title:'Error!',
-                        text:error.message || "something went wrong",
-                        icon:'error'
+                        title: 'Error!',
+                        text: error.message || "something went wrong",
+                        icon: 'error'
                     })
                 }
             })
@@ -312,4 +386,80 @@
                 }
             });
         });
+
+
+
+        //for adding offer
+        async function addOffer(productId) {
+  const {value:amount} = await Swal.fire({
+    title:"Offer in percentage",
+    input:"number",
+    inputLabel:"Percentage",
+    inputPlaceholder:"%",
+  })
+  $.ajax({
+    url:'/admin/products/addProductOffer',
+    method:"POST",
+    data:{
+        percentage:amount,
+        productId:productId
+    },
+    success:(response)=>{
+        if(response.status === true){
+            location.reload()
+            Swal.fire('Offer added','The offer has been removed','success')
+        }else{
+            Swal.fire("Failed",data.message||"Adding offer failed","error");
+        }
+    }
+  })
+}
+
+
+
+
+
+
+
+
+
+async function removeOffer(productId) {
+    try {
+        Swal.fire({
+            title:"Remove offer",
+            text:'Are you want to remove this offer',
+            icon:'Warning',
+            showCancelButton:true,
+            confirmButtonColor:'#3085d6',
+            cancelButtonColor:'d33',
+            confirmButtonText:"Yes, Remove it",
+            timer:5000,
+            timerProgressBar:true,
+        }).then(async (result)=>{
+            if(result.isConfirmed){
+                $.ajax({
+                    url:"/admin/products/removeProductOffer",
+                    method:"POST",
+                    data:{
+                        productId:productId
+                    },
+                    success:(response)=>{
+                        if(response.status === true){
+                            Swal.fire('Removed!','The offer has been removed','success')
+                            location.reload()
+                        }else if(response.status==false){
+                            Swal.fire("Failed",data.message||"Adding offer failed","error");
+                        }
+                    }
+                })
+            }
+        })
+    
+     
+    } catch (error) {
+    console.log("Error while removing product offer", error)
+    }
+}
+
+
     </script>

@@ -178,7 +178,15 @@
                                                                         class="fa fa-inr"></i>
                                                                     <%=product.regularPrice%>
                                                                 </del>
+
+                                                                <% if(product.productOffer && product.productOffer>0
+                                                                    ){%>
+                                                                    <span class="product-offer">
+                                                                        <%=product.productOffer%>%off
+                                                                    </span>
+                                                                    <%}%>
                                                         </h4>
+
                                                         <div class="product-rating">
                                                             <i class="fa fa-star"></i>
                                                             <i class="fa fa-star"></i>
@@ -187,10 +195,8 @@
                                                             <i class="fa fa-star"></i>
                                                         </div>
                                                         <div class="product-btns">
-                                                            <button
-                                                                class="add-to-wishlist"
-                                                                onclick="addToWishList('<%= product._id %>', this)"
-                                                            >
+                                                            <button class="add-to-wishlist"
+                                                                onclick="addToWishList('<%= product._id %>', this)">
                                                                 <i class="<%= wishlistProductIds.includes(product._id.toString()) ? 'fa fa-heart' : 'fa fa-heart-o' %>"
                                                                     style="color: <%= wishlistProductIds.includes(product._id.toString()) ? '#D10024' : 'inherit' %>;">
                                                                 </i>
@@ -271,16 +277,16 @@
                         }
 
                         .no-products-message {
-                            text-align: center;                        
-                            margin: 50px auto;                        
+                            text-align: center;
+                            margin: 50px auto;
                         }
 
                         .no-products-text {
-                            font-size: 24px;                            
-                            color: #555;                           
-                            font-weight: 400;                            
-                            letter-spacing: 1px;                            
-                            text-transform: capitalize;                
+                            font-size: 24px;
+                            color: #555;
+                            font-weight: 400;
+                            letter-spacing: 1px;
+                            text-transform: capitalize;
                         }
                     </style>
 
@@ -621,6 +627,16 @@
         .checkbox-filter::-webkit-scrollbar-thumb {
             background: #D10024;
             border-radius: 5px;
+        }
+
+        .product-offer {
+            color: #ff6b6b;           
+            font-weight: bold;
+            margin-left: 10px;
+            padding: 2px 6px;
+            background-color: #ffecec;            
+            border-radius: 3px;
+            font-size: 1.4rem;
         }
     </style>
 

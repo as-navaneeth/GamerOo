@@ -3,7 +3,17 @@
 <%-include("../../views/partials/user/header")%>
 
 
-
+<style>
+    .product-offer {
+    color: #ff6b6b; /* Bright red for attention */
+    font-weight: bold;
+    margin-left: 1px;
+    padding: 3px 6px;
+    background-color: #ffecec; /* Light red background */
+    border-radius: 3px;
+    font-size: 1.8rem;
+}
+</style>
 
 
     <!-- BREADCRUMB -->
@@ -119,6 +129,13 @@
                                     <i class="fa fa-times-circle"></i> Out of Stock
                                 <% } %>
                             </span>
+
+                            <% if(product.productOffer && product.productOffer >0 ){%>
+                                <span  class="product-offer">
+                                    <%=product.productOffer%>%off
+                                </span>
+                                <%}%>
+
                         </div>
                         <p>
                             <%=product.description%>

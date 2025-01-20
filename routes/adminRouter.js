@@ -10,7 +10,6 @@ const productController = require("../controllers/admin/productController");
 const orderController=require("../controllers/admin/orderController");
 const couponController = require('../controllers/admin/couponController');
 const salesReportController = require('../controllers/admin/salesReportController');
-
 const { userAuth, adminAuth } = require("../middlewares/auth");
 
 //login management
@@ -51,6 +50,9 @@ router.post('/products/list/:id',adminAuth,productController.listProduct);
 
 router.get('/products/edit/:id',adminAuth,productController.editProduct)
 router.post('/products/edit/:id', adminAuth, handleProductUpload, productController.updateProduct);
+
+router.post('/products/addProductOffer',adminAuth,productController.addOffer);
+router.post('/products/removeProductOffer',adminAuth,productController.removeOffer);
 
 // Coupon Management Routes
 router.get('/coupons', adminAuth, couponController.getCoupons);

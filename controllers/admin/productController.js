@@ -307,6 +307,49 @@ const listProduct=async(req,res)=>{
 }
 
 
+const addOffer=async(req,res)=>{
+    try {
+        const { productId, percentage } = req.body;
+        const product = await Product.findById({ _id: productId });
+        const category = await Category.findOne({ _id: product.category });
+        // if (category.categoryOffer > percentage) {
+        //   return res.json({
+        //     status: false,
+        //     message: 'This products category has already has category offer',
+        //   });
+        // }
+        product.salePrice = product.salePrice - Math.floor(product.regularPrice * (percentage / 100));
+        product.productOffer = parseInt(percentage);
+        // category.categoryOffer = 0;
+        await product.save();
+        res.json({ status: true });
+      } catch (error) {
+        console.log(error);
+        res
+          .status(HttpStatus.INTERNAL_SERVER_ERROR)
+          .json({ message: 'Internal server error' });
+      }
+}
+
+
+const removeOffer=async(req,res)=>{
+    try {
+        const {productId}=req.body;
+        const product=await Product.findById({_id:productId});
+        const percentage=product.productOffer;
+        product.salePrice+=Math.floor(product.regularPrice*(percentage/100));
+        product.productOffer=0;
+        await product.save();
+        res.json({status:true});
+
+    } catch (error) {   
+        res.status(400).send('Error in removing product offer')
+        
+    }
+}
+
+
+
 module.exports = {
     getProduct,
     getAddProduct,
@@ -315,7 +358,9 @@ module.exports = {
     updateProduct,
     deleteProduct,
     unlistProduct,
-    listProduct
+    listProduct,
+    addOffer,
+    removeOffer,
 }
 
 
