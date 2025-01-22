@@ -33,6 +33,9 @@ router.put("/category/edit/:id", adminAuth, categoryController.editCategory);
 router.post("/category/list/:id",adminAuth,categoryController.listCategory);
 router.post("/category/unlist/:id",adminAuth,categoryController.unlistCategory);
 
+router.post("/category/addCategoryOffer",adminAuth,categoryController.addCategoryOffer);
+router.post("/category/removeCategoryOffer",adminAuth,categoryController.removeOffer);
+
 //brand management
 router.get("/brands", adminAuth, brandController.getBrand);
 router.post("/addBrand", adminAuth, brandUpload.single("brandImage"), brandController.addBrand);

@@ -1,10 +1,10 @@
 
-const category=require('../../models/categorySchema');
-
+const Category=require('../../models/categorySchema');
+const Product=require('../../models/productSchema');
 
 const getCategory= async(req,res)=>{
     try {
-        const categories=await category.find();
+        const categories=await Category.find();
         res.render('category',{categories})
     } catch (error) {
         res.status(500).send("error")
@@ -17,7 +17,7 @@ const addCategory=async(req,res)=>{
         console.log(req.body)
        
 
-        const existingCategory=await category.findOne({nameLower:name.toLowerCase()});
+        const existingCategory=await Category.findOne({nameLower:name.toLowerCase()});
         console.log(existingCategory);
         if(existingCategory){
             return res.status(400).json({success:false,message:"Category Already Exists!"});
@@ -25,7 +25,7 @@ const addCategory=async(req,res)=>{
 
 
 
-        const newCategory=new category({name,description});
+        const newCategory=new Category({name,description});
         await newCategory.save();                  //saving the newcategory 
         console.log("Category saved successfully")
 
@@ -49,7 +49,7 @@ const editCategory=async(req,res)=>{
         const {id}=req.params;
         const {name,description}=req.body;
 
-        const updatedCategory=await category.findByIdAndUpdate(
+        const updatedCategory=await Category.findByIdAndUpdate(
             id,
             {name,description},
             {new:true, runValidators:true}   //check this 
@@ -116,7 +116,85 @@ const unlistCategory = async (req, res) => {
 };
 
 
+//add and remove categoty offer
 
+const addCategoryOffer=async(req,res)=>{
+    try {
+       
+        
+        const percentage=parseInt(req.body.percentage);
+        const categoryId=req.body.categoryId;
+        
+        const category=await Category.findById(categoryId);
+
+                
+        if(!category){
+            return res.status(404).json({message:'Product not found'});
+        }
+
+        const products=await Product.find({category:categoryId});
+        const hasProductOffer=products.some(
+            (product)=>product.productOffer>percentage
+        );
+        if(hasProductOffer){
+            return res.json({stauts:false,
+                message:'Product with this category already have product Offer',
+            })
+        }
+        
+        category.categoryOffer = percentage
+        await category.save()
+
+        //category offer 
+        for(const product of products){
+            product.salePrice=product.regularPrice-Math.floor(product.regularPrice*(percentage/100));
+            product.productOffer=0;
+            await product.save();            
+        }
+
+       await category.save();
+
+
+        res.json({status:true});
+
+    }catch{
+        console.log("offer error");
+        
+        return res.status(400).json({success:false,message:'Internal server error'});
+    }
+}
+
+
+
+const removeOffer=async(req,res)=>{
+    try {
+        const categoryId = req.body.categoryId;
+        const category = await Category.findById(categoryId);
+        if (!category) {
+          return res
+            .status(HttpStatus.NOT_FOUND)
+            .json({ status: false, message: 'Category not found' });
+        }
+        const percentage = category.categoryOffer;
+        const products = await Product.find({ category: category._id });
+        if (products.length > 0) {
+          for (const product of products) {
+            product.salePrice += Math.floor(
+              product.regularPrice * (percentage / 100)
+            );
+            product.productOffer = 0;
+            await product.save();
+          }
+        }
+        category.categoryOffer = 0;
+        await category.save();
+        res.json({ status: true });
+      } catch (error) {
+        res
+          .status(HttpStatus.INTERNAL_SERVER_ERROR)
+          .json({ status: false, message: 'Internal server error' });
+      }
+}
 
 
 
@@ -126,6 +204,7 @@ module.exports={
     editCategory,
     listCategory,
     unlistCategory,
-    
+    addCategoryOffer,
+    removeOffer,
     
 }

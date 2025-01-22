@@ -249,7 +249,18 @@
 
                       </td>
                       <td>
-                        <%=category.offer || "N/A" %>
+                        <%if(category.categoryOffer===0 || !category.categoryOffer){%>
+                          <button class="btn btn-info" style="width:100px">
+                            <a href="#" class="text-white" onclick="addOffer('<%= category._id%>')">Add Offer</a>
+                          </button>
+                          <%}else{%>
+                            <button>
+                              <a href="#" class="text-white" onclick="removeOffer('<%=category._id%>')">Remove</a>
+                            </button>
+                            <%}%>
+                      </td>
+                      <td>
+                        <%= category.categoryOffer %>
                       </td>
 
                       <!-- Adding the edit button-->
@@ -399,14 +410,13 @@
 
 
     //toggle button
-    documet.querySelectorAll('.toggle-switch').forEach(switchElement=>{
+    document.querySelectorAll('.toggle-switch').forEach(switchElement=>{
       switchElement.addEventListener('change',async (e)=>{
         const checkbox=e.target;
         const categoryId=checkbox.getAttribute('data-id');
         const isListed=checkbox.checked;
 
-        const url=isListed
-        ?`/admin/category/list/${categoryId}` :`/admin/categoey/unlist/${categoryId}`;
+        const url=isListed?`/admin/category/list/${categoryId}` :`/admin/categoey/unlist/${categoryId}`;
 
         try {
           const result=await Swal.fire({
@@ -454,6 +464,90 @@
       })
     })
 
+
+    //for adding and remove offer
+    async function addOffer(categoryId){
+      const {value:amount}=await Swal.fire({
+        title:'Offer in percentage',
+        input:'number',
+        inputLabel:'Percentage',
+        inputPlaceholder:"%",
+      })
+      if(amount){
+        console.log(amount);
+        try {
+          const response=await fetch('/admin/category/addCategoryOffer',{
+            method:'POST',
+            headers:{
+              'content-type':'application/json',
+            },
+            body:JSON.stringify({
+              percentage:amount,
+              categoryId:categoryId,
+            }),
+          });
+          const data=await response.json()
+          if(response.ok && data.status===true){
+            Swal.fire(
+              'Offer Added',
+              "The offer has been added",
+              "success"
+            ).then(()=>{
+              window.location.reload()
+            })
+          }else{
+            Swal.fire("Failed",
+            data.message || "Adding offer failed",
+            "error");
+          }
+        } catch (error) {
+          Swal.fire(
+        "Error",
+        "An error occured while adding offer",
+        "error"
+        );
+        console.log("Error in adding category offer",error);
+        }
+      }
+    }
+
+
+    async function removeOffer(categoryId) {
+    try {
+      const response = await fetch('/admin/category/removeCategoryOffer',{
+
+
+
+      method:"POST",
+      headers:{
+        'content-type':'application/json',
+      },
+      body:JSON.stringify({
+        categoryId:categoryId,
+      }),
+    });
+    const data = await response.json()
+    if(response.ok && data.status ===true){
+      Swal.fire(
+        "Offer removed",
+        "The offer has been removed",
+        "success"
+    ).then(()=>{
+        location.reload()
+      })
+    }else{
+      Swal.fire("Failed",data.message||"Removing offer failed","error");
+    }
+     
+    } catch (error) {
+      Swal.fire(
+        "Error",
+        "An error occured while removing offer",
+        "error"
+    );
+    console.log("Error while removing ", error)
+    }
+}
 
   </script>
 
