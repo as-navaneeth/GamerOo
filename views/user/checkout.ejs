@@ -738,7 +738,7 @@ async function handleRazorpayPayment() {
 }
 
 async function handleCodOrder(orderId) {
-    try {
+    try {    
         const response = await fetch('/payment/cod', {
             method: 'POST',
             headers: {
@@ -779,8 +779,20 @@ async function handleCodOrder(orderId) {
 
 function placeOrder() {
     const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+    const finalAmount=parseFloat(document.getElementById('finalAmount').textContent.replace('₹', '').trim());
+    
 
-    if(paymentMethod === 'cod') {
+    if(paymentMethod==='cod' && finalAmount>2000){
+        Swal.fire({
+            icons:'error',
+            title:'COD Not Avaliable',
+            text:'Cash on Delivery is not Avaliable for order above ₹2000.',
+            confirmButtonColor:'#D10024'
+        });
+        return;
+    }
+
+    if(paymentMethod === 'cod' ) {
         Swal.fire({
         title: 'Confirm Order',
         text: 'Are you sure you want to place this order?',
