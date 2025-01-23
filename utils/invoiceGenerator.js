@@ -20,7 +20,7 @@ async function generateInvoice(order) {
             doc.pipe(writeStream);
 
             // Add logo
-            doc.image(path.join(__dirname, '../public/img/logo.png'), 50, 45, { width: 100 })
+            doc.image(path.join(__dirname, '../public/img/GamerOo_project_fdfd-removebg-preview.png'), 50, 45, { width: 100 })
                .fontSize(20)
                .text('INVOICE', 275, 50)
                .moveDown();
@@ -28,13 +28,13 @@ async function generateInvoice(order) {
             // Add company info
             doc.fontSize(10)
                .text('GamerOo', 50, 100)
-               .text('123 Gaming Street', 50, 115)
-               .text('Bangalore, Karnataka 560001', 50, 130)
+               .text('Kochi', 50, 115)
+               .text('Kerala', 50, 130)
                .text('India', 50, 145)
                .moveDown();
 
             // Add customer info
-            doc.text(`Invoice Number: #${order._id.toString().slice(-8).toUpperCase()}`, 50)
+            doc.text(`Invoice Number: #${order.orderId}`, 50)
                .text(`Date: ${new Date(order.orderDate).toLocaleDateString()}`, 50)
                .text(`Customer: ${order.shippingAddress.name}`, 50)
                .text(`Address: ${order.shippingAddress.address}`, 50)
@@ -56,9 +56,9 @@ async function generateInvoice(order) {
             
             order.items.forEach(item => {
                 doc.text(item.product.name, 50, position)
-                   .text(item.quantity.toString(), 250, position)
-                   .text(`₹${item.price.toFixed(2)}`, 350, position)
-                   .text(`₹${(item.quantity * item.price).toFixed(2)}`, 450, position);
+                   .text(item.quantity.toString(), 270, position)
+                   .text(`RS:${item.price.toFixed(2)}`, 350, position)
+                   .text(`RS:${(item.quantity * item.price).toFixed(2)}`, 450, position);
                 position += 25;
             });
 
@@ -70,21 +70,21 @@ async function generateInvoice(order) {
             doc.font('Helvetica-Bold');
             if (order.discount > 0) {
                 doc.text('Subtotal:', 350, position)
-                   .text(`₹${(order.totalAmount + order.discount).toFixed(2)}`, 450, position);
+                   .text(`RS:${(order.totalAmount + order.discount).toFixed(2)}`, 450, position);
                 position += 25;
                 doc.text('Discount:', 350, position)
-                   .text(`-₹${order.discount.toFixed(2)}`, 450, position);
+                   .text(`-RS:${order.discount.toFixed(2)}`, 450, position);
                 position += 25;
             }
             
             if (order.shippingCost > 0) {
                 doc.text('Shipping:', 350, position)
-                   .text(`₹${order.shippingCost.toFixed(2)}`, 450, position);
+                   .text(`RS:${order.shippingCost.toFixed(2)}`, 450, position);
                 position += 25;
             }
 
             doc.text('Total:', 350, position)
-               .text(`₹${order.totalAmount.toFixed(2)}`, 450, position);
+               .text(`RS:${order.totalAmount.toFixed(2)}`, 450, position);
 
             // Add footer
             doc.fontSize(10)

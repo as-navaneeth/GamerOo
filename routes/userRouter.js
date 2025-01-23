@@ -60,6 +60,7 @@ router.post('/userProfile/change-password',userAuth,userController.postChangePas
 router.get('/orders', userAuth, orderController.getMyOrders);
 router.get('/orders/:orderId', userAuth, orderController.getOrderDetails);
 router.post('/orders/:orderId/cancel', userAuth, orderController.cancelOrder);
+router.get('/order/invoice/:orderId',userAuth,orderController.downloadInvoice);
 
 // Return order routes
 router.post('/orders/:orderId/return', userAuth, orderController.requestReturn);

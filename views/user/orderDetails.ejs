@@ -96,6 +96,21 @@
     font-size: 14px; 
     cursor: pointer; 
     }
+    
+    .primary-btn1 {
+    display: inline-block;
+    padding: 4px 5px;
+    background-color: #D10024;
+    border: none;
+    border-radius: 40px;
+    color: #FFF;
+    text-transform: uppercase;
+    font-weight: 700;
+    text-align: center;
+    -webkit-transition: 0.2s all;
+    transition: 0.2s all;
+    margin-left: 14px;
+}
 
 </style>
 
@@ -251,7 +266,16 @@
                         <% } %>
                     </div>
                 </div>
-                
+
+
+                <!--Add the button for downloading invoice-->
+                <% if(order.status==='Delivered' || order.paymentStatus==='Success'){%>
+                <div class="mt=3 pt-3 border-top">
+                    <button class="primary-btn1"  onclick="downloadInvoice('<%=order._id%>')">
+                        Download Invoice
+                    </button>
+                </div>
+                <%}%>
                 
                 <div class="order-details-card">
                     <div class="order-header">
@@ -414,6 +438,14 @@ function submitReturn() {
         alert('Error submitting return request');
     });
 }
+
+
+function downloadInvoice(orderId){
+  window.location.href=`/order/invoice/${orderId}`
+}
+
+
+
 </script>
 
 <%- include("../../views/partials/user/footer") %>

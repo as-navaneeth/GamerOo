@@ -3,6 +3,7 @@ const Cart = require('../../models/cartSchema');
 const User = require('../../models/userSchema');
 const Wallet=require('../../models/walletSchema');
 const { OrderedBulkOperation } = require('mongodb');
+const {generateInvoice}=require('../../utils/invoiceGenerator');
 
 // Get all orders for a user
 const getMyOrders = async (req, res) => {
@@ -131,6 +132,34 @@ const cancelOrder = async (req, res) => {
         });
     }
 };
+
+
+
+
+const downloadInvoice=async(req,res)=>{
+    try {
+        const orderId=req.params.orderId;        
+        const order=await Order.findById(orderId).populate('items.product');
+
+        if(!order){
+            return res.status(404).send("order not found");            
+        }
+
+        const invoicePath=await generateInvoice(order);
+
+        res.setHeader('Content-Type','application/pdf');
+        res.setHeader('Content-Disposition',`attachment;filename=invoice-${order.orderId}.pdf`);
+        res.sendFile(invoicePath);
+
+
+    } catch (error) {   
+        console.error('Error generating invoice:',error);
+        res.status(500).send('Error generating invoice');
+    }
+}
+
+
+
 
 // Request return for an order
 const requestReturn = async (req, res) => {
@@ -325,6 +354,7 @@ module.exports = {
     getMyOrders,
     getOrderDetails,
     cancelOrder,
+    downloadInvoice,
     requestReturn,
     getReturnStatus,
     createOrder,
