@@ -39,7 +39,7 @@ const getCheckout = async (req, res) => {
         const address = addresses.find(addr => addr.isDefault) || addresses[0];
 
         //get avaliable coupons
-        const availableCoupons=await Coupon.find({isActive:true});
+        const availableCoupons=await Coupon.find({isActive:true,endDate:{$gte:new Date()}});
 
         if (!cart || cart.items.length === 0) {
             return res.redirect('/cart');
