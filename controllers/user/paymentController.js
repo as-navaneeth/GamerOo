@@ -108,6 +108,7 @@ const verifyPayment = async (req, res) => {
     try {
         
         const { razorpay_payment_id, razorpay_order_id, razorpay_signature, receipt } = req.body;
+        console.log(req.body);
 
         // Verify signature
         const sign = razorpay_order_id + "|" + razorpay_payment_id;
@@ -232,9 +233,15 @@ const getOrderStatus = async (req, res) => {
     }
 };
 
+
+
+
+
+
 module.exports = {
     createRazorpayOrder,
     verifyPayment,
     handleCodOrder,
-    getOrderStatus
+    getOrderStatus,
+    
 };

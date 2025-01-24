@@ -57,11 +57,19 @@ async function handlePayment(orderId, amount, paymentMethod) {
                         if (verifyResult.success) {
                             window.location.href = `/orders/${orderId}`;
                         } else {
+                            await updateOrderStatus(orderId, 'Failed');
                             alert('Payment verification failed');
                         }
                     } catch (error) {
                         console.error('Payment verification error:', error);
+                        await updateOrderStatus(orderId, 'Failed');
                         alert('Payment verification failed');
+                    }
+                },
+                modal: {
+                    ondismiss: async function () {
+                        await updateOrderStatus(orderId, 'Failed');
+                        alert('Payment cancelled');
                     }
                 },
                 prefill: {
@@ -75,10 +83,34 @@ async function handlePayment(orderId, amount, paymentMethod) {
             };
 
             const rzp = new Razorpay(options);
+            rzp.on('payment.success', async function (response) {
+                await updateOrderStatus(orderId, 'Failed');
+                alert('Payment Failed:'+response.error.description) 
+            });
             rzp.open();
         }
     } catch (error) {
         console.error('Payment error:', error);
+        await updateOrderStatus(orderId, 'Failed');
         alert('Error processing payment');
+    }
+}
+
+
+//function to update order status
+async function updateOrderStatus(orderId, status) {
+    try {
+        const response = await fetch('/admin/orders/update-status', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ orderId, status })
+        });
+        if(!response.ok){
+            console.error('Failed to update order status')
+        }
+    }catch (error) {
+        console.error('Error updating order status:', error);
     }
 }

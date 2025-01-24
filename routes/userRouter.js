@@ -108,6 +108,7 @@ router.get('/wallet', userAuth, walletController.getWallet);
 router.post('/payment/create-order', userAuth, paymentController.createRazorpayOrder);
 router.post('/payment/verify', userAuth, paymentController.verifyPayment);
 router.post('/payment/cod', userAuth, paymentController.handleCodOrder);
+// router.post('/payment/update-status', userAuth, paymentController.updateOrderStatus);
 
 // Coupon routes
 router.post('/coupons/apply', userAuth, couponController.applyCoupon);
