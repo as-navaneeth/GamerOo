@@ -195,28 +195,8 @@ processCheckout = async (req, res) => {
                 message: "Order placed successfully",
                 orderId: newOrder._id
             });
-        } else {
-            // For online payment
-            try {
-                const razorpayOrder = await razorpay.orders.create({
-                    amount: Math.round(finalAmount * 100),
-                    currency: 'INR',
-                    receipt: newOrder._id.toString()
-                });
-
-                res.json({
-                    success: true,
-                    order: razorpayOrder,
-                    key: process.env.RAZORPAY_KEY_ID,
-                    orderId: newOrder._id
-                });
-            } catch (error) {
-                console.error('Razorpay order creation error:', error);
-                // Delete the order if Razorpay order creation fails
-                await Order.findByIdAndDelete(newOrder._id);
-                throw new Error('Error creating payment order');
-            }
-        }
+        } 
+        
     } catch (error) {
         console.error('Error processing checkout:', error);
         res.status(500).json({

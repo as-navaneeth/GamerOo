@@ -4,6 +4,7 @@ const Order = require('../../models/orderSchema');
 const Cart = require('../../models/cartSchema');
 const User = require('../../models/userSchema');
 const Address = require('../../models/addressSchema');
+const Wallet=require('../../models/walletSchema');
 
 require('dotenv').config();
 
@@ -161,6 +162,8 @@ const verifyPayment = async (req, res) => {
                 message: "Invalid signature"
             });
         }
+
+
     } catch (error) {
         console.error('Payment verification error:', error);
         res.status(500).json({
@@ -170,40 +173,165 @@ const verifyPayment = async (req, res) => {
     }
 };
 
-// Handle COD orders
-const handleCodOrder = async (req, res) => {
+
+
+const handleWalletPayment=async (req,res)=>{
     try {
-        const { orderId } = req.body;
-        
-        // Find the order
-        const order = await Order.findById(orderId);
-        if (!order) {
-            return res.status(404).json({
+        const {finalAmount}=req.body;
+        const userId=req.session.user;
+
+
+        // Ensure amount is a valid number
+        if (isNaN(finalAmount) || finalAmount <= 0) {
+            return res.status(400).json({
                 success: false,
-                message: "Order not found"
+                message: 'Invalid amount'
+            });
+        }
+        
+        //find the user's wallet
+        const wallet=await Wallet.findOne({user:userId});
+
+        if(!wallet || wallet.balance< finalAmount){
+            return res.status(400).json({
+                success:false,
+                message:'Insufficient wallet balance'
             });
         }
 
-        // Update order status for COD
-        order.paymentStatus = 'Pending';
-        order.status = 'Confirmed';
-        await order.save();
+        
 
-        // Clear cart after successful order placement
-        await Cart.findOneAndDelete({ user: req.session.user });
+        //create order in database
+        const cart=await Cart.findOne({user:userId}).populate('items.product');
+        const address=await Address.findOne({user:userId, isDefault:true});
+
+        if(!cart || !address){
+            return res.status(400).json({
+                success:'false',
+                message:'Cart or address not found'
+            });
+        }
+
+
+        
+        // Format shipping address
+        const shippingAddress = {
+            name: address.name,
+            address: address.address,
+            city: address.city,
+            state: address.state,
+            pincode: address.pincode,
+            phone: address.phone
+        };
+
+        // Create order items
+        const orderItems = cart.items.map(item => ({
+            product: item.product._id,
+            quantity: item.quantity,
+            price: item.price
+        }));
+
+        // Get applied coupon from session
+        const appliedCoupon = req.session.appliedCoupon;
+        const originalAmount = cart.items.reduce((total, item) => total + (item.price * item.quantity), 0);
+
+        // Create order in database
+        const newOrder = new Order({
+            user: userId,
+            items: orderItems,
+            totalAmount: finalAmount,
+            originalAmount: originalAmount,
+            discount: appliedCoupon ? appliedCoupon.discountAmount : 0,
+            shippingAddress: shippingAddress,
+            paymentMethod: 'Wallet',
+            paymentStatus: 'Success',
+            status: 'Confirmed',
+            orderDate: new Date()
+        });
+
+        if (appliedCoupon) {
+            newOrder.couponCode = appliedCoupon.code;
+            newOrder.couponDiscount = {
+                code: appliedCoupon.code,
+                discountType: appliedCoupon.discountType,
+                discountAmount: appliedCoupon.discountAmount
+            };
+        }
+
+        await newOrder.save();
+
+
+        //Dedut the amount from the wallet
+        wallet.balance-=finalAmount;
+        wallet.transactions.push({
+            type:'debit',
+            amount:finalAmount,
+            description:`Order payment for ${newOrder.orderId}`,
+            date:new Date()
+        })
+        await wallet.save();
+
+
+
+        // Clear cart after successful payment
+        await Cart.findOneAndDelete({ user: userId });
 
         res.json({
             success: true,
-            message: "Order placed successfully"
+            message: 'Payment successful',
+            orderId: newOrder._id
         });
+
+
+
     } catch (error) {
-        console.error('COD order error:', error);
+        console.error('Wallet payment error:', error);
         res.status(500).json({
             success: false,
-            message: "Error processing COD order"
+            message: 'Error processing wallet payment'
         });
     }
-};
+}
+
+
+
+
+
+
+// Handle COD orders
+// const handleCodOrder = async (req, res) => {
+//     try {
+//         const { orderId } = req.body;
+        
+//         // Find the order
+//         const order = await Order.findById(orderId);
+//         if (!order) {
+//             return res.status(404).json({
+//                 success: false,
+//                 message: "Order not found"
+//             });
+//         }
+
+//         // Update order status for COD
+//         order.paymentStatus = 'Pending';
+//         order.status = 'Confirmed';
+//         await order.save();
+
+//         // Clear cart after successful order placement
+//         await Cart.findOneAndDelete({ user: req.session.user });
+
+//         res.json({
+//             success: true,
+//             message: "Order placed successfully"
+//         });
+//     } catch (error) {
+//         console.error('COD order error:', error);
+//         res.status(500).json({
+//             success: false,
+//             message: "Error processing COD order"
+//         });
+//     }
+// };
 
 // Get order status
 const getOrderStatus = async (req, res) => {
@@ -234,7 +362,7 @@ const getOrderStatus = async (req, res) => {
 
 module.exports = {
     createRazorpayOrder,
-    verifyPayment,
-    handleCodOrder,
-    getOrderStatus
+    verifyPayment,    
+    getOrderStatus,
+    handleWalletPayment,
 };
