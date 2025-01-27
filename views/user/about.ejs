@@ -1,0 +1,223 @@
+<%- include('../partials/user/header') %>
+
+<div class="about-container">
+    <!-- Hero Section -->
+    <div class="hero-section">
+        <h1>Welcome to GamerOo</h1>
+        <p>Your Ultimate Gaming Destination</p>
+    </div>
+
+    <!-- Our Story Section -->
+    <section class="about-section">
+        <h2>Our Story</h2>
+        <div class="content">
+            <p>Founded in 2025, GamerOo was born from a passion for gaming and a vision to create the ultimate gaming marketplace. We understand that gaming is more than just a hobby - it's a lifestyle, a community, and a source of endless entertainment.</p>
+            <p>Our mission is to provide gamers with high-quality gaming products, exceptional customer service, and a seamless shopping experience.</p>
+        </div>
+    </section>
+
+    <!-- Why Choose Us Section -->
+    <section class="features-section">
+        <h2>Why Choose GamerOo?</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <i class="fas fa-shipping-fast"></i>
+                <h3>Free & Fast Shipping</h3>
+                <p>Quick and reliable delivery to your doorstep</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-certificate"></i>
+                <h3>Authentic Products</h3>
+                <p>100% genuine gaming products</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-headset"></i>
+                <h3>24/7 Support</h3>
+                <p>Always here to help you</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-tags"></i>
+                <h3>Best Prices</h3>
+                <p>Competitive prices and regular deals</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Our Values Section -->
+    <section class="values-section">
+        <h2>Our Values</h2>
+        <div class="values-grid">
+            <div class="value-item">
+                <h3>Quality</h3>
+                <p>We never compromise on the quality of our products</p>
+            </div>
+            <div class="value-item">
+                <h3>Community</h3>
+                <p>Building and supporting the gaming community</p>
+            </div>
+            <div class="value-item">
+                <h3>Innovation</h3>
+                <p>Constantly evolving to serve you better</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact-section">
+        <h2>Get in Touch</h2>
+        <div class="contact-info">
+            <div class="contact-item">
+                <i class="fas fa-envelope"></i>
+                <p>support@gameroo.com</p>
+            </div>
+            <div class="contact-item">
+                <i class="fas fa-phone"></i>
+                <p>1234567890</p>
+            </div>
+            <div class="contact-item">
+                <i class="fas fa-map-marker-alt"></i>
+                <p>KOCHI, KERALA</p>
+            </div>
+        </div>
+    </section>
+</div>
+
+<style>
+.about-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.hero-section {
+    text-align: center;
+    padding: 80px 20px;
+    background: linear-gradient(rgba(255 0 0/70%), rgba(0, 0, 0, 0.7)), url('/images/about-hero.jpg');
+    background-size: cover;
+    background-position: center;
+    color: white;
+    border-radius: 10px;
+    margin-bottom: 40px;
+}
+
+.hero-section h1 {
+    font-size: 3em;
+    margin-bottom: 20px;
+}
+
+.hero-section p {
+    font-size: 1.5em;
+}
+
+.about-section {
+    padding: 40px 0;
+    text-align: center;
+}
+
+.about-section .content {
+    max-width: 800px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+.features-section {
+    padding: 40px 0;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+    padding: 20px;
+}
+
+.feature-card {
+    text-align: center;
+    padding: 30px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+}
+
+.feature-card i {
+    font-size: 2.5em;
+    color: #D10024;
+    margin-bottom: 20px;
+}
+
+.values-section {
+    padding: 40px 0;
+}
+
+.values-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    padding: 20px;
+}
+
+.value-item {
+    text-align: center;
+    padding: 20px;
+}
+
+.contact-section {
+    padding: 40px 0;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    margin-top: 40px;
+}
+
+.contact-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+    padding: 20px;
+}
+
+.contact-item {
+    text-align: center;
+    padding: 20px;
+}
+
+.contact-item i {
+    font-size: 2em;
+    color: #D10024;
+    margin-bottom: 15px;
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #333;
+}
+
+@media (max-width: 768px) {
+    .hero-section {
+        padding: 60px 20px;
+    }
+
+    .hero-section h1 {
+        font-size: 2.5em;
+    }
+
+    .hero-section p {
+        font-size: 1.2em;
+    }
+
+    .features-grid,
+    .values-grid,
+    .contact-info {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+<%- include('../partials/user/footer') %>

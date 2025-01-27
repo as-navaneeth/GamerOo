@@ -115,5 +115,7 @@ router.post('/coupons/apply', userAuth, couponController.applyCoupon);
 router.post('/coupons/remove', userAuth, couponController.removeCoupon);
 router.get('/coupons/applied', userAuth, couponController.getAppliedCoupon);
 
+// About page
+router.get('/about', userController.getAboutPage);
 
 module.exports=router;

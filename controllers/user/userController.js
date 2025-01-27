@@ -783,6 +783,19 @@ const getReturnStatus = async (req, res) => {
 
 
 
+// Get about page
+const getAboutPage = async (req, res) => {
+    try {
+        res.render('about', {
+            title: 'About Us | GamerOo',
+            user: req.session.user || null
+        });
+    } catch (error) {
+        console.error('Error loading about page:', error);
+        res.status(500).render('error', { error: 'Failed to load about page' });
+    }
+};
+
 module.exports = {
     loadHomePage,   //28
     pageNotFound,
@@ -804,5 +817,5 @@ module.exports = {
     postChangePassword, //490
     requestReturn,
     getReturnStatus,
-
+    getAboutPage,
 }
