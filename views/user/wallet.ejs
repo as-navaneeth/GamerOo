@@ -1,5 +1,8 @@
 <%- include("../../views/partials/user/header") %>
 
+<!-- Custom stlylesheet -->
+<link type="text/css" rel="stylesheet" href="/css/style.css" />
+
 <div id="breadcrumb" class="section">
     <div class="container">
         <div class="row">
@@ -24,6 +27,11 @@
                         <h4 class="card-title">Wallet Balance</h4>
                         <h2 class="text-primary mb-4">₹<%= wallet.balance.toFixed(2) %></h2>
                         <p class="text-muted">This balance can be used for future purchases</p>
+                        <div class="d-flex justify-content-center gap-2">
+                            <button class="btn btn-primary" onclick="addMoneyToWallet(500)">Add ₹500</button>
+                            <button class="btn btn-primary" onclick="addMoneyToWallet(1000)">Add ₹1000</button>
+                            <button class="btn btn-primary" onclick="addMoneyToWallet(2000)">Add ₹2000</button>
+                        </div>
                     </div>
                 </div>
 
@@ -85,5 +93,132 @@
     color: white;
 }
 </style>
+
+<script>
+    async function addMoneyToWallet(amount) {
+        try {
+            // Show loading
+            Swal.fire({
+                title: 'Processing...',
+                text: 'Please wait while we set up your payment',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            // Create order
+            const response = await fetch('/wallet/create-order', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ amount })
+            });
+
+            const data = await response.json();
+            
+            // Close loading dialog
+            Swal.close();
+
+            if (!data.success) {
+                throw new Error(data.message || 'Failed to create order');
+            }
+
+            const options = {
+                key: data.key,
+                amount: data.order.amount,
+                currency: "INR",
+                name: "GamerOo",
+                description: "Add money to wallet",
+                order_id: data.order.id,
+                handler: async function (response) {
+                    try {
+                        // Show processing message
+                        Swal.fire({
+                            title: 'Verifying Payment...',
+                            text: 'Please wait while we verify your payment',
+                            allowOutsideClick: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+
+                        const verifyResponse = await fetch('/wallet/verify-payment', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                razorpay_payment_id: response.razorpay_payment_id,
+                                razorpay_order_id: response.razorpay_order_id,
+                                razorpay_signature: response.razorpay_signature,
+                                amount: amount
+                            })
+                        });
+
+                        const verifyData = await verifyResponse.json();
+                        
+                        if (verifyData.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Success!',
+                                text: 'Money has been added to your wallet',
+                                confirmButtonColor: '#D10024'
+                            }).then(() => {
+                                window.location.reload();
+                            });
+                        } else {
+                            throw new Error(verifyData.message || 'Payment verification failed');
+                        }
+                    } catch (error) {
+                        console.error('Payment verification error:', error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Payment Failed',
+                            text: error.message || 'Error verifying payment',
+                            confirmButtonColor: '#D10024'
+                        });
+                    }
+                },
+                prefill: {
+                    name: "<%= user?.name || '' %>",
+                    email: "<%= user?.email || '' %>"
+                },
+                theme: {
+                    color: "#D10024"
+                },
+                modal: {
+                    ondismiss: function() {
+                        Swal.fire({
+                            icon: 'info',
+                            title: 'Payment Cancelled',
+                            text: 'You cancelled the payment process',
+                            confirmButtonColor: '#D10024'
+                        });
+                    }
+                }
+            };
+
+            const rzp = new Razorpay(options);
+            rzp.open();
+
+        } catch (error) {
+            console.error('Error adding money to wallet:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: error.message || 'Error adding money to wallet',
+                confirmButtonColor: '#D10024'
+            });
+        }
+    }
+</script>
+
+    <!-- Razorpay Script -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <%- include("../../views/partials/user/footer") %>

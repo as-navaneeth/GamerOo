@@ -103,6 +103,9 @@ router.delete('/wishlist/remove/:productId', userAuth, wishlistController.remove
 
 // Wallet routes
 router.get('/wallet', userAuth, walletController.getWallet);
+router.post('/wallet/create-order', userAuth, walletController.createRazorpayOrderForWallet);
+router.post('/wallet/verify-payment', userAuth, walletController.verifyRazorpayPaymentForWallet);
+
 
 // Payment routes
 router.post('/payment/create-order', userAuth, paymentController.createRazorpayOrder);
