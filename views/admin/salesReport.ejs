@@ -149,13 +149,13 @@
         </div>
         <div>
             <% if (currentPage > 1) { %>
-                <a href="?page=<%= currentPage - 1 %>&limit=<%= limit %>&startDate=<%= startDate %>&endDate=<%= endDate %>">Previous</a>
+                <a href="?page=<%= currentPage - 1 %>&limit=<%= typeof limit !== 'undefined' ? limit : 10 %>&startDate=<%= startDate %>&endDate=<%= endDate %>">Previous</a>
             <% } %>
         
             <span>Page <%= currentPage %> of <%= totalPages %></span>
         
             <% if (currentPage < totalPages) { %>
-                <a href="?page=<%= currentPage + 1 %>&limit=<%= limit %>&startDate=<%= startDate %>&endDate=<%= endDate %>">Next</a>
+                <a href="?page=<%= currentPage + 1 %>&limit=<%= typeof limit !== 'undefined' ? limit : 10 %>&startDate=<%= startDate %>&endDate=<%= endDate %>">Next</a>
             <% } %>
         </div>
         

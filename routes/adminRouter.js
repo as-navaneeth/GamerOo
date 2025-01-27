@@ -10,6 +10,7 @@ const productController = require("../controllers/admin/productController");
 const orderController=require("../controllers/admin/orderController");
 const couponController = require('../controllers/admin/couponController');
 const salesReportController = require('../controllers/admin/salesReportController');
+const dashboardController=require('../controllers/admin/dashboardController');
 const { userAuth, adminAuth } = require("../middlewares/auth");
 
 //login management
@@ -20,6 +21,10 @@ router.get("/pageerror", adminController.pageerror);
 router.get("/logout", adminController.logout);
 
 router.get("/dashboard", adminAuth, adminController.loadDashboard);
+router.get('/dashboard/sales', adminAuth, dashboardController.getSalesData);
+router.get('/dashboard/top-products', adminAuth, dashboardController.getTopProducts);
+router.get('/dashboard/top-categories', adminAuth, dashboardController.getTopCategories);
+router.get('/dashboard/top-brands', adminAuth, dashboardController.getTopBrands);
 
 //block and unblock user
 router.get('/customer', adminAuth, customerController.userList);
