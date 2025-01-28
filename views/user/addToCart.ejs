@@ -124,9 +124,9 @@
                             <strong>Total</strong>
                             <strong>₹<%= cart ? cart.totalAmount : 0 %></strong>
                         </div>
-                        <button class="btn btn-primary w-100" style="background-color: #D10024;" onclick="proceedToCheckout()" <%= !cart || cart.items.length === 0 ? 'disabled' : '' %>>
+                        <a href="/checkout" class="btn btn-primary w-100" style="background-color: #D10024;"  <%= !cart || cart.items.length === 0 ? 'disabled' : '' %>>
                             Proceed to Checkout
-                        </button>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -189,40 +189,25 @@ function deleteCartItem(itemId){
 
 
 
-function proceedToCheckout(){
-    //check user has a default addres
+// function proceedToCheckout(){
+//     //check user has a default addres
 
-    fetch('/checkout/validate')
-    .then(response=>response.json())
-    .then(data=>{
-        if(data.success){
-            window.location.href='/checkout';
-        }else{
-            Swal.fire({
-                title:'Address Required',
-                text: 'Please add a delivery address before checkout',
-                icon:'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#D10024',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Add Address',
-                cancelButtonText: 'Cancel'
-            }).then((result)=>{
-                if(result.isConfirmed){
-                    window.location.href='/manageAddress';
-                }
-            })
-        }
-    })
-    .catch(error=>{
-        console.error("Error:",error);
-        Swal.fire(
-            'Error!',
-            'Something went wrong',
-            'error'
-        )
-    })
-}
+//     fetch('/checkout')
+//     .then(response=>response.json())
+//     .then(data=>{
+//         if(data.success){
+//             window.location.href='/checkout';
+//         }
+//     })
+//     .catch(error=>{
+//         console.error("Error:",error);
+//         Swal.fire(
+//             'Error!',
+//             'Something went wrong',
+//             'error'
+//         )
+//     })
+// }
 
 
 </script>

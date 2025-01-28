@@ -45,9 +45,9 @@ const getCheckout = async (req, res) => {
             return res.redirect('/cart');
         }
 
-        if (!address) {
-            return res.redirect('/manageAddress');
-        }
+        // if (!address) {
+        //     return res.redirect('/manageAddress');
+        // }
 
         // Calculate total amount
         let totalAmount = 0;
