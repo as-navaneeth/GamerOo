@@ -185,10 +185,75 @@ const deleteCartItem = async (req, res) => {
     }
 }
 
+// Update cart item quantity
+const updateCartQuantity = async (req, res) => {
+    const { itemId } = req.params;
+    const { quantity } = req.body;
+    const userId = req.session.user;
+
+    try {
+        const cart = await Cart.findOne({ user: userId });
+        if (!cart) {
+            return res.status(404).json({ success: false, message: 'Cart not found' });
+        }
+
+        const cartItem = cart.items.find(item => item._id.toString() === itemId);
+        if (!cartItem) {
+            return res.status(404).json({ success: false, message: 'Item not found in cart' });
+        }
+
+        const product = await Product.findById(cartItem.product);
+        if (!product) {
+            return res.status(404).json({ success: false, message: 'Product not found' });
+        }
+
+        // Calculate the quantity difference
+        const quantityDiff = quantity - cartItem.quantity;
+
+        // Check if new quantity is within limits (1-3)
+        if (quantity < 1 || quantity > 3) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Quantity must be between 1 and 3' 
+            });
+        }
+
+        // Check if we have enough stock
+        if (quantityDiff > 0 && quantityDiff > product.stock) {
+            return res.status(400).json({
+                success: false,
+                message: `Cannot add more items. Only ${product.stock} available in stock`
+            });
+        }
+
+        // Update product stock
+        product.stock -= quantityDiff;
+        await product.save();
+
+        // Update cart item quantity
+        cartItem.quantity = quantity;
+        cart.totalAmount = cart.items.reduce((total, item) => total + item.price * item.quantity, 0);
+        await cart.save();
+
+        res.status(200).json({
+            success: true,
+            message: 'Quantity updated successfully',
+            newQuantity: quantity,
+            totalAmount: cart.totalAmount,
+            itemTotal: cartItem.price * quantity,
+            newStock: product.stock
+        });
+
+    } catch (error) {
+        console.error('Error updating quantity:', error);
+        res.status(500).json({ success: false, message: 'Error updating quantity' });
+    }
+};
 
 module.exports = {
     getAddtoCart,
     addToCart,
-    deleteCartItem
-   
+    deleteCartItem,
+    updateCartQuantity,
+    loadShopPage
 };

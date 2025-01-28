@@ -89,6 +89,7 @@ router.post('/update-selected-address', userAuth, addressController.updateSelect
 router.get('/cart', userAuth, cartController.getAddtoCart);
 router.post('/cart/add',userAuth,cartController.addToCart);
 router.delete('/cart/delete/:itemId',userAuth,cartController.deleteCartItem);
+router.patch('/cart/update-quantity/:itemId', userAuth, cartController.updateCartQuantity);
 
 //checkout controller
 router.get('/checkout/validate', userAuth, checkoutController.validateCheckout);
