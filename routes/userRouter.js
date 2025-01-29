@@ -112,6 +112,7 @@ router.post('/wallet/verify-payment', userAuth, walletController.verifyRazorpayP
 router.post('/payment/create-order', userAuth, paymentController.createRazorpayOrder);
 router.post('/payment/verify', userAuth, paymentController.verifyPayment);
 router.post('/payment/wallet',userAuth,paymentController.handleWalletPayment)
+router.post('/payment/retry/:orderId', userAuth, paymentController.retryPayment);
 // router.post('/payment/cod', userAuth, paymentController.handleCodOrder);
 
 // Coupon routes

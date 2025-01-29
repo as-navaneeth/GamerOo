@@ -2,6 +2,7 @@ const Cart = require('../../models/cartSchema');
 const Address = require('../../models/addressSchema');
 const Order = require('../../models/orderSchema');
 const Coupon = require('../../models/couponSchema');
+const Wallet=require('../../models/walletSchema');
 
 // Validate checkout
 const validateCheckout = async (req, res) => {
@@ -45,6 +46,8 @@ const getCheckout = async (req, res) => {
             return res.redirect('/cart');
         }
 
+        const wallet=await Wallet.findOne({user:userId});
+
         // if (!address) {
         //     return res.redirect('/manageAddress');
         // }
@@ -60,7 +63,8 @@ const getCheckout = async (req, res) => {
             address,
             addresses,  // Pass all addresses to the view
             totalAmount,
-            availableCoupons
+            availableCoupons,
+            walletBalance:wallet?wallet.balance:0
         });
     } catch (error) {
         console.error('Error in checkout:', error);
@@ -193,7 +197,7 @@ processCheckout = async (req, res) => {
             res.json({
                 success: true,
                 message: "Order placed successfully",
-                orderId: newOrder._id
+                orderId: newOrder._id,                
             });
         } 
         

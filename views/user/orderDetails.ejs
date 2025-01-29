@@ -153,6 +153,11 @@
                                 <span class="order-status status-<%= order.status.toLowerCase() %>">
                                     <%= order.status %>
                                 </span>
+                                <% if (order.paymentMethod === 'Online Payment' && order.paymentStatus === 'Pending') { %>
+                                    <button class="btn btn-warning btn-sm ml-2" onclick="retryPayment('<%= order._id %>')">
+                                        Retry Payment
+                                    </button>
+                                <% } %>
                             </div>
                         </div>
                     </div>
@@ -404,6 +409,7 @@
     </div>
 </div>
 
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
 function openReturnModal() {
     $('#returnModal').modal('show');
@@ -444,8 +450,100 @@ function downloadInvoice(orderId){
   window.location.href=`/order/invoice/${orderId}`
 }
 
+function retryPayment(orderId) {
+    fetch(`/payment/retry/${orderId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const options = {
+                key: data.key,
+                amount: data.order.amount,
+                currency: data.order.currency,
+                name: "GamerOo",
+                description: "Payment for Order",
+                order_id: data.order.id,
+                handler: function (response) {
+                    verifyPayment(response, data.orderId);
+                },
+                prefill: {
+                    name: "<%= order.shippingAddress.name %>",
+                    contact: "<%= order.shippingAddress.phone %>"
+                },
+                theme: {
+                    color: "#D10024"
+                }
+            };
 
+            const rzp = new Razorpay(options);
+            rzp.open();
 
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: data.message
+            });
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Something went wrong while initiating payment'
+        });
+    });
+}
+
+function verifyPayment(response, orderId) {
+    fetch('/payment/verify', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_order_id: response.razorpay_order_id,
+            razorpay_signature: response.razorpay_signature,
+            order_id: orderId // Using order_id for retry payments
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Payment Successful',
+                text: 'Your payment has been processed successfully!'
+            }).then(() => {
+                window.location.reload(); // Reload to show updated status
+            });
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Payment Failed',
+                text: data.message
+            }).then(() => {
+                window.location.reload(); // Reload even on failure to show updated status
+            });
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Something went wrong while verifying payment'
+        }).then(() => {
+            window.location.reload(); // Reload on error to ensure we show current status
+        });
+    });
+}
 </script>
 
 <%- include("../../views/partials/user/footer") %>

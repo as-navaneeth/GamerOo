@@ -22,8 +22,7 @@ const createRazorpayOrder = async (req, res) => {
         // Get cart and address
         const cart = await Cart.findOne({ user: userId }).populate('items.product');
         const address = await Address.findOne({
-            user: userId,
-            isDefault: true
+            user: userId,            
         });
 
         if (!cart || !address) {
@@ -107,8 +106,7 @@ const createRazorpayOrder = async (req, res) => {
 // Verify Razorpay payment
 const verifyPayment = async (req, res) => {
     try {
-        
-        const { razorpay_payment_id, razorpay_order_id, razorpay_signature, receipt } = req.body;
+        const { razorpay_payment_id, razorpay_order_id, razorpay_signature, receipt, order_id } = req.body;
 
         // Verify signature
         const sign = razorpay_order_id + "|" + razorpay_payment_id;
@@ -117,20 +115,18 @@ const verifyPayment = async (req, res) => {
             .update(sign.toString())
             .digest("hex");
 
-    
-
         if (razorpay_signature === expectedSign) {
-            // Find and update order
-            const order = await Order.findById(receipt);
+            // Find and update order using either receipt or order_id
+            const orderId = receipt || order_id;
+            const order = await Order.findById(orderId);
             
             if (!order) {
-                console.error('Order not found:', receipt);
+                console.error('Order not found:', orderId);
                 return res.status(404).json({
                     success: false,
                     message: "Order not found"
                 });
             }
-
 
             // Update order status
             order.paymentStatus = 'Success';
@@ -138,10 +134,11 @@ const verifyPayment = async (req, res) => {
             order.paymentId = razorpay_payment_id;
             order.razorpayOrderId = razorpay_order_id;
             await order.save();
-           
 
-            // Clear cart after successful payment
-            await Cart.findOneAndDelete({ user: req.session.user });
+            // Clear cart after successful payment (only if it's a new order)
+            if (receipt) { // Only clear cart for new orders, not retry payments
+                await Cart.findOneAndDelete({ user: req.session.user });
+            }
 
             res.json({
                 success: true,
@@ -150,7 +147,8 @@ const verifyPayment = async (req, res) => {
         } else {
             console.error('Signature verification failed');
             // If signature verification fails
-            const order = await Order.findById(receipt);
+            const orderId = receipt || order_id;
+            const order = await Order.findById(orderId);
             if (order) {
                 order.paymentStatus = 'Failed';
                 order.status = 'Failed';
@@ -162,7 +160,6 @@ const verifyPayment = async (req, res) => {
                 message: "Invalid signature"
             });
         }
-
 
     } catch (error) {
         console.error('Payment verification error:', error);
@@ -360,9 +357,53 @@ const getOrderStatus = async (req, res) => {
     }
 };
 
+// Retry payment for pending orders
+const retryPayment = async (req, res) => {
+    try {
+        const { orderId } = req.params;
+        const order = await Order.findById(orderId);
+
+        if (!order) {
+            return res.status(404).json({
+                success: false,
+                message: "Order not found"
+            });
+        }
+
+        if (order.paymentStatus !== 'Pending' || order.paymentMethod !== 'Online Payment') {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid order status for retry payment"
+            });
+        }
+
+        // Create new Razorpay order
+        const razorpayOrder = await razorpay.orders.create({
+            amount: Math.round(order.totalAmount * 100),
+            currency: 'INR',
+            receipt: order._id.toString()
+        });
+
+        res.json({
+            success: true,
+            order: razorpayOrder,
+            key: process.env.RAZORPAY_KEY_ID,
+            orderId: order._id
+        });
+
+    } catch (error) {
+        console.error('Error retrying payment:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error retrying payment'
+        });
+    }
+};
+
 module.exports = {
     createRazorpayOrder,
     verifyPayment,    
     getOrderStatus,
     handleWalletPayment,
+    retryPayment
 };
