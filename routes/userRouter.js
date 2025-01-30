@@ -27,13 +27,29 @@ router.post("/verifyOtp",userController.verifyOtp);
 router.post("/resendOtp",userController.resendOtp);
 //google authentification routes
 router.get("/auth/google",passport.authenticate('google',{scope:['profile','email']}));
-router.get("/auth/google/callback",passport.authenticate('google',{failureRedirect:'/signup'}),(req,res)=>{
-    res.redirect('/')
-});
+router.get("/auth/google/callback",passport.authenticate('google',{
+    failureRedirect: '/signup',
+  }), (req, res) => {
+  
+    if (req.user && req.user._id) {
+      const userId = req.user._id; 
+      req.session.user = userId;
+      res.redirect('/');
+    } else {
+   
+      res.redirect('/signup');
+    }
+  });
 //User login and logout
 router.get("/login",userController.loadLogin);
 router.post("/login",userController.login);
 router.get("/logout",userController.logout);
+
+// Forgot Password routes
+router.get('/forgot-password', userController.loadForgotPassword);
+router.post('/forgot-password', userController.forgotPassword);
+router.get('/reset-password/:token', userController.loadResetPassword);
+router.post('/reset-password', userController.resetPassword);
 
 //shop page
 router.get('/shop',userController.loadShoppingPage);

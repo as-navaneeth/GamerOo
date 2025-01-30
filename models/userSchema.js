@@ -66,16 +66,17 @@ const userSchema= new Schema({
             ref:"Category",
         },
         brand:{
-            types:String
+            type:String
         },
         searchOn:{
             type:Date,
             default:Date.now
         }
 
-    }]
+    }],
+    resetPasswordToken: String,
+    resetPasswordExpires: Date
 })
-
 
 const User=mongoose.model("User",userSchema);
 

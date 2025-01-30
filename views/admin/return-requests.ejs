@@ -24,7 +24,7 @@
                     <tbody>
                         <% returnRequests.forEach(order => { %>
                             <tr>
-                                <td><%= order._id %></td>
+                                <td><%= order.orderId %></td>
                                 <td><%= order.user.name %></td>
                                 <td><%= new Date(order.returnDate).toLocaleDateString() %></td>
                                 <td><%= order.returnReason %></td>

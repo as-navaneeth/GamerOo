@@ -4,6 +4,7 @@ const env = require("dotenv").config();
 const bcrypt = require("bcrypt");
 const { generateInvoice } = require('../../utils/invoiceGenerator');
 const ejs = require('ejs');
+const crypto = require('crypto');
 
 const Category = require('../../models/categorySchema');
 const Product = require('../../models/productSchema');
@@ -28,8 +29,7 @@ const pageNotFound = async (req, res) => {
 
 const loadHomePage = async (req, res) => {
     try {
-        const userId = req.session.user;
-        
+        const userId = req.session.user;        
 
         const productData = await Product.find({ isListed: true })
             .populate('category')
@@ -312,7 +312,7 @@ const login = async (req, res) => {
             return res.status(400).json({ message: "Password do not match" })
 
         }
-        req.session.user = findUser._id;
+        req.session.user = findUser._id;        
         res.redirect("/")
 
     } catch (error) {
@@ -786,36 +786,177 @@ const getReturnStatus = async (req, res) => {
 // Get about page
 const getAboutPage = async (req, res) => {
     try {
-        res.render('about', {
-            title: 'About Us | GamerOo',
-            user: req.session.user || null
-        });
+        res.render('about');
     } catch (error) {
         console.error('Error loading about page:', error);
-        res.status(500).render('error', { error: 'Failed to load about page' });
+        res.status(500).send('Internal Server Error');
+    }
+};
+
+// Load forgot password page
+const loadForgotPassword = async (req, res) => {
+    try {
+        res.render('forgotPassword', { message: '' });
+    } catch (error) {
+        console.error('Error loading forgot password page:', error);
+        res.status(500).send('Internal Server Error');
+    }
+};
+
+// Handle forgot password request
+const forgotPassword = async (req, res) => {
+    try {
+        const { email } = req.body;
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "No account found with this email"
+            });
+        }
+
+        // Generate reset token
+        const resetToken = crypto.randomBytes(32).toString('hex');
+        const resetTokenExpiry = Date.now() + 3600000; // Token valid for 1 hour
+
+        // Save reset token to user
+        user.resetPasswordToken = resetToken;
+        user.resetPasswordExpires = resetTokenExpiry;
+        await user.save();
+
+        // Create reset password URL
+        const resetUrl = `${req.protocol}://${req.get('host')}/reset-password/${resetToken}`;
+
+        // Send email with reset link
+        const mailOptions = {
+            from: process.env.EMAIL_USER,
+            to: user.email,
+            subject: 'Password Reset Request',
+            html: `
+                <h1>Password Reset Request</h1>
+                <p>You requested a password reset for your GamerOo account.</p>
+                <p>Click the link below to reset your password:</p>
+                <a href="${resetUrl}">${resetUrl}</a>
+                <p>This link will expire in 1 hour.</p>
+                <p>If you didn't request this, please ignore this email.</p>
+            `
+        };
+
+        const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            port: 587,
+            secure: false,
+            requireTLS: true,
+            auth: {
+                user: process.env.NODEMAILER_EMAIL,
+                pass: process.env.NODEMAILER_PASSWORD
+            }
+        })
+
+        await transporter.sendMail(mailOptions);
+
+        res.json({
+            success: true,
+            message: "Password reset link sent to your email"
+        });
+
+    } catch (error) {
+        console.error('Error in forgot password:', error);
+        res.status(500).json({
+            success: false,
+            message: "Error sending reset email"
+        });
+    }
+};
+
+// Load reset password page
+const loadResetPassword = async (req, res) => {
+    try {
+        const { token } = req.params;
+        const user = await User.findOne({
+            resetPasswordToken: token,
+            resetPasswordExpires: { $gt: Date.now() }
+        });
+
+        if (!user) {
+            return res.render('resetPassword', {
+                message: 'Password reset token is invalid or has expired',
+                token: token
+            });
+        }
+
+        res.render('resetPassword', { message: '', token: token });
+
+    } catch (error) {
+        console.error('Error loading reset password page:', error);
+        res.status(500).send('Internal Server Error');
+    }
+};
+
+// Handle reset password
+const resetPassword = async (req, res) => {
+    try {
+        const { token, password } = req.body;
+        
+        const user = await User.findOne({
+            resetPasswordToken: token,
+            resetPasswordExpires: { $gt: Date.now() }
+        });
+
+        if (!user) {
+            return res.status(400).json({
+                success: false,
+                message: "Password reset token is invalid or has expired"
+            });
+        }
+
+        // Hash new password
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+
+        // Update user password and clear reset token
+        user.password = hashedPassword;
+        user.resetPasswordToken = undefined;
+        user.resetPasswordExpires = undefined;
+        await user.save();
+
+        res.json({
+            success: true,
+            message: "Password has been reset successfully"
+        });
+
+    } catch (error) {
+        console.error('Error resetting password:', error);
+        res.status(500).json({
+            success: false,
+            message: "Error resetting password"
+        });
     }
 };
 
 module.exports = {
-    loadHomePage,   //28
-    pageNotFound,
     loadSignup,
     signup,
+    loadVerifyOtp,
     verifyOtp,
     resendOtp,
     loadLogin,
     login,
-    logout,        //63
+    logout,
     loadShoppingPage,
-    loadVerifyOtp,
     getUserProfile,
     updateProfile,
+    getChangePassword,
+    postChangePassword,
     getOrders,
     getOrderDetails,
     downloadInvoice,
-    getChangePassword, //469
-    postChangePassword, //490
-    requestReturn,
-    getReturnStatus,
-    getAboutPage,
-}
+    pageNotFound,
+    loadHomePage,
+    loadForgotPassword,
+    forgotPassword,
+    loadResetPassword,
+    resetPassword,
+    getAboutPage
+};
