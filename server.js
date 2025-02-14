@@ -46,6 +46,11 @@ app.use("/admin",adminRouter);
 app.use(errorHandler);
 
 
+//for page 404
+app.use((req,res)=>{
+    res.status(404).render('page-404',{message:"Page Not Found"});
+})
+
 
 
 
