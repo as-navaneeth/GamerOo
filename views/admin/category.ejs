@@ -115,6 +115,11 @@
     .form-check-input:checked::before {
       transform: translateX(20px);
     }
+
+    .error {
+    color: red;
+    font-size: 14px;
+  }
   </style>
 
 
@@ -143,13 +148,14 @@
             <div class="modal-body">
               <div class="mb-3">
                 <label for="categoryName" class="form-label">Category Name</label>
-                <input type="text" class="form-control" id="categoryName" name="name" placeholder="Enter category name"
-                  required>
+                <input type="text" class="form-control" id="categoryName" name="name" placeholder="Enter category name">
+                <span id="nameError" class="error"></span>
               </div>
               <div class="mb-3">
                 <label for="categoryDescription" class="form-label">Category Description</label>
                 <textarea class="form-control" id="categoryDescription" name="description" rows="3"
-                  placeholder="Enter category description" required></textarea>
+                  placeholder="Enter category description" ></textarea>
+                  <span id="descriptionError" class="error"></span>
               </div>
             </div>
             <div class="modal-footer">
@@ -177,12 +183,13 @@
               <input type="hidden" id="editCategoryId" name="id" />
               <div class="mb-3">
                 <label for="editCategoryName" class="form-label">Category Name</label>
-                <input type="text" class="form-control" id="editCategoryName" name="name" required />
+                <input type="text" class="form-control" id="editCategoryName" name="name" />
+                <span id="editnameError" class="error"></span>
               </div>
               <div class="mb-3">
                 <label for="editCategoryDescription" class="form-label">Category Description</label>
-                <textarea class="form-control" id="editCategoryDescription" name="description" rows="3"
-                  required></textarea>
+                <textarea class="form-control" id="editCategoryDescription" name="description" rows="3"></textarea>
+                <span id="editdescriptionError" class="error"></span>
               </div>
             </div>
             <div class="modal-footer">
@@ -303,6 +310,27 @@
       const name = document.getElementById("categoryName").value;
       const description = document.getElementById("categoryDescription").value;
 
+ //clear previous error message
+ document.getElementById("nameError").textContent="";
+  document.getElementById("descriptionError").textContent="";
+
+  isValid=true;
+
+  //validate category name
+  if(!name || name.length<3){
+    document.getElementById("nameError").textContent="Please fill category name";
+    isValid=false
+  }
+
+  //validate category description
+  if(!description || description.length<3){
+    document.getElementById("descriptionError").textContent="Please fill category description";
+    isValid=false
+  }
+
+  if(!isValid) return;
+
+
       try {
         const response = await fetch("/admin/category/add", {
           method: "POST",
@@ -370,6 +398,25 @@
         const id = document.getElementById("editCategoryId").value;
         const name = document.getElementById("editCategoryName").value;
         const description = document.getElementById("editCategoryDescription").value;
+
+        //clear previous error message
+        document.getElementById("editnameError").textContent="";
+        document.getElementById("editdescriptionError").textContent="";
+
+         let isValid=true;
+
+        //validate edit Category name
+        if(!name || name.length<3){
+          document.getElementById("editnameError").textContent="Please fill category name";
+          isValid=false
+        }
+
+        if(!description || description.length<3){
+          document.getElementById("editdescriptionError").textContent="Please fill category description";
+          isValid=false
+        }
+
+        if(!isValid) return;
 
         try {
           const response = await fetch(`/admin/category/edit/${id}`, {

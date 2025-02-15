@@ -49,6 +49,15 @@ const editCategory=async(req,res)=>{
         const {id}=req.params;
         const {name,description}=req.body;
 
+        //check if category exists with same name
+        const duplicateCategory=await Category.findOne({name,_id:{$ne:id}});
+        if(duplicateCategory){
+            return res.status(400).json({success:false,message:"Category name already"})
+        }
+       
+
+
+
         const updatedCategory=await Category.findByIdAndUpdate(
             id,
             {name,description},
