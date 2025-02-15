@@ -108,7 +108,7 @@ const getOrderDetails = async (req, res) => {
             return res.status(404).render('error', { message: 'Order not found' });
         }
 
-        res.render('orderDetails', { order });
+        res.render('orderDetailsadmin', { order });
     } catch (error) {
         console.error('Error fetching order details:', error);
         res.status(500).render('error', { message: 'Error fetching order details' });
