@@ -55,9 +55,6 @@ const editCategory=async(req,res)=>{
             return res.status(400).json({success:false,message:"Category name already"})
         }
        
-
-
-
         const updatedCategory=await Category.findByIdAndUpdate(
             id,
             {name,description},
