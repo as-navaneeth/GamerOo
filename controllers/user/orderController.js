@@ -45,8 +45,15 @@ const getMyOrders = async (req, res) => {
 // Get single order details
 const getOrderDetails = async (req, res) => {
     try {
-        const orderId = req.params.orderId;
+        const orderId = req.params.order_id;
         const userId = req.session.user;
+        
+        // Validate orderId format
+        if (! orderId || ! orderId.match(/^[0-9a-fA-F]{24}$/)) {
+            return res.status(400).render('error', {
+                message: 'Invalid order ID'
+            });
+        }
 
         const order = await Order.findOne({
             _id: orderId,

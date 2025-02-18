@@ -204,7 +204,7 @@ const handleWalletPayment=async (req,res)=>{
 
         //create order in database
         const cart=await Cart.findOne({user:userId}).populate('items.product');
-        const address=await Address.findOne({user:userId, isDefault:true});
+        const address=await Address.findOne({user:userId});
 
         if(!cart || !address){
             return res.status(400).json({
