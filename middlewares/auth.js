@@ -18,7 +18,10 @@ const userAuth = async(req,res,next)=>{
     // }else{
     //     res.redirect("/login")
     // }
-
+//newly added
+    res.set('Cache-Control', 'no-cache, no-store, must-revalidate, private, max-age=0');
+    res.set('Pragma', 'no-cache');
+    res.set('Expires', '0');
 
 
     try {

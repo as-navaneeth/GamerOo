@@ -22,10 +22,19 @@ app.use(session({
     cookie:{
         secure:false,
         httpOnly:true,
-        maxAge:72*60*60*1000
+        maxAge:72*60*60*1000,
+        sameSite:'strict' //newly added
     }
 }))
 
+//added newly
+app.use((req,res,next)=>{
+    res.set('Cache-Control', 'no-cache, no-store, must-revalidate, private, max-age=0');
+    res.set('Pragma', 'no-cache');
+    res.set('Expires', '0');
+    next();
+})
+//till here
 
 app.use(passport.initialize());
 app.use(passport.session());

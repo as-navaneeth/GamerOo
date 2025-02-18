@@ -88,6 +88,17 @@ const logout = async (req, res) => {
                 console.log("Session destruction error", err.message);
                 return res.redirect("/pageNotFound");
             }
+
+            //added newly
+            //clear session
+            res.clearCookie('connect.sid');
+             // Set cache control headers to prevent caching
+             res.set('Cache-Control', 'no-cache, no-store, must-revalidate, private, max-age=0');
+             res.set('Pragma', 'no-cache');
+             res.set('Expires', '0');
+
+
+             //till h
             return res.redirect("/login")
         })
 
