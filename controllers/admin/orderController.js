@@ -1,5 +1,6 @@
 const Order = require('../../models/orderSchema');
 const Product = require('../../models/productSchema');
+const walletController=require('../../controllers/user/walletController');
 
 // List all orders with pagination and filters
 const listOrders = async (req, res) => {
@@ -146,6 +147,17 @@ const handleReturnRequest = async (req, res) => {
                     await product.save();
                 }
             }
+
+            //refudn logic: add money to user's wallet
+            const refundAmount=order.totalAmount;
+            await walletController.addToWallet(
+                order.user,
+                refundAmount,
+                `Refund for order ${order.orderId} -${'Product Returnd'}`,
+                order._id,
+            );
+           
+
         } else if (action === 'reject') {
             order.returnStatus = 'Return Rejected';
             order.returnReason = reason;

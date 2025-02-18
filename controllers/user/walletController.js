@@ -46,7 +46,7 @@ const addToWallet = async (userId, amount, description, orderId = null) => {
             type: 'credit',
             amount: amount,
             description: description,
-            orderId: order.orderId
+            orderId:order? order.orderId :null
         });
 
         // Update balance
