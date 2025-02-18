@@ -135,6 +135,9 @@ const verifyPayment = async (req, res) => {
             order.razorpayOrderId = razorpay_order_id;
             await order.save();
 
+            //remove coupon from session after order 
+            delete req.session.appliedCoupon;
+
             // Clear cart after successful payment
             await Cart.findOneAndDelete({user:req.session.user});
 
@@ -152,6 +155,9 @@ const verifyPayment = async (req, res) => {
                 order.status = 'Failed';
                 await order.save();
             }
+
+            //remove copon even if payment fails
+            delete req.session.appliedCoupon;
 
             res.status(400).json({
                 success: false,
