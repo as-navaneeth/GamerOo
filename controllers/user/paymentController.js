@@ -135,10 +135,8 @@ const verifyPayment = async (req, res) => {
             order.razorpayOrderId = razorpay_order_id;
             await order.save();
 
-            // Clear cart after successful payment (only if it's a new order)
-            if (receipt) { // Only clear cart for new orders, not retry payments
-                await Cart.findOneAndDelete({ user: req.session.user });
-            }
+            // Clear cart after successful payment
+            await Cart.findOneAndDelete({user:req.session.user});
 
             res.json({
                 success: true,
