@@ -28,12 +28,33 @@ const userAuth = async(req,res,next)=>{
 
         const user= await User.findById(req.session.user);
 
-        if(user && !user.isBlocked){
-            res.locals.user=user;
-            return next();
+        //new line of codes
+
+        if(user){
+            if(user.isBlocked){
+                //destroy session and logout the user
+                req.session.destroy((err)=>{
+                    if(err){
+                        console.error("Session destruction error:",err);
+                    }
+                    return res.redirect("/login")
+                });
+            }else{
+                res.locals.user=user;
+                return next();
+            }
         }else{
-            return res.redirect("/login")
+            return res.redirect("/login");
         }
+
+        //new line ends here
+
+        // if(user && !user.isBlocked){
+        //     res.locals.user=user;
+        //     return next();
+        // }else{
+        //     return res.redirect("/login")
+        // }
 
 
     } catch (error) {
